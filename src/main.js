@@ -10,18 +10,8 @@ import { Application, Assets, Sprite } from "pixi.js";
   // Append the application canvas to the document body
   document.getElementById("pixi-container").appendChild(app.canvas);
 
-  //const texture = await Assets.load("/assets/bunny.png");
-  //const bunny = new Sprite(texture);
-
-  //bunny.position.set(app.screen.width / 2, app.screen.height / 2);
-
-  //app.stage.addChild(bunny);
-
-  // Listen for animate update
-  app.ticker.add((time) => {
-    // Just for fun, let's rotate mr rabbit a little.
-    // * Delta is 1 if running at 100% performance *
-    // * Creates frame-independent transformation *
-    //bunny.rotation += 0.1 * time.deltaTime;
-  });
+  const texture = await Assets.load("/assets/card1.png");
+  const testcard = new Sprite(texture);
+  testcard.position.set(app.screen.width / 2, app.screen.height / 2);
+  app.stage.addChild(testcard);
 })();
