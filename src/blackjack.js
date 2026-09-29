@@ -1,17 +1,30 @@
 import { Card } from "./card.js"
 
-export class Player {
-    constructor(name) {
+export class Player { // Also the dealer
+    constructor(name, table) {
         this.name = name;
+        this.table = table;
+
+        this.deck = [];
+        this.balance = 200;
+        this.bet = 50;
     }
 
-    // After house
+    Hit() {
+        let card = this.table.TakeCard();
+        this.deck.push(card);
+    }
+    GetDeckSum() {
+        let sum = 0
+        for (const card of this.deck) {
+            sum += card.gameValue;
+        }
+        return sum;
+    }
 }
 
 export class Table {
-    constructor() {
-        this.deck = [];
-    }
+    deck = [];
 
     GenerateDeck() {
         this.deck = [];
