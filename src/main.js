@@ -22,7 +22,7 @@ import { Table, Player } from "./blackjack";
         src: "/assets/Jacquard12-Regular.ttf",
         family: "PrimaryFont"
     })
-    const playerSumText = new Text({
+    const playerSumText = new Text({ 
         text: "TEST",
         style: {
             fill: "#FFFFFF",
@@ -48,6 +48,13 @@ import { Table, Player } from "./blackjack";
 
     let player = new Player("Player", table);
     let dealer = new Player("Dealer", table);
+
+    let f = 3;
+    container.addChild(table.deck[f].sprite);
+    table.deck[f].sprite.x = 400;
+    table.deck[f].sprite.scale = 4;
+    playerSumText.text = table.deck[f].value;
+    console.log(table.deck[f].value)
 
     app.ticker.add((ticker) => {
 

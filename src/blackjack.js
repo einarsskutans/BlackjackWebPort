@@ -28,9 +28,9 @@ export class Table {
 
     GenerateDeck() {
         this.deck = [];
-        for (let value = 1; value < 14; value++) {
-            for (let symbol = 1; symbol < 5; symbol++) {
-                const card = new Card(value, value, symbol);
+        for (let symbol = 1; symbol < 5; symbol++) {
+            for (let value = 1; value < 14; value++) {
+                let card = new Card(value, value, symbol);
                 if (value > 10) card.gameValue = 10; // Faces are 10
                 if (value == 1) card.gameValue = 11; // Ace is 11
                 card.symbol = symbol;

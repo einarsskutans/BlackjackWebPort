@@ -3,6 +3,6 @@ export class Card {
         this.value = value;
         this.gameValue = gameValue;
         this.symbol = symbol;
-        this.sprite = null;
     }
+    sprite;
 }
