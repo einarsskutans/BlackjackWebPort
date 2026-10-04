@@ -1,5 +1,6 @@
 import { Application, Assets, Sprite, Container, Text } from "pixi.js";
 import { Table, Player } from "./blackjack";
+import { Card } from "./card"
 
 (async () => {
      // Create a new application
@@ -25,7 +26,7 @@ import { Table, Player } from "./blackjack";
     await Assets.load({
         src: "/assets/Jacquard12-Regular.ttf",
         family: "PrimaryFont"
-    })
+    });
     const playerSumText = new Text({ 
         text: "TEST",
         style: {
@@ -33,7 +34,7 @@ import { Table, Player } from "./blackjack";
             fontSize: 36,
             fontFamily: "PrimaryFont"
         }
-    })
+    });
     const dealerSumText = new Text({ 
         text: "TEST",
         style: {
@@ -41,7 +42,7 @@ import { Table, Player } from "./blackjack";
             fontSize: 36,
             fontFamily: "PrimaryFont"
         }
-    })
+    });
     container.addChild(playerSumText);
     container.addChild(dealerSumText);
     playerSumText.x = -app.screen.width / 2 + 32;
@@ -60,17 +61,14 @@ import { Table, Player } from "./blackjack";
         const sprite = new Sprite(texture);
         table.spriteDeck[i].sprite = sprite;
         table.spriteDeck[i].sprite.eventMode = "static";
-        table.spriteDeck[i].sprite.on("pointerover", () => {
-            table.spriteDeck[i].sprite.scale.set(5);
-            table.spriteDeck[i].sprite.x -= 16;
-            table.spriteDeck[i].sprite.y -= 32;
-        })
-        table.spriteDeck[i].sprite.on("pointerout", () => {
-            table.spriteDeck[i].sprite.scale.set(4);
-            table.spriteDeck[i].sprite.x += 16;
-            table.spriteDeck[i].sprite.y += 32;
-        })
     }
+    const cardBackTexture = await Assets.load("/assets/card53.png");
+    cardBackTexture.source.scaleMode = "nearest";
+    const cardBackSprite = new Sprite(cardBackTexture);
+    cardBackSprite.scale.set(4);
+
+    const backCard = new Card();
+    backCard.sprite = cardBackSprite;
 
     let player = new Player("Player", table);
     let dealer = new Player("Dealer", table);
@@ -85,15 +83,6 @@ import { Table, Player } from "./blackjack";
             gamestate = 6;
         }
     })
-
-    /*
-    let f = 3;
-    container.addChild(table.deck[f].sprite);
-    table.deck[f].sprite.x = 400;
-    table.deck[f].sprite.scale = 4;
-    playerSumText.text = table.deck[f].value;
-    console.log(table.deck[f].value)
-    */
 
     let elapsed = 0;
     let sleep = 0;
@@ -119,6 +108,10 @@ import { Table, Player } from "./blackjack";
                 for (const card of player.deck) {
                     container.removeChild(card.sprite);
                 }
+                for (const card of dealer.deck) {
+                    container.removeChild(card.sprite);
+                }
+                container.removeChild(backCard.sprite);
 
                 player.deck = [];
                 dealer.deck = [];
@@ -138,11 +131,25 @@ import { Table, Player } from "./blackjack";
 
                     container.addChild(card.sprite);
                     card.sprite.scale.set(4);
-                    card.sprite.x = leftSide + 32 + i*128;
+                    card.sprite.x = leftSide + 32 + i*104;
                     card.sprite.y = bottomSide - 128 - 64;
                     
                     console.log(card.value);
                 }
+                for (let i = 0; i < dealer.deck.length; i++) {
+                    const card = dealer.deck[i];
+
+                    container.addChild(card.sprite);
+
+                    card.sprite.scale.set(4);
+                    card.sprite.x = i*104;
+                    card.sprite.y = -128;
+                    
+                    console.log(card.value);
+                }
+                container.addChild(backCard.sprite);
+                backCard.sprite.x = 0;
+                backCard.sprite.y = -128;
 
                 if (player.GetDeckSum() > 21 || dealer.GetDeckSum() === 21) {
                     gamestate = 3;
@@ -169,7 +176,7 @@ import { Table, Player } from "./blackjack";
 
                     container.addChild(card.sprite);
                     card.sprite.scale.set(4);
-                    card.sprite.x = leftSide + 32 + i*128;
+                    card.sprite.x = leftSide + 32 + i*104;
                     card.sprite.y = bottomSide - 128 - 64;
                     
                     console.log(card.value);
@@ -204,12 +211,26 @@ import { Table, Player } from "./blackjack";
                     gamestate = 4;
                     break;
                 }
-                if (player.GetDeckSum() > dealer.GetDeckSum() && dealer.GetDeckSum() != 21) {
+                if (player.GetDeckSum() >= dealer.GetDeckSum() && dealer.GetDeckSum() != 21) {
                     dealer.Hit();
                     dealerSumText.text = dealer.GetDeckSum();
                     sleep = 1000;
                     waiting = true;
+
+                    for (let i = 0; i < dealer.deck.length; i++) {
+                        const card = dealer.deck[i];
+
+                        container.addChild(card.sprite);
+                        card.sprite.scale.set(4);
+                        card.sprite.x = i*104;
+                        card.sprite.y = -128;
+                        
+                        console.log(card.value);
+                    }
                 }
+                container.addChild(backCard.sprite);
+                backCard.sprite.x = 0;
+                backCard.sprite.y = -128;
 
                 break;
             case 3: // LOSE
