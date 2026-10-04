@@ -16,8 +16,10 @@ export class Player { // Also the dealer
     }
     GetDeckSum() {
         let sum = 0
-        for (const card of this.deck) {
-            sum += card.gameValue;
+        if (this.deck.length > 0) {
+            for (const card of this.deck) {
+                sum += card.gameValue;
+            }
         }
         return sum;
     }
@@ -25,18 +27,26 @@ export class Player { // Also the dealer
 
 export class Table {
     deck = [];
+    spriteDeck = [];
 
-    GenerateDeck() {
-        this.deck = [];
+    GenerateSpriteDeck() {
+        this.spriteDeck = [];
         for (let symbol = 1; symbol < 5; symbol++) {
             for (let value = 1; value < 14; value++) {
                 let card = new Card(value, value, symbol);
-                if (value > 10) card.gameValue = 10; // Faces are 10
                 if (value == 1) card.gameValue = 11; // Ace is 11
                 card.symbol = symbol;
-                this.deck.push(card);
+                this.spriteDeck.push(card);
             }
         }
+    }
+
+    GenerateDeck() {
+        this.deck = [];
+        for (const card of this.spriteDeck) {
+            this.deck.push(card);
+        }
+        
     }
     TakeCard() {
         const n = Math.floor(Math.random() * this.deck.length);
