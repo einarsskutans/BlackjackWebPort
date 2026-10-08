@@ -1,6 +1,5 @@
 import { Application, Assets, Sprite, Container, Text } from "pixi.js";
 import { Table, Player } from "./blackjack";
-import { Card } from "./card"
 
 (async () => {
      // Create a new application
@@ -48,7 +47,8 @@ import { Card } from "./card"
     container.addChild(dealerSumText);
 
     // Game logic
-    let gamestate = 1;
+
+    let gamestate = "START";
 
     const table = new Table();
     table.GenerateSpriteDeck();
@@ -70,12 +70,12 @@ import { Card } from "./card"
 
     document.addEventListener("keydown", (event) => {
         if (event.key ==  "x") {
-            gamestate = 2;
+            gamestate = "HIT";
         }
     })
     document.addEventListener("keydown", (event) => {
         if (event.key ==  "z") {
-            gamestate = 7;
+            gamestate = "PREHOLD";
         }
     })
 
@@ -125,7 +125,7 @@ import { Card } from "./card"
 
         // Main gameplay loop
         switch (gamestate) {
-            case 1: // START, take 2 cards
+            case "START":
                 for (const card of player.deck) {
                     container.removeChild(card.sprite);
                 }
@@ -151,43 +151,41 @@ import { Card } from "./card"
                 dealerSumText.text = dealer.deck[1].gameValue + "+";
 
                 if (player.GetDeckSum() > 21 || dealer.GetDeckSum() === 21) {
-                    gamestate = 3;
+                    gamestate = "LOSE";
                     break;
                 }
                 if (player.GetDeckSum() === 21 || dealer.GetDeckSum() > 21) {
-                    gamestate = 4;
+                    gamestate = "WIN";
                     break;
                 }
 
-                gamestate = 5;
+                gamestate = "LOOP";
 
                 break;
         
-            case 2: // HIT, take 1 card
+            case "HIT":
                 player.Hit();
-
-                //if (player.GetDeckSum() > 21) gamestate = 3;
 
                 drawCards(player);
                 playerSumText.text = player.GetDeckSum();
 
                 if (player.GetDeckSum() > 21 && dealer.GetDeckSum() > 21) {
-                    gamestate = 4; // Change this to a TIE
+                    gamestate = "TIE";
                     break;
                 }
                 if (player.GetDeckSum() > 21 || dealer.GetDeckSum() === 21) {
-                    gamestate = 3;
+                    gamestate = "LOSE";
                     break;
                 }
                 if (player.GetDeckSum() === 21 || dealer.GetDeckSum() > 21) {
-                    gamestate = 4;
+                    gamestate = "WIN";
                     break;
                 }
 
-                gamestate = 5;
+                gamestate = "LOOP";
 
                 break;
-            case 7:
+            case "PREHOLD": // Time to drop backcard
                 dealerSumText.text = dealer.GetDeckSum();
                 cardBackSprite.alpha -= ticker.deltaTime * 0.05;
                 cardBackSprite.y += ticker.deltaTime * 1;
@@ -195,21 +193,21 @@ import { Card } from "./card"
                     container.removeChild(cardBackSprite);
                     sleep = 1000;
                     waiting = true;
-                    gamestate = 6;
+                    gamestate = "HOLD";
                 }
 
                 break;
-            case 6: // HOLD
+            case "HOLD":
                 if (player.GetDeckSum() < dealer.GetDeckSum() && dealer.GetDeckSum() < 22) {
-                    gamestate = 3;
+                    gamestate = "LOSE";
                     break;
                 }
                 if (dealer.GetDeckSum() === 21 && player.GetDeckSum() === 21) {
-                    gamestate = 4; // Change this to a TIE
+                    gamestate = "TIE";
                     break;
                 }
                 if (dealer.GetDeckSum() > 21) {
-                    gamestate = 4;
+                    gamestate = "WIN";
                     break;
                 }
                 if (player.GetDeckSum() >= dealer.GetDeckSum() && dealer.GetDeckSum() != 21) {
@@ -222,22 +220,30 @@ import { Card } from "./card"
                 }
 
                 break;
-            case 3: // LOSE
+            case "LOSE":
                 playerSumText.text = "LOSE";
                 sleep = 2000;
                 waiting = true;
 
-                gamestate = 1;
+                gamestate = "START";
 
                 break;
-            case 4: // WIN
+            case "WIN":
                 playerSumText.text = "WIN";
                 sleep = 2000;
                 waiting = true;
 
-                gamestate = 1;
+                gamestate = "START";
 
                 break;
+            case "TIE":
+            playerSumText.text = "TIE";
+            sleep = 2000;
+            waiting = true;
+
+            gamestate = "START";
+
+            break;
 
             default:
                 break;
