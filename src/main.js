@@ -19,17 +19,21 @@ import { Card } from "./card"
     container.y = app.screen.height / 2;
     
     // Text
-    await Assets.load({
-        src: "/assets/Jacquard12-Regular.ttf",
-        family: "PrimaryFont"
-    });
+    const font = new FontFace(
+        "PrimaryFont",
+        "url('/assets/Silkscreen-Regular.ttf')"
+    );
+    await font.load();
+    document.fonts.add(font);
+
     const playerSumText = new Text({ 
         text: "TEST",
         style: {
             fill: "#FFFFFF",
             fontSize: 36,
             fontFamily: "PrimaryFont"
-        }
+        },
+        anchor: 0.5
     });
     const dealerSumText = new Text({ 
         text: "TEST",
@@ -37,14 +41,11 @@ import { Card } from "./card"
             fill: "#FFFFFF",
             fontSize: 36,
             fontFamily: "PrimaryFont"
-        }
+        },
+        anchor: 0.5
     });
     container.addChild(playerSumText);
     container.addChild(dealerSumText);
-    playerSumText.x = -app.screen.width / 2 + 32;
-    playerSumText.y = -app.screen.height / 2 + 32;
-    dealerSumText.x = -app.screen.width / 2 + 128;
-    dealerSumText.y = -app.screen.height / 2 + 32;
 
     // Game logic
     let gamestate = 1;
@@ -102,6 +103,12 @@ import { Card } from "./card"
         cardBackSprite.alpha = 1;
     }
 
+    playerSumText.x = 0; dealerSumText.x = 0;
+    playerSumText.y = app.screen.height/4 + spacing; dealerSumText.y = -app.screen.height/4 + spacing;
+    playerSumText.style.fontSize = Math.round(scale * 8);
+    dealerSumText.style.fontSize = Math.round(scale * 8);
+    
+
     app.ticker.add((ticker) => {
         
         // Sleep functionality
@@ -141,7 +148,7 @@ import { Card } from "./card"
                 drawCards(dealer);
                 drawDealerBackCard();
                 playerSumText.text = player.GetDeckSum();
-                dealerSumText.text = dealer.GetDeckSum();
+                dealerSumText.text = dealer.deck[1].gameValue + "+";
 
                 if (player.GetDeckSum() > 21 || dealer.GetDeckSum() === 21) {
                     gamestate = 3;
@@ -181,10 +188,13 @@ import { Card } from "./card"
 
                 break;
             case 7:
+                dealerSumText.text = dealer.GetDeckSum();
                 cardBackSprite.alpha -= ticker.deltaTime * 0.05;
                 cardBackSprite.y += ticker.deltaTime * 1;
                 if (cardBackSprite.alpha <= 0) {
                     container.removeChild(cardBackSprite);
+                    sleep = 1000;
+                    waiting = true;
                     gamestate = 6;
                 }
 
@@ -214,7 +224,7 @@ import { Card } from "./card"
                 break;
             case 3: // LOSE
                 playerSumText.text = "LOSE";
-                sleep = 1000;
+                sleep = 2000;
                 waiting = true;
 
                 gamestate = 1;
@@ -222,7 +232,7 @@ import { Card } from "./card"
                 break;
             case 4: // WIN
                 playerSumText.text = "WIN";
-                sleep = 1000;
+                sleep = 2000;
                 waiting = true;
 
                 gamestate = 1;
