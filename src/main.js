@@ -26,7 +26,7 @@ import { Table, Player } from "./blackjack";
     document.fonts.add(font);
 
     const playerSumText = new Text({ 
-        text: "TEST",
+        text: "LOADING",
         style: {
             fill: "#FFFFFF",
             fontSize: 36,
@@ -34,21 +34,39 @@ import { Table, Player } from "./blackjack";
         },
         anchor: 0.5
     });
-    const dealerSumText = new Text({ 
-        text: "TEST",
+    const dealerSumText = new Text({
         style: {
             fill: "#FFFFFF",
             fontSize: 36,
             fontFamily: "PrimaryFont"
         },
         anchor: 0.5
+    });
+    const playerBalanceText = new Text({
+        style: {
+            fill: "#ffffe0",
+            fontSize: 36,
+            fontFamily: "PrimaryFont"
+        },
+        anchory: 0.5
+    });
+    const playerBetText = new Text({
+        text: "LOADING",
+        style: {
+            fill: "#ff5733",
+            fontSize: 36,
+            fontFamily: "PrimaryFont"
+        },
+        anchory: 0.5
     });
     container.addChild(playerSumText);
     container.addChild(dealerSumText);
+    container.addChild(playerBalanceText);
+    container.addChild(playerBetText);
 
     // Game logic
 
-    let gamestate = "START";
+    let gamestate = "RESET";
 
     const table = new Table();
     table.GenerateSpriteDeck();
@@ -69,13 +87,34 @@ import { Table, Player } from "./blackjack";
     let dealer = new Player("Dealer", table);
 
     document.addEventListener("keydown", (event) => {
-        if (event.key ==  "x") {
+        if (event.key ==  "x" && gamestate === "LOOP") {
             gamestate = "HIT";
         }
     })
     document.addEventListener("keydown", (event) => {
-        if (event.key ==  "z") {
+        if (event.key ==  "z" && gamestate === "LOOP") {
             gamestate = "PREHOLD";
+        }
+    })
+    document.addEventListener("keydown", (event) => {
+        if (event.key ==  "e" && gamestate === "BET") {
+            gamestate = "START";
+        }
+    })
+    document.addEventListener("keydown", (event) => {
+        if (event.key ==  "w" && gamestate === "BET") {
+            if (player.bet < player.balance) {
+                player.bet += 50;
+                playerBetText.text = "BET $" + player.bet;
+            }
+        }
+    })
+    document.addEventListener("keydown", (event) => {
+        if (event.key ==  "s" && gamestate === "BET") {
+            if (player.bet > 50) {
+                player.bet -= 50;
+                playerBetText.text = "BET $" + player.bet;
+            }
         }
     })
 
@@ -107,7 +146,12 @@ import { Table, Player } from "./blackjack";
     playerSumText.y = app.screen.height/4 + spacing; dealerSumText.y = -app.screen.height/4 + spacing;
     playerSumText.style.fontSize = Math.round(scale * 8);
     dealerSumText.style.fontSize = Math.round(scale * 8);
-    
+    playerBalanceText.x = -app.screen.width/2 + 64;
+    playerBalanceText.y = -spacing/4;
+    playerBalanceText.style.fontSize = Math.round(scale * 8);
+    playerBetText.x = -app.screen.width/2 + 64;
+    playerBetText.y = spacing/4;
+    playerBetText.style.fontSize = Math.round(scale * 8);
 
     app.ticker.add((ticker) => {
         
@@ -125,7 +169,7 @@ import { Table, Player } from "./blackjack";
 
         // Main gameplay loop
         switch (gamestate) {
-            case "START":
+            case "RESET":
                 for (const card of player.deck) {
                     container.removeChild(card.sprite);
                 }
@@ -136,9 +180,19 @@ import { Table, Player } from "./blackjack";
 
                 player.deck = [];
                 dealer.deck = [];
-
                 table.GenerateDeck();
 
+                if (player.bet > player.balance) player.bet = player.balance;
+
+                playerSumText.text = "PLACE YOUR BETS";
+                dealerSumText.text = "";
+                playerBalanceText.text = "CASH $" + player.balance;
+                playerBetText.text = "BET $" + player.bet;
+
+                gamestate = "BET";
+
+                break;
+            case "START":
                 dealer.Hit();
                 dealer.Hit();
                 player.Hit();
@@ -222,28 +276,33 @@ import { Table, Player } from "./blackjack";
                 break;
             case "LOSE":
                 playerSumText.text = "LOSE";
+                player.balance -= player.bet;
+
                 sleep = 2000;
                 waiting = true;
 
-                gamestate = "START";
+                gamestate = "RESET";
 
                 break;
             case "WIN":
                 playerSumText.text = "WIN";
+                player.balance += player.bet;
+
                 sleep = 2000;
                 waiting = true;
 
-                gamestate = "START";
+                gamestate = "RESET";
 
                 break;
             case "TIE":
-            playerSumText.text = "TIE";
-            sleep = 2000;
-            waiting = true;
+                playerSumText.text = "TIE";
 
-            gamestate = "START";
+                sleep = 2000;
+                waiting = true;
 
-            break;
+                gamestate = "RESET";
+
+                break;
 
             default:
                 break;
