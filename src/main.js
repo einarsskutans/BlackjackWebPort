@@ -99,6 +99,7 @@ import { Card } from "./card"
         container.addChild(cardBackSprite);
         cardBackSprite.x = -(dealer.deck.length - 1) * spacing / 2;
         cardBackSprite.y = -app.screen.height / 4;
+        cardBackSprite.alpha = 1;
     }
 
     app.ticker.add((ticker) => {
@@ -116,8 +117,6 @@ import { Card } from "./card"
         }
 
         // Main gameplay loop
-        playerSumText.text = player.GetDeckSum();
-        dealerSumText.text = dealer.GetDeckSum();
         switch (gamestate) {
             case 1: // START, take 2 cards
                 for (const card of player.deck) {
@@ -141,6 +140,8 @@ import { Card } from "./card"
                 drawCards(player);
                 drawCards(dealer);
                 drawDealerBackCard();
+                playerSumText.text = player.GetDeckSum();
+                dealerSumText.text = dealer.GetDeckSum();
 
                 if (player.GetDeckSum() > 21 || dealer.GetDeckSum() === 21) {
                     gamestate = 3;
@@ -161,6 +162,7 @@ import { Card } from "./card"
                 //if (player.GetDeckSum() > 21) gamestate = 3;
 
                 drawCards(player);
+                playerSumText.text = player.GetDeckSum();
 
                 if (player.GetDeckSum() > 21 && dealer.GetDeckSum() > 21) {
                     gamestate = 4; // Change this to a TIE
@@ -206,6 +208,7 @@ import { Card } from "./card"
                     waiting = true;
 
                     drawCards(dealer);
+                    dealerSumText.text = dealer.GetDeckSum();
                 }
 
                 break;

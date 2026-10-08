@@ -34,7 +34,8 @@ export class Table {
         for (let symbol = 1; symbol < 5; symbol++) {
             for (let value = 1; value < 14; value++) {
                 let card = new Card(value, value, symbol);
-                if (value == 1) card.gameValue = 11; // Ace is 11
+                //if (value == 1) card.gameValue = 11; // Ace is 11
+                if (value >= 10) card.gameValue = 10;
                 card.symbol = symbol;
                 this.spriteDeck.push(card);
             }
