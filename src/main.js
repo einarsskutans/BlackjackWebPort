@@ -17,10 +17,6 @@ import { Card } from "./card"
     app.stage.addChild(container);
     container.x = app.screen.width / 2;
     container.y = app.screen.height / 2;
-
-    // Defining layouts
-    let leftSide = -app.screen.width / 2;
-    let bottomSide = app.screen.height / 2;
     
     // Text
     await Assets.load({
@@ -59,16 +55,14 @@ import { Card } from "./card"
         const texture = await Assets.load(`/assets/card${i+1}.png`);
         texture.source.scaleMode = "nearest";
         const sprite = new Sprite(texture);
+        sprite.anchor.set(0.5);
         table.spriteDeck[i].sprite = sprite;
         table.spriteDeck[i].sprite.eventMode = "static";
     }
     const cardBackTexture = await Assets.load("/assets/card53.png");
     cardBackTexture.source.scaleMode = "nearest";
     const cardBackSprite = new Sprite(cardBackTexture);
-    cardBackSprite.scale.set(4);
-
-    const backCard = new Card();
-    backCard.sprite = cardBackSprite;
+    cardBackSprite.anchor.set(0.5);
 
     let player = new Player("Player", table);
     let dealer = new Player("Dealer", table);
@@ -81,12 +75,32 @@ import { Card } from "./card"
     document.addEventListener("keydown", (event) => {
         if (event.key ==  "z") {
             gamestate = 6;
+            container.removeChild(cardBackSprite);
         }
     })
 
     let elapsed = 0;
     let sleep = 0;
     let waiting = false;
+
+    const scale = ((app.screen.width / 2560) * 0.7 + (app.screen.height / 1440) * 0.3)*8;
+    const spacing = scale*24;
+    function drawCards(target) {
+        for (let i = 0; i < target.deck.length; i++) {
+            const card = target.deck[i];
+            container.addChild(card.sprite);
+            card.sprite.x = -(target.deck.length - 1) * spacing / 2 + i * spacing;
+            card.sprite.y = target === player ? app.screen.height / 4 : -app.screen.height / 4;
+            card.sprite.scale.set(scale);
+            console.log(card.value);
+        }
+    }
+    function drawDealerBackCard() {
+        cardBackSprite.scale.set(scale);
+        container.addChild(cardBackSprite);
+        cardBackSprite.x = -(dealer.deck.length - 1) * spacing / 2;
+        cardBackSprite.y = -app.screen.height / 4;
+    }
 
     app.ticker.add((ticker) => {
         
@@ -111,7 +125,7 @@ import { Card } from "./card"
                 for (const card of dealer.deck) {
                     container.removeChild(card.sprite);
                 }
-                container.removeChild(backCard.sprite);
+                container.removeChild(cardBackSprite);
 
                 player.deck = [];
                 dealer.deck = [];
@@ -126,30 +140,9 @@ import { Card } from "./card"
                 playerSumText.text = player.GetDeckSum() + "\nDeck count: " + table.deck.length;
                 dealerSumText.text = dealer.GetDeckSum();
 
-                for (let i = 0; i < player.deck.length; i++) {
-                    const card = player.deck[i];
-
-                    container.addChild(card.sprite);
-                    card.sprite.scale.set(4);
-                    card.sprite.x = leftSide + 32 + i*104;
-                    card.sprite.y = bottomSide - 128 - 64;
-                    
-                    console.log(card.value);
-                }
-                for (let i = 0; i < dealer.deck.length; i++) {
-                    const card = dealer.deck[i];
-
-                    container.addChild(card.sprite);
-
-                    card.sprite.scale.set(4);
-                    card.sprite.x = i*104;
-                    card.sprite.y = -128;
-                    
-                    console.log(card.value);
-                }
-                container.addChild(backCard.sprite);
-                backCard.sprite.x = 0;
-                backCard.sprite.y = -128;
+                drawCards(player);
+                drawCards(dealer);
+                drawDealerBackCard();
 
                 if (player.GetDeckSum() > 21 || dealer.GetDeckSum() === 21) {
                     gamestate = 3;
@@ -171,16 +164,7 @@ import { Card } from "./card"
 
                 //if (player.GetDeckSum() > 21) gamestate = 3;
 
-                for (let i = 0; i < player.deck.length; i++) {
-                    const card = player.deck[i];
-
-                    container.addChild(card.sprite);
-                    card.sprite.scale.set(4);
-                    card.sprite.x = leftSide + 32 + i*104;
-                    card.sprite.y = bottomSide - 128 - 64;
-                    
-                    console.log(card.value);
-                }
+                drawCards(player);
 
                 if (player.GetDeckSum() > 21 && dealer.GetDeckSum() > 21) {
                     gamestate = 4; // Change this to a TIE
@@ -217,25 +201,13 @@ import { Card } from "./card"
                     sleep = 1000;
                     waiting = true;
 
-                    for (let i = 0; i < dealer.deck.length; i++) {
-                        const card = dealer.deck[i];
-
-                        container.addChild(card.sprite);
-                        card.sprite.scale.set(4);
-                        card.sprite.x = i*104;
-                        card.sprite.y = -128;
-                        
-                        console.log(card.value);
-                    }
+                    drawCards(dealer);
                 }
-                container.addChild(backCard.sprite);
-                backCard.sprite.x = 0;
-                backCard.sprite.y = -128;
 
                 break;
             case 3: // LOSE
                 playerSumText.text = "LOSE";
-                sleep = 3000;
+                sleep = 1000;
                 waiting = true;
 
                 gamestate = 1;
@@ -243,7 +215,7 @@ import { Card } from "./card"
                 break;
             case 4: // WIN
                 playerSumText.text = "WIN";
-                sleep = 3000;
+                sleep = 1000;
                 waiting = true;
 
                 gamestate = 1;
