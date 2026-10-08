@@ -74,8 +74,7 @@ import { Card } from "./card"
     })
     document.addEventListener("keydown", (event) => {
         if (event.key ==  "z") {
-            gamestate = 6;
-            container.removeChild(cardBackSprite);
+            gamestate = 7;
         }
     })
 
@@ -117,6 +116,8 @@ import { Card } from "./card"
         }
 
         // Main gameplay loop
+        playerSumText.text = player.GetDeckSum();
+        dealerSumText.text = dealer.GetDeckSum();
         switch (gamestate) {
             case 1: // START, take 2 cards
                 for (const card of player.deck) {
@@ -136,9 +137,6 @@ import { Card } from "./card"
                 dealer.Hit();
                 player.Hit();
                 player.Hit();
-
-                playerSumText.text = player.GetDeckSum() + "\nDeck count: " + table.deck.length;
-                dealerSumText.text = dealer.GetDeckSum();
 
                 drawCards(player);
                 drawCards(dealer);
@@ -160,8 +158,6 @@ import { Card } from "./card"
             case 2: // HIT, take 1 card
                 player.Hit();
 
-                playerSumText.text = player.GetDeckSum() + "\nDeck count: " + table.deck.length;
-
                 //if (player.GetDeckSum() > 21) gamestate = 3;
 
                 drawCards(player);
@@ -182,6 +178,15 @@ import { Card } from "./card"
                 gamestate = 5;
 
                 break;
+            case 7:
+                cardBackSprite.alpha -= ticker.deltaTime * 0.05;
+                cardBackSprite.y += ticker.deltaTime * 1;
+                if (cardBackSprite.alpha <= 0) {
+                    container.removeChild(cardBackSprite);
+                    gamestate = 6;
+                }
+
+                break;
             case 6: // HOLD
                 if (player.GetDeckSum() < dealer.GetDeckSum() && dealer.GetDeckSum() < 22) {
                     gamestate = 3;
@@ -197,7 +202,6 @@ import { Card } from "./card"
                 }
                 if (player.GetDeckSum() >= dealer.GetDeckSum() && dealer.GetDeckSum() != 21) {
                     dealer.Hit();
-                    dealerSumText.text = dealer.GetDeckSum();
                     sleep = 1000;
                     waiting = true;
 
