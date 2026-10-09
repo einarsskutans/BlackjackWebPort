@@ -48,7 +48,7 @@ import { Table, Player } from "./blackjack";
             fontSize: 36,
             fontFamily: "PrimaryFont"
         },
-        anchory: 0.5
+        anchor: {x: 0, y: 0.5}
     });
     const playerBetText = new Text({
         text: "LOADING",
@@ -57,15 +57,76 @@ import { Table, Player } from "./blackjack";
             fontSize: 36,
             fontFamily: "PrimaryFont"
         },
-        anchory: 0.5
+        anchor: {x: 0, y: 0.5}
+    });
+
+    const keyZText = new Text({
+        text: "Hold",
+        style: {
+            fill: "#FFFFFF",
+            fontSize: 36,
+            fontFamily: "PrimaryFont"
+        },
+        anchor: {x: 0, y: 0.6}
+    });
+    const keyXText = new Text({
+        text: "Hit",
+        style: {
+            fill: "#FFFFFF",
+            fontSize: 36,
+            fontFamily: "PrimaryFont"
+        },
+        anchor: {x: 0, y: 0.6}
+    });
+    const keyVText = new Text({
+        text: "Bet+",
+        style: {
+            fill: "#FFFFFF",
+            fontSize: 36,
+            fontFamily: "PrimaryFont"
+        },
+        anchor: {x: 0, y: 0.6}
+    });
+    const keyCText = new Text({
+        text: "Bet-",
+        style: {
+            fill: "#FFFFFF",
+            fontSize: 36,
+            fontFamily: "PrimaryFont"
+        },
+        anchor: {x: 0, y: 0.6}
     });
     container.addChild(playerSumText);
     container.addChild(dealerSumText);
     container.addChild(playerBalanceText);
     container.addChild(playerBetText);
+    container.addChild(keyZText);
+    container.addChild(keyXText);
+    container.addChild(keyVText);
+    container.addChild(keyCText);
+
+    const keyZTexture = await Assets.load("/assets/card54.png");
+    const keyXTexture = await Assets.load("/assets/card55.png");
+    const keyVTexture = await Assets.load("/assets/card57.png");
+    const keyCTexture = await Assets.load("/assets/card58.png");
+    keyZTexture.source.scaleMode = "nearest";
+    keyXTexture.source.scaleMode = "nearest";
+    keyVTexture.source.scaleMode = "nearest";
+    keyCTexture.source.scaleMode = "nearest";
+    const keyZSprite = new Sprite(keyZTexture);
+    const keyXSprite = new Sprite(keyXTexture);
+    const keyVSprite = new Sprite(keyVTexture);
+    const keyCSprite = new Sprite(keyCTexture);
+    keyZSprite.anchor.set(0.5);
+    keyXSprite.anchor.set(0.5);
+    keyVSprite.anchor.set(0.5);
+    keyCSprite.anchor.set(0.5);
+    container.addChild(keyZSprite);
+    container.addChild(keyXSprite);
+    container.addChild(keyVSprite);
+    container.addChild(keyCSprite);
 
     // Game logic
-
     let gamestate = "RESET";
 
     const table = new Table();
@@ -87,18 +148,14 @@ import { Table, Player } from "./blackjack";
     let dealer = new Player("Dealer", table);
 
     document.addEventListener("keydown", (event) => {
-        if (event.key ==  "x" && gamestate === "LOOP") {
-            gamestate = "HIT";
+        if (event.key ==  "x") {
+            if (gamestate === "LOOP") gamestate = "HIT";
+            else if (gamestate === "BET") gamestate = "START";
         }
     })
     document.addEventListener("keydown", (event) => {
         if (event.key ==  "z" && gamestate === "LOOP") {
             gamestate = "PREHOLD";
-        }
-    })
-    document.addEventListener("keydown", (event) => {
-        if (event.key ==  "e" && gamestate === "BET") {
-            gamestate = "START";
         }
     })
     document.addEventListener("keydown", (event) => {
@@ -115,6 +172,30 @@ import { Table, Player } from "./blackjack";
                 player.bet -= 50;
                 playerBetText.text = "BET $" + player.bet;
             }
+        }
+    })
+    document.addEventListener("keydown", (event) => {
+        if (event.key ==  " ") {
+            container.addChild(keyZSprite);
+            container.addChild(keyXSprite);
+            container.addChild(keyVSprite);
+            container.addChild(keyCSprite);
+            container.addChild(keyZText);
+            container.addChild(keyXText);
+            container.addChild(keyVText);
+            container.addChild(keyCText);
+        }
+    })
+    document.addEventListener("keyup", (event) => {
+        if (event.key ==  " ") {
+            container.removeChild(keyZSprite);
+            container.removeChild(keyXSprite);
+            container.removeChild(keyVSprite);
+            container.removeChild(keyCSprite);
+            container.removeChild(keyZText);
+            container.removeChild(keyXText);
+            container.removeChild(keyVText);
+            container.removeChild(keyCText);
         }
     })
 
@@ -152,6 +233,33 @@ import { Table, Player } from "./blackjack";
     playerBetText.x = -app.screen.width/2 + 64;
     playerBetText.y = spacing/4;
     playerBetText.style.fontSize = Math.round(scale * 8);
+
+    keyZSprite.scale.set(scale/4);
+    keyXSprite.scale.set(scale/4);
+    keyVSprite.scale.set(scale/4);
+    keyCSprite.scale.set(scale/4);
+    keyZSprite.y = app.screen.height/2 - spacing*2;
+    keyXSprite.y = app.screen.height/2 - spacing*1.5;
+    keyVSprite.y = app.screen.height/2 - spacing;
+    keyCSprite.y = app.screen.height/2 - spacing/2;
+    keyZSprite.x = app.screen.width/2 - spacing*2;
+    keyXSprite.x = app.screen.width/2 - spacing*2;
+    keyVSprite.x = app.screen.width/2 - spacing*2;
+    keyCSprite.x = app.screen.width/2 - spacing*2;
+    
+    keyZText.y = app.screen.height/2 - spacing*2;
+    keyXText.y = app.screen.height/2 - spacing*1.5;
+    keyVText.y = app.screen.height/2 - spacing;
+    keyCText.y = app.screen.height/2 - spacing/2;
+    keyZText.x = app.screen.width/2 - spacing*1.7;
+    keyXText.x = app.screen.width/2 - spacing*1.7;
+    keyVText.x = app.screen.width/2 - spacing*1.7;
+    keyCText.x = app.screen.width/2 - spacing*1.7;
+
+    keyZText.style.fontSize = Math.round(scale * 6);
+    keyXText.style.fontSize = Math.round(scale * 6);
+    keyVText.style.fontSize = Math.round(scale * 6);
+    keyCText.style.fontSize = Math.round(scale * 6);
 
     app.ticker.add((ticker) => {
         
