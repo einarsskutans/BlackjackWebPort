@@ -150,9 +150,6 @@ import { Table, Player } from "./blackjack";
     keyVSprite.anchor.set(0.5);
     keyCSprite.anchor.set(0.5);
     keySpaceSprite.anchor.set(0.5);
-    container.addChild(keySpaceSprite);
-    container.addChild(keySpaceText);
-
     
     const table = new Table();
     table.GenerateSpriteDeck();
@@ -168,6 +165,16 @@ import { Table, Player } from "./blackjack";
     cardBackTexture.source.scaleMode = "nearest";
     const cardBackSprite = new Sprite(cardBackTexture);
     cardBackSprite.anchor.set(0.5);
+    const cardEmptyTexture1 = await Assets.load("/assets/card59.png");
+    cardEmptyTexture1.source.scaleMode = "nearest";
+    const cardEmptySprite1 = new Sprite(cardEmptyTexture1);
+    cardEmptySprite1.anchor.set(0.5);
+    cardEmptySprite1.alpha = 0.9;
+    const cardEmptyTexture2 = await Assets.load("/assets/card59.png");
+    cardEmptyTexture2.source.scaleMode = "nearest";
+    const cardEmptySprite2 = new Sprite(cardEmptyTexture2);
+    cardEmptySprite2.anchor.set(0.5);
+    cardEmptySprite2.alpha = 0.7;
     
 
     // Game logic
@@ -253,6 +260,12 @@ import { Table, Player } from "./blackjack";
         cardBackSprite.y = -app.screen.height / 4;
         cardBackSprite.alpha = 1;
     }
+    cardEmptySprite1.scale.set(scale);
+    cardEmptySprite1.x = -spacing/2;
+    cardBackSprite.y = 0;
+    cardEmptySprite2.scale.set(scale);
+    cardEmptySprite2.x = spacing/2;
+    cardBackSprite.y = 0;
 
     playerSumText.x = 0; dealerSumText.x = 0;
     playerSumText.y = app.screen.height/4 + spacing; dealerSumText.y = -app.screen.height/4 + spacing;
@@ -282,6 +295,9 @@ import { Table, Player } from "./blackjack";
     keySpaceSprite.x = app.screen.width/2 - spacing*2;
     keySpaceSprite.y = app.screen.height/2 - spacing/2;
 
+    container.addChild(keySpaceSprite);
+    container.addChild(keySpaceText);
+
     app.ticker.add((ticker) => {
         
         // Sleep functionality
@@ -306,6 +322,8 @@ import { Table, Player } from "./blackjack";
                     container.removeChild(card.sprite);
                 }
                 container.removeChild(cardBackSprite);
+                container.addChild(cardEmptySprite1);
+                container.addChild(cardEmptySprite2);
 
                 player.deck = [];
                 dealer.deck = [];
@@ -322,6 +340,9 @@ import { Table, Player } from "./blackjack";
 
                 break;
             case "START":
+                container.removeChild(cardEmptySprite1);
+                container.removeChild(cardEmptySprite2);
+
                 dealer.Hit();
                 dealer.Hit();
                 player.Hit();
