@@ -50,7 +50,7 @@ import { Table, Player } from "./blackjack";
             fontSize: 36,
             fontFamily: "PrimaryFont"
         },
-        anchor: {x: 0, y: 0.5}
+        anchor: {x: 0, y: 0}
     });
     const playerBetText = new Text({
         text: "LOADING",
@@ -59,7 +59,7 @@ import { Table, Player } from "./blackjack";
             fontSize: 36,
             fontFamily: "PrimaryFont"
         },
-        anchor: {x: 0, y: 0.5}
+        anchor: {x: 0, y: 0}
     });
 
     const keyZText = new Text({
@@ -135,16 +135,22 @@ import { Table, Player } from "./blackjack";
     const keyVTexture = await Assets.load("/assets/keyboard_w.png");
     const keyCTexture = await Assets.load("/assets/keyboard_s.png");
     const keySpaceTexture = await Assets.load("/assets/keyboard_space.png");
+    const playerTexture = await Assets.load("/assets/player.png");
+    const dealerTexture = await Assets.load("/assets/dealer.png");
     keyZTexture.source.scaleMode = "nearest";
     keyXTexture.source.scaleMode = "nearest";
     keyVTexture.source.scaleMode = "nearest";
     keyCTexture.source.scaleMode = "nearest";
     keySpaceTexture.source.scaleMode = "nearest";
+    playerTexture.source.scaleMode = "nearest";
+    dealerTexture.source.scaleMode = "nearest";
     const keyZSprite = new Sprite(keyZTexture);
     const keyXSprite = new Sprite(keyXTexture);
     const keyVSprite = new Sprite(keyVTexture);
     const keyCSprite = new Sprite(keyCTexture);
     const keySpaceSprite = new Sprite(keySpaceTexture);
+    const playerSprite = new Sprite(playerTexture);
+    const dealerSprite = new Sprite(dealerTexture);
     keyZSprite.anchor.set(0.5);
     keyXSprite.anchor.set(0.5);
     keyVSprite.anchor.set(0.5);
@@ -274,12 +280,12 @@ import { Table, Player } from "./blackjack";
     dealerSumText.y = -app.screen.height/4 + spacing;
     playerSumText.style.fontSize = Math.round(scale * 8);
     dealerSumText.style.fontSize = Math.round(scale * 8);
-    playerBalanceText.x = -app.screen.width/2 + 64;
-    playerBalanceText.y = -spacing/4;
-    playerBalanceText.style.fontSize = Math.round(scale * 8); 
-    playerBetText.x = -app.screen.width/2 + 64;
-    playerBetText.y = spacing/4;
-    playerBetText.style.fontSize = Math.round(scale * 8);
+    playerBalanceText.x = -app.screen.width/2 + spacing*1.1;
+    playerBalanceText.y = app.screen.height/2 - spacing;
+    playerBalanceText.style.fontSize = Math.round(scale * 6); 
+    playerBetText.x = -app.screen.width/2 + spacing*1.1;
+    playerBetText.y = app.screen.height/2 - spacing/1.5;
+    playerBetText.style.fontSize = Math.round(scale * 6);
 
     keyZSprite.scale.set(scale/6);
     keyXSprite.scale.set(scale/6);
@@ -298,8 +304,18 @@ import { Table, Player } from "./blackjack";
     keySpaceSprite.x = app.screen.width/2 - spacing*1.6;
     keySpaceSprite.y = app.screen.height/4 + spacing;
 
+    playerSprite.scale.set(scale/1.6);
+    dealerSprite.scale.set(scale/1.6);
+    playerSprite.anchor.y = 1;
+    playerSprite.x = -app.screen.width/2 + spacing/6;
+    dealerSprite.x = -app.screen.width/2 + spacing/6;
+    dealerSprite.y = -app.screen.height/2 + spacing/6;
+    playerSprite.y = app.screen.height/2 - spacing/6;
+
     container.addChild(keySpaceSprite);
     container.addChild(keySpaceText);
+    container.addChild(playerSprite);
+    container.addChild(dealerSprite);
 
     app.ticker.add((ticker) => {
         
