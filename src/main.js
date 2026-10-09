@@ -70,8 +70,8 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.6},
-        x: app.screen.width/2 - spacing*1.7,
-        y: app.screen.height/2 - spacing*2
+        x: app.screen.width/2 - spacing*1.1,
+        y: app.screen.height/2 - spacing*2.5
     });
     const keyXText = new Text({
         text: "Hit",
@@ -81,8 +81,8 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.6},
-        x: app.screen.width/2 - spacing*1.7,
-        y: app.screen.height/2 - spacing*1.5
+        x: app.screen.width/2 - spacing*1.1,
+        y: app.screen.height/2 - spacing*2
     });
     const keyVText = new Text({
         text: "Bet+",
@@ -92,8 +92,8 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.6},
-        x: app.screen.width/2 - spacing*1.7,
-        y: app.screen.height/2 - spacing
+        x: app.screen.width/2 - spacing*1.1,
+        y: app.screen.height/2 - spacing*1.5
     });
     const keyCText = new Text({
         text: "Bet-",
@@ -103,19 +103,19 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.6},
-        x: app.screen.width/2 - spacing*1.7,
-        y: app.screen.height/2 - spacing/2
+        x: app.screen.width/2 - spacing*1.1,
+        y: app.screen.height/2 - spacing
     });
     const keySpaceText = new Text({
-        text: "Keys",
+        text: "Hold",
         style: {
             fill: "#FFFFFF",
             fontSize: 36,
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.6},
-        x: app.screen.width/2 - spacing*1.6,
-        y: app.screen.height/2 - spacing/2
+        x: app.screen.width/2 - spacing*1.1,
+        y: app.screen.height/4 + spacing
     });
 
     container.addChild(playerSumText);
@@ -262,18 +262,21 @@ import { Table, Player } from "./blackjack";
     }
     cardEmptySprite1.scale.set(scale);
     cardEmptySprite1.x = -spacing/2;
+    cardEmptySprite1.y = app.screen.height/4;
     cardBackSprite.y = 0;
     cardEmptySprite2.scale.set(scale);
     cardEmptySprite2.x = spacing/2;
+    cardEmptySprite2.y = app.screen.height/4;
     cardBackSprite.y = 0;
 
     playerSumText.x = 0; dealerSumText.x = 0;
-    playerSumText.y = app.screen.height/4 + spacing; dealerSumText.y = -app.screen.height/4 + spacing;
+    playerSumText.y = app.screen.height/4 + spacing;
+    dealerSumText.y = -app.screen.height/4 + spacing;
     playerSumText.style.fontSize = Math.round(scale * 8);
     dealerSumText.style.fontSize = Math.round(scale * 8);
     playerBalanceText.x = -app.screen.width/2 + 64;
     playerBalanceText.y = -spacing/4;
-    playerBalanceText.style.fontSize = Math.round(scale * 8);
+    playerBalanceText.style.fontSize = Math.round(scale * 8); 
     playerBetText.x = -app.screen.width/2 + 64;
     playerBetText.y = spacing/4;
     playerBetText.style.fontSize = Math.round(scale * 8);
@@ -283,17 +286,17 @@ import { Table, Player } from "./blackjack";
     keyVSprite.scale.set(scale/6);
     keyCSprite.scale.set(scale/6);
     keySpaceSprite.scale.set(scale/3);
-    keyZSprite.y = app.screen.height/2 - spacing*2;
-    keyXSprite.y = app.screen.height/2 - spacing*1.5;
-    keyVSprite.y = app.screen.height/2 - spacing;
-    keyCSprite.y = app.screen.height/2 - spacing/2;
-    keyZSprite.x = app.screen.width/2 - spacing*2;
-    keyXSprite.x = app.screen.width/2 - spacing*2;
-    keyVSprite.x = app.screen.width/2 - spacing*2;
-    keyCSprite.x = app.screen.width/2 - spacing*2;
+    keyZSprite.y = app.screen.height/2 - spacing*2.5;
+    keyXSprite.y = app.screen.height/2 - spacing*2;
+    keyVSprite.y = app.screen.height/2 - spacing*1.5;
+    keyCSprite.y = app.screen.height/2 - spacing;
+    keyZSprite.x = app.screen.width/2 - spacing*1.4;
+    keyXSprite.x = app.screen.width/2 - spacing*1.4;
+    keyVSprite.x = app.screen.width/2 - spacing*1.4;
+    keyCSprite.x = app.screen.width/2 - spacing*1.4;
 
-    keySpaceSprite.x = app.screen.width/2 - spacing*2;
-    keySpaceSprite.y = app.screen.height/2 - spacing/2;
+    keySpaceSprite.x = app.screen.width/2 - spacing*1.6;
+    keySpaceSprite.y = app.screen.height/4 + spacing;
 
     container.addChild(keySpaceSprite);
     container.addChild(keySpaceText);
