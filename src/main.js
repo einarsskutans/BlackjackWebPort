@@ -150,9 +150,9 @@ import { Table, Player } from "./blackjack";
     const keyXTexture = await Assets.load({src: "/assets/keyboard_x.png", data: {scaleMode: "nearest"}});
     const keyVTexture = await Assets.load({src: "/assets/keyboard_w.png", data: {scaleMode: "nearest"}});
     const keyCTexture = await Assets.load({src: "/assets/keyboard_s.png", data: {scaleMode: "nearest"}});
-    const keySpaceTexture = await Assets.load({src: "/assets/keyboard_space.png", data: {scaleMode: "nearest"}});
     const playerTexture = await Assets.load({src: "/assets/player.png", data: {scaleMode: "nearest"}});
     const dealerTexture = await Assets.load({src: "/assets/dealer.png", data: {scaleMode: "nearest"}});
+    const shopTexture = await Assets.load({src: "/assets/shop.png", data: {scaleMode: "nearest"}});
 
     const cardBackTexture = await Assets.load({src: "/assets/card53.png", data: {scaleMode: "nearest"}});
     const cardEmptyTexture1 = await Assets.load({src: "/assets/card59.png", data: {scaleMode: "nearest"}});
@@ -163,9 +163,11 @@ import { Table, Player } from "./blackjack";
     const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: -menuText.width/1.7, y: scale}, scale: scale/6});
     const keyVSprite = new Sprite({texture: keyVTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
     const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
-    const keySpaceSprite = new Sprite({texture: keySpaceTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.5, y: app.screen.height/4 + spacing*1.08}, scale: scale/3});
     const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
     const dealerSprite = new Sprite({texture: dealerTexture, position: {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6});
+    const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6, eventMode: "static"});
+    shopSprite.on("pointerover", () => {shopSprite.alpha = 0.4});
+    shopSprite.on("pointerout", () => {shopSprite.alpha = 1});
 
     const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, position: {y: 0}});
     const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, position: {x: -spacing/2, y: app.screen.height/4}, alpha: 0.9, scale: scale});
@@ -319,7 +321,7 @@ import { Table, Player } from "./blackjack";
                 }
                 menuText.text = "Take two cards <--";
                 container.removeChild(cardBackSprite, keyXSprite, keyZSprite);
-                container.addChild(playerSprite, dealerSprite, playerNameText, dealerNameText, keyX2Sprite, menuText, keyVSprite, keyCSprite, playerSumText, dealerSumText, playerBalanceText, playerBetText);
+                container.addChild(playerSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, menuText, keyVSprite, keyCSprite, playerSumText, dealerSumText, playerBalanceText, playerBetText);
 
                 player.deck = [];
                 dealer.deck = [];
