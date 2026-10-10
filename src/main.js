@@ -158,11 +158,11 @@ import { Table, Player } from "./blackjack";
     const cardEmptyTexture1 = await Assets.load({src: "/assets/card59.png", data: {scaleMode: "nearest"}});
     const cardEmptyTexture2 = await Assets.load({src: "/assets/card59.png", data: {scaleMode: "nearest"}});
 
-    const keyZSprite = new Sprite({texture: keyZTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.4, y: app.screen.height/2 - spacing*2.5}, scale: scale/6});
-    const keyXSprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.4, y: app.screen.height/2 - spacing*2}, scale: scale/6});
+    const keyZSprite = new Sprite({texture: keyZTexture, anchor: 0.5, position: {x: 0, y: -app.screen.height / 4}, scale: scale/6});
+    const keyXSprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/4}, scale: scale/6});
     const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: -menuText.width/1.7, y: scale}, scale: scale/6});
-    const keyVSprite = new Sprite({texture: keyVTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.4, y: app.screen.height/2 - spacing*1.5}, scale: scale/6});
-    const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.4, y: app.screen.height/2 - spacing}, scale: scale/6});
+    const keyVSprite = new Sprite({texture: keyVTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/2.86}, scale: scale/8});
+    const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/2.86}, scale: scale/8});
     const keySpaceSprite = new Sprite({texture: keySpaceTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.5, y: app.screen.height/4 + spacing*1.08}, scale: scale/3});
     const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
     const dealerSprite = new Sprite({texture: dealerTexture, position: {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6});
@@ -188,44 +188,62 @@ import { Table, Player } from "./blackjack";
     let player = new Player("Player", table);
     let dealer = new Player("Dealer", table);
 
+    function updateKeys() {
+        keyVSprite.x = playerBetText.x + playerBetText.width + spacing/4;
+        keyCSprite.x = playerBetText.x + playerBetText.width + spacing/1.8;
+        keyXSprite.x = player.deck.length * spacing/1.6;
+        keyZSprite.x = dealer.deck.length * spacing/1.6;
+    }
+
     document.addEventListener("keydown", (event) => {
         if (event.key ==  "x") {
-            if (gamestate === "LOOP") gamestate = "HIT";
-            else if (gamestate === "BET") gamestate = "START";
-            else if (gamestate === "MENU_WAIT") gamestate = "RESET";
+            if (gamestate === "LOOP") {
+                keyXSprite.alpha = 0.6;
+                gamestate = "HIT";
+            }
+            else if (gamestate === "BET") {
+                keyXSprite.alpha = 0.6;
+                gamestate = "START";
+            }
+            else if (gamestate === "MENU_WAIT") {
+                keyX2Sprite.alpha = 0.6;
+                gamestate = "RESET";
+            }
         }
-    })
-    document.addEventListener("keydown", (event) => {
         if (event.key ==  "z" && gamestate === "LOOP") {
             gamestate = "PREHOLD";
+            keyZSprite.alpha = 0.6;
         }
-    })
-    document.addEventListener("keydown", (event) => {
         if (event.key ==  "w" && gamestate === "BET") {
             if (player.bet < player.balance) {
+                keyVSprite.alpha = 0.6;
                 player.bet += 50;
                 playerBetText.text = "BET $" + player.bet;
+                updateKeys();
             }
         }
-    })
-    document.addEventListener("keydown", (event) => {
         if (event.key ==  "s" && gamestate === "BET") {
             if (player.bet > 50) {
+                keyCSprite.alpha = 0.6;
                 player.bet -= 50;
                 playerBetText.text = "BET $" + player.bet;
+                updateKeys();
             }
-        }
-    })
-    document.addEventListener("keydown", (event) => {
-        if (event.key ==  " ") {
-            container.removeChild(keySpaceSprite, keySpaceText);
-            container.addChild(keyZSprite, keyXSprite, keyVSprite, keyCSprite, keyZText, keyXText, keyVText, keyCText);
         }
     })
     document.addEventListener("keyup", (event) => {
-        if (event.key ==  " ") {
-            container.removeChild(keyZSprite, keyXSprite, keyVSprite, keyCSprite, keyZText, keyXText, keyVText, keyCText);
-            container.addChild(keySpaceSprite, keySpaceText);
+        if (event.key == "x") {
+            keyXSprite.alpha = 1;
+            keyX2Sprite.alpha = 1;
+        }
+        if (event.key == "z") {
+            keyZSprite.alpha = 1;
+        }
+        if (event.key == "w") {
+            keyVSprite.alpha = 1;
+        }
+        if (event.key == "s") {
+            keyCSprite.alpha = 1;
         }
     })
 
@@ -240,6 +258,7 @@ import { Table, Player } from "./blackjack";
             card.sprite.x = -(target.deck.length - 1) * spacing / 2 + i * spacing;
             card.sprite.y = target === player ? app.screen.height / 4 : -app.screen.height / 4;
             card.sprite.scale.set(scale);
+            updateKeys();
             console.log(card.value);
         }
     }
@@ -292,17 +311,15 @@ import { Table, Player } from "./blackjack";
                     gamestate = "MENU";
                     break;
                 }
-
-                container.addChild(keySpaceSprite, keySpaceText, playerSprite, dealerSprite, playerNameText, dealerNameText, playerSumText, dealerSumText, playerBalanceText, playerBetText)
-
                 for (const card of player.deck) {
                     container.removeChild(card.sprite);
                 }
                 for (const card of dealer.deck) {
                     container.removeChild(card.sprite);
                 }
-                container.removeChild(cardBackSprite, menuText, keyX2Sprite);
-                container.addChild(playerSprite, dealerSprite, playerNameText, dealerNameText, keySpaceSprite, keySpaceText, cardEmptySprite1, cardEmptySprite2);
+                menuText.text = "Take two cards <--";
+                container.removeChild(cardBackSprite, keyXSprite, keyZSprite);
+                container.addChild(playerSprite, dealerSprite, playerNameText, dealerNameText, cardEmptySprite1, cardEmptySprite2, keyX2Sprite, menuText, keyVSprite, keyCSprite, playerSumText, dealerSumText, playerBalanceText, playerBetText);
 
                 player.deck = [];
                 dealer.deck = [];
@@ -310,16 +327,19 @@ import { Table, Player } from "./blackjack";
 
                 if (player.bet > player.balance) player.bet = player.balance;
 
-                playerSumText.text = "PLACE YOUR BETS";
+                playerSumText.text = "";
                 dealerSumText.text = "";
                 playerBalanceText.text = "CASH $" + player.balance;
                 playerBetText.text = "BET $" + player.bet;
+                updateKeys();
+                keyXSprite.x = spacing*1.24;
 
                 gamestate = "BET";
 
                 break;
             case "START":
-                container.removeChild(cardEmptySprite1, cardEmptySprite2);
+                container.removeChild(cardEmptySprite1, cardEmptySprite2, keyVSprite, keyCSprite, menuText, keyX2Sprite);
+                container.addChild(keyXSprite, keyZSprite);
 
                 dealer.Hit();
                 dealer.Hit();
