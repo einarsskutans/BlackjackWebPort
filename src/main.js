@@ -143,6 +143,7 @@ import { Table, Player } from "./blackjack";
     const playerTexture = await Assets.load({src: "/assets/player.png", data: {scaleMode: "nearest"}});
     const dealerTexture = await Assets.load({src: "/assets/dealer.png", data: {scaleMode: "nearest"}});
     const shopTexture = await Assets.load({src: "/assets/shop.png", data: {scaleMode: "nearest"}});
+    const shopBgTexture = await Assets.load({src: "/assets/shopbg.png", data: {scaleMode: "nearest"}});
 
     const cardBackTexture = await Assets.load({src: "/assets/card53.png", data: {scaleMode: "nearest"}});
     const cardEmptyTexture1 = await Assets.load({src: "/assets/card59.png", data: {scaleMode: "nearest"}});
@@ -156,8 +157,34 @@ import { Table, Player } from "./blackjack";
     const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
     const dealerSprite = new Sprite({texture: dealerTexture, position: {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6});
     const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6, eventMode: "static"});
-    shopSprite.on("pointerover", () => {shopSprite.alpha = 0.4});
-    shopSprite.on("pointerout", () => {shopSprite.alpha = 1});
+    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: {x: 1, y: 0.5}, position: {x: 0, y: 0}, scale: scale*1.4, label: "shopBg"})
+    shopSprite.on("pointerover", () => {shopSprite.alpha = 0.4;});
+    shopSprite.on("pointerout", () => {shopSprite.alpha = 1;});
+    shopSprite.on("click", () => {
+        if (container.getChildByLabel("shopBg")) {
+            const animate = () => {
+                shopBgSprite.x += scale*2;
+                if (shopBgSprite.x >= app.screen.width/1.4) {
+                    shopBgSprite.x = app.screen.width/1.4;
+                    app.ticker.remove(animate);
+                    container.removeChild(shopBgSprite);
+                }
+            };
+            app.ticker.add(animate);
+        }
+        else {
+            shopBgSprite.x = app.screen.width/1.4;
+            container.addChild(shopBgSprite);
+            const animate = () => {
+                shopBgSprite.x -= scale*2;
+                if (shopBgSprite.x <= app.screen.width/2 + spacing/2) {
+                    shopBgSprite.x = app.screen.width/2 + spacing/2;
+                    app.ticker.remove(animate);
+                }
+            };
+            app.ticker.add(animate);
+        }
+    });
 
     const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, position: {y: 0}});
     const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, position: {x: -spacing/2, y: app.screen.height/4}, alpha: 0.9, scale: scale});
