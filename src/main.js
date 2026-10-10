@@ -161,8 +161,8 @@ import { Table, Player } from "./blackjack";
     const keyZSprite = new Sprite({texture: keyZTexture, anchor: 0.5, position: {x: 0, y: -app.screen.height / 4}, scale: scale/6});
     const keyXSprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/4}, scale: scale/6});
     const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: -menuText.width/1.7, y: scale}, scale: scale/6});
-    const keyVSprite = new Sprite({texture: keyVTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/2.86}, scale: scale/8});
-    const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/2.86}, scale: scale/8});
+    const keyVSprite = new Sprite({texture: keyVTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
+    const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
     const keySpaceSprite = new Sprite({texture: keySpaceTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.5, y: app.screen.height/4 + spacing*1.08}, scale: scale/3});
     const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
     const dealerSprite = new Sprite({texture: dealerTexture, position: {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6});
@@ -191,8 +191,8 @@ import { Table, Player } from "./blackjack";
     function updateKeys() {
         keyVSprite.x = playerBetText.x + playerBetText.width + spacing/4;
         keyCSprite.x = playerBetText.x + playerBetText.width + spacing/1.8;
-        keyXSprite.x = player.deck.length * spacing/1.6;
-        keyZSprite.x = dealer.deck.length * spacing/1.6;
+        keyXSprite.x = player.deck.length * spacing/1.4;
+        keyZSprite.x = dealer.deck.length * spacing/1.4;
     }
 
     document.addEventListener("keydown", (event) => {
@@ -319,7 +319,7 @@ import { Table, Player } from "./blackjack";
                 }
                 menuText.text = "Take two cards <--";
                 container.removeChild(cardBackSprite, keyXSprite, keyZSprite);
-                container.addChild(playerSprite, dealerSprite, playerNameText, dealerNameText, cardEmptySprite1, cardEmptySprite2, keyX2Sprite, menuText, keyVSprite, keyCSprite, playerSumText, dealerSumText, playerBalanceText, playerBetText);
+                container.addChild(playerSprite, dealerSprite, playerNameText, dealerNameText, keyX2Sprite, menuText, keyVSprite, keyCSprite, playerSumText, dealerSumText, playerBalanceText, playerBetText);
 
                 player.deck = [];
                 dealer.deck = [];
