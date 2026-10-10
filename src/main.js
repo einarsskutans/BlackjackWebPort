@@ -128,11 +128,21 @@ import { Table, Player } from "./blackjack";
         text: "Hold",
         style: {
             fill: "#FFFFFF",
-            fontSize: Math.round(scale * 8),
+            fontSize: Math.round(scale * 7),
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.6},
-        position: {x: app.screen.width/2 - spacing*1.1, y: app.screen.height/4 + spacing}
+        position: {x: app.screen.width/2 - spacing*1.1, y: app.screen.height/4 + spacing*1.08}
+    });
+    const menuText = new Text({
+        text: "Start a new Ventti",
+        style: {
+            fill: "#FFFFFF",
+            fontSize: Math.round(scale * 7),
+            fontFamily: "PrimaryFont"
+        },
+        anchor: 0.5,
+        position: {x: 0, y: 0}
     });
 
     // Sprites
@@ -150,9 +160,10 @@ import { Table, Player } from "./blackjack";
 
     const keyZSprite = new Sprite({texture: keyZTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.4, y: app.screen.height/2 - spacing*2.5}, scale: scale/6});
     const keyXSprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.4, y: app.screen.height/2 - spacing*2}, scale: scale/6});
+    const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: -menuText.width/1.7, y: scale}, scale: scale/6});
     const keyVSprite = new Sprite({texture: keyVTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.4, y: app.screen.height/2 - spacing*1.5}, scale: scale/6});
     const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.4, y: app.screen.height/2 - spacing}, scale: scale/6});
-    const keySpaceSprite = new Sprite({texture: keySpaceTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.6, y: app.screen.height/4 + spacing}, scale: scale/3});
+    const keySpaceSprite = new Sprite({texture: keySpaceTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.5, y: app.screen.height/4 + spacing*1.08}, scale: scale/3});
     const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
     const dealerSprite = new Sprite({texture: dealerTexture, position: {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6});
 
@@ -172,7 +183,7 @@ import { Table, Player } from "./blackjack";
     }
 
     // Game logic
-    let gamestate = "RESET";
+    let gamestate = "MENU";
 
     let player = new Player("Player", table);
     let dealer = new Player("Dealer", table);
@@ -181,6 +192,7 @@ import { Table, Player } from "./blackjack";
         if (event.key ==  "x") {
             if (gamestate === "LOOP") gamestate = "HIT";
             else if (gamestate === "BET") gamestate = "START";
+            else if (gamestate === "MENU_WAIT") gamestate = "RESET";
         }
     })
     document.addEventListener("keydown", (event) => {
@@ -255,17 +267,6 @@ import { Table, Player } from "./blackjack";
         cardBackSprite.alpha = 1;
     }
 
-    container.addChild(keySpaceSprite);
-    container.addChild(keySpaceText);
-    container.addChild(playerSprite);
-    container.addChild(dealerSprite);
-    container.addChild(playerNameText);
-    container.addChild(dealerNameText);
-    container.addChild(playerSumText);
-    container.addChild(dealerSumText);
-    container.addChild(playerBalanceText);
-    container.addChild(playerBetText);
-
     app.ticker.add((ticker) => {
         
         // Sleep functionality
@@ -282,7 +283,44 @@ import { Table, Player } from "./blackjack";
 
         // Main gameplay loop
         switch (gamestate) {
+            case "MENU":
+                for (const card of player.deck) {
+                    container.removeChild(card.sprite);
+                }
+                for (const card of dealer.deck) {
+                    container.removeChild(card.sprite);
+                }
+                container.removeChildren();
+                if (player.balance <= 0) menuText.text = "It's so over..\nstart a new game?";
+                else menuText.text = "Start a new Ventti";
+                container.addChild(menuText, keyX2Sprite);
+
+                player.balance = 200; // make a restart function
+                player.bet = 50;
+
+                gamestate = "MENU_WAIT";
+
+                break;
+            case "MENU_WAIT":
+                break;
+
             case "RESET":
+                if (player.balance <= 0) {
+                    gamestate = "MENU";
+                    break;
+                }
+
+                container.addChild(keySpaceSprite);
+                container.addChild(keySpaceText);
+                container.addChild(playerSprite);
+                container.addChild(dealerSprite);
+                container.addChild(playerNameText);
+                container.addChild(dealerNameText);
+                container.addChild(playerSumText);
+                container.addChild(dealerSumText);
+                container.addChild(playerBalanceText);
+                container.addChild(playerBetText);
+
                 for (const card of player.deck) {
                     container.removeChild(card.sprite);
                 }
@@ -290,8 +328,8 @@ import { Table, Player } from "./blackjack";
                     container.removeChild(card.sprite);
                 }
                 container.removeChild(cardBackSprite);
-                container.addChild(cardEmptySprite1);
-                container.addChild(cardEmptySprite2);
+                container.removeChild(menuText, keyX2Sprite);
+                container.addChild(playerSprite, dealerSprite, playerNameText, dealerNameText, keySpaceSprite, keySpaceText, cardEmptySprite1, cardEmptySprite2);
 
                 player.deck = [];
                 dealer.deck = [];
@@ -421,7 +459,7 @@ import { Table, Player } from "./blackjack";
                 gamestate = "RESET";
 
                 break;
-
+  
             default:
                 break;
         }
