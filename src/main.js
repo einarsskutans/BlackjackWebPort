@@ -124,16 +124,6 @@ import { Table, Player } from "./blackjack";
         anchor: {x: 0, y: 0.6},
         position: {x: app.screen.width/2 - spacing*1.1, y: app.screen.height/2 - spacing}
     });
-    const keySpaceText = new Text({
-        text: "Hold",
-        style: {
-            fill: "#FFFFFF",
-            fontSize: Math.round(scale * 7),
-            fontFamily: "PrimaryFont"
-        },
-        anchor: {x: 0, y: 0.6},
-        position: {x: app.screen.width/2 - spacing*1.1, y: app.screen.height/4 + spacing*1.08}
-    });
     const menuText = new Text({
         text: "Start a new Ventti",
         style: {
