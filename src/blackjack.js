@@ -6,8 +6,11 @@ export class Player { // Also the dealer
         this.table = table;
 
         this.deck = [];
-        this.balance = 200;
-        this.bet = 50;
+        this.balance;
+        this.bet;
+        this.balanceDefault = 200;
+        this.betDefault = 50;
+        this.Reset();
     }
 
     Hit() {
@@ -22,6 +25,10 @@ export class Player { // Also the dealer
             }
         }
         return sum;
+    }
+    Reset() {
+        this.balance = this.balanceDefault;
+        this.bet = this.betDefault;
     }
 }
 

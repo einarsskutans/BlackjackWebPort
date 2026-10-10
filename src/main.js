@@ -218,30 +218,14 @@ import { Table, Player } from "./blackjack";
     })
     document.addEventListener("keydown", (event) => {
         if (event.key ==  " ") {
-            container.removeChild(keySpaceSprite);
-            container.removeChild(keySpaceText);
-            container.addChild(keyZSprite);
-            container.addChild(keyXSprite);
-            container.addChild(keyVSprite);
-            container.addChild(keyCSprite);
-            container.addChild(keyZText);
-            container.addChild(keyXText);
-            container.addChild(keyVText);
-            container.addChild(keyCText);
+            container.removeChild(keySpaceSprite, keySpaceText);
+            container.addChild(keyZSprite, keyXSprite, keyVSprite, keyCSprite, keyZText, keyXText, keyVText, keyCText);
         }
     })
     document.addEventListener("keyup", (event) => {
         if (event.key ==  " ") {
-            container.removeChild(keyZSprite);
-            container.removeChild(keyXSprite);
-            container.removeChild(keyVSprite);
-            container.removeChild(keyCSprite);
-            container.removeChild(keyZText);
-            container.removeChild(keyXText);
-            container.removeChild(keyVText);
-            container.removeChild(keyCText);
-            container.addChild(keySpaceSprite);
-            container.addChild(keySpaceText);
+            container.removeChild(keyZSprite, keyXSprite, keyVSprite, keyCSprite, keyZText, keyXText, keyVText, keyCText);
+            container.addChild(keySpaceSprite, keySpaceText);
         }
     })
 
@@ -295,8 +279,7 @@ import { Table, Player } from "./blackjack";
                 else menuText.text = "Start a new Ventti";
                 container.addChild(menuText, keyX2Sprite);
 
-                player.balance = 200; // make a restart function
-                player.bet = 50;
+                player.Reset();
 
                 gamestate = "MENU_WAIT";
 
@@ -310,16 +293,7 @@ import { Table, Player } from "./blackjack";
                     break;
                 }
 
-                container.addChild(keySpaceSprite);
-                container.addChild(keySpaceText);
-                container.addChild(playerSprite);
-                container.addChild(dealerSprite);
-                container.addChild(playerNameText);
-                container.addChild(dealerNameText);
-                container.addChild(playerSumText);
-                container.addChild(dealerSumText);
-                container.addChild(playerBalanceText);
-                container.addChild(playerBetText);
+                container.addChild(keySpaceSprite, keySpaceText, playerSprite, dealerSprite, playerNameText, dealerNameText, playerSumText, dealerSumText, playerBalanceText, playerBetText)
 
                 for (const card of player.deck) {
                     container.removeChild(card.sprite);
@@ -327,8 +301,7 @@ import { Table, Player } from "./blackjack";
                 for (const card of dealer.deck) {
                     container.removeChild(card.sprite);
                 }
-                container.removeChild(cardBackSprite);
-                container.removeChild(menuText, keyX2Sprite);
+                container.removeChild(cardBackSprite, menuText, keyX2Sprite);
                 container.addChild(playerSprite, dealerSprite, playerNameText, dealerNameText, keySpaceSprite, keySpaceText, cardEmptySprite1, cardEmptySprite2);
 
                 player.deck = [];
@@ -346,8 +319,7 @@ import { Table, Player } from "./blackjack";
 
                 break;
             case "START":
-                container.removeChild(cardEmptySprite1);
-                container.removeChild(cardEmptySprite2);
+                container.removeChild(cardEmptySprite1, cardEmptySprite2);
 
                 dealer.Hit();
                 dealer.Hit();
