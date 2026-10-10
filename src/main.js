@@ -61,6 +61,24 @@ import { Table, Player } from "./blackjack";
         },
         anchor: {x: 0, y: 0}
     });
+    const playerNameText = new Text({
+        text: "Player",
+        style: {
+            fill: "#FFFFFF",
+            fontSize: 36,
+            fontFamily: "PrimaryFont"
+        },
+        anchor: {x: 0, y: 0}
+    });
+    const dealerNameText = new Text({
+        text: "Dealer",
+        style: {
+            fill: "#FFFFFF",
+            fontSize: 36,
+            fontFamily: "PrimaryFont"
+        },
+        anchor: {x: 0, y: 0}
+    });
 
     const keyZText = new Text({
         text: "Hold",
@@ -281,11 +299,18 @@ import { Table, Player } from "./blackjack";
     playerSumText.style.fontSize = Math.round(scale * 8);
     dealerSumText.style.fontSize = Math.round(scale * 8);
     playerBalanceText.x = -app.screen.width/2 + spacing*1.1;
-    playerBalanceText.y = app.screen.height/2 - spacing;
+    playerBalanceText.y = app.screen.height/2 - spacing/1.3;
     playerBalanceText.style.fontSize = Math.round(scale * 6); 
     playerBetText.x = -app.screen.width/2 + spacing*1.1;
-    playerBetText.y = app.screen.height/2 - spacing/1.5;
+    playerBetText.y = app.screen.height/2 - spacing/2;
     playerBetText.style.fontSize = Math.round(scale * 6);
+
+    playerNameText.x = -app.screen.width/2 + spacing*1.12;
+    playerNameText.y = app.screen.height/2 - spacing;
+    playerNameText.style.fontSize = Math.round(scale * 5);
+    dealerNameText.x = -app.screen.width/2 + spacing*1.12;
+    dealerNameText.y = -app.screen.height/2 + spacing/6;
+    dealerNameText.style.fontSize = Math.round(scale * 5);
 
     keyZSprite.scale.set(scale/6);
     keyXSprite.scale.set(scale/6);
@@ -316,6 +341,8 @@ import { Table, Player } from "./blackjack";
     container.addChild(keySpaceText);
     container.addChild(playerSprite);
     container.addChild(dealerSprite);
+    container.addChild(playerNameText);
+    container.addChild(dealerNameText);
 
     app.ticker.add((ticker) => {
         
