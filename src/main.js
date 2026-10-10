@@ -1,4 +1,4 @@
-import { Application, Assets, Sprite, Container, Text } from "pixi.js";
+import { Application, Assets, Sprite, Container, Text, SCALE_MODES } from "pixi.js";
 import { Table, Player } from "./blackjack";
 
 (async () => {
@@ -74,7 +74,7 @@ import { Table, Player } from "./blackjack";
         position: {x: -app.screen.width/2 + spacing*1.12, y: app.screen.height/2 - spacing}
     });
     const dealerNameText = new Text({
-        text: "Dealer",
+        text: "Evil\nDealer",
         style: {
             fill: "#FFFFFF",
             fontSize: Math.round(scale * 5),
@@ -136,32 +136,29 @@ import { Table, Player } from "./blackjack";
     });
 
     // Sprites
-    const keyZTexture = await Assets.load("/assets/keyboard_z.png");
-    const keyXTexture = await Assets.load("/assets/keyboard_x.png");
-    const keyVTexture = await Assets.load("/assets/keyboard_w.png");
-    const keyCTexture = await Assets.load("/assets/keyboard_s.png");
-    const keySpaceTexture = await Assets.load("/assets/keyboard_space.png");
-    const playerTexture = await Assets.load("/assets/player.png");
-    const dealerTexture = await Assets.load("/assets/dealer.png");
-    keyZTexture.source.scaleMode = "nearest";
-    keyXTexture.source.scaleMode = "nearest";
-    keyVTexture.source.scaleMode = "nearest";
-    keyCTexture.source.scaleMode = "nearest";
-    keySpaceTexture.source.scaleMode = "nearest";
-    playerTexture.source.scaleMode = "nearest";
-    dealerTexture.source.scaleMode = "nearest";
-    const keyZSprite = new Sprite(keyZTexture);
-    const keyXSprite = new Sprite(keyXTexture);
-    const keyVSprite = new Sprite(keyVTexture);
-    const keyCSprite = new Sprite(keyCTexture);
-    const keySpaceSprite = new Sprite(keySpaceTexture);
-    const playerSprite = new Sprite(playerTexture);
-    const dealerSprite = new Sprite(dealerTexture);
-    keyZSprite.anchor.set(0.5);
-    keyXSprite.anchor.set(0.5);
-    keyVSprite.anchor.set(0.5);
-    keyCSprite.anchor.set(0.5);
-    keySpaceSprite.anchor.set(0.5);
+    const keyZTexture = await Assets.load({src: "/assets/keyboard_z.png", data: {scaleMode: "nearest"}});
+    const keyXTexture = await Assets.load({src: "/assets/keyboard_x.png", data: {scaleMode: "nearest"}});
+    const keyVTexture = await Assets.load({src: "/assets/keyboard_w.png", data: {scaleMode: "nearest"}});
+    const keyCTexture = await Assets.load({src: "/assets/keyboard_s.png", data: {scaleMode: "nearest"}});
+    const keySpaceTexture = await Assets.load({src: "/assets/keyboard_space.png", data: {scaleMode: "nearest"}});
+    const playerTexture = await Assets.load({src: "/assets/player.png", data: {scaleMode: "nearest"}});
+    const dealerTexture = await Assets.load({src: "/assets/dealer.png", data: {scaleMode: "nearest"}});
+
+    const cardBackTexture = await Assets.load({src: "/assets/card53.png", data: {scaleMode: "nearest"}});
+    const cardEmptyTexture1 = await Assets.load({src: "/assets/card59.png", data: {scaleMode: "nearest"}});
+    const cardEmptyTexture2 = await Assets.load({src: "/assets/card59.png", data: {scaleMode: "nearest"}});
+
+    const keyZSprite = new Sprite({texture: keyZTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.4, y: app.screen.height/2 - spacing*2.5}, scale: scale/6});
+    const keyXSprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.4, y: app.screen.height/2 - spacing*2}, scale: scale/6});
+    const keyVSprite = new Sprite({texture: keyVTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.4, y: app.screen.height/2 - spacing*1.5}, scale: scale/6});
+    const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.4, y: app.screen.height/2 - spacing}, scale: scale/6});
+    const keySpaceSprite = new Sprite({texture: keySpaceTexture, anchor: 0.5, position: {x: app.screen.width/2 - spacing*1.6, y: app.screen.height/4 + spacing}, scale: scale/3});
+    const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
+    const dealerSprite = new Sprite({texture: dealerTexture, position: {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6});
+
+    const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, position: {y: 0}});
+    const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, position: {x: -spacing/2, y: app.screen.height/4}, alpha: 0.9, scale: scale});
+    const cardEmptySprite2 = new Sprite({texture: cardEmptyTexture2, anchor: 0.5, position: {x: spacing/2, y: app.screen.height/4}, alpha: 0.7, scale: scale});
     
     const table = new Table();
     table.GenerateSpriteDeck();
@@ -173,21 +170,6 @@ import { Table, Player } from "./blackjack";
         table.spriteDeck[i].sprite = sprite;
         table.spriteDeck[i].sprite.eventMode = "static";
     }
-    const cardBackTexture = await Assets.load("/assets/card53.png");
-    cardBackTexture.source.scaleMode = "nearest";
-    const cardBackSprite = new Sprite(cardBackTexture);
-    cardBackSprite.anchor.set(0.5);
-    const cardEmptyTexture1 = await Assets.load("/assets/card59.png");
-    cardEmptyTexture1.source.scaleMode = "nearest";
-    const cardEmptySprite1 = new Sprite(cardEmptyTexture1);
-    cardEmptySprite1.anchor.set(0.5);
-    cardEmptySprite1.alpha = 0.9;
-    const cardEmptyTexture2 = await Assets.load("/assets/card59.png");
-    cardEmptyTexture2.source.scaleMode = "nearest";
-    const cardEmptySprite2 = new Sprite(cardEmptyTexture2);
-    cardEmptySprite2.anchor.set(0.5);
-    cardEmptySprite2.alpha = 0.7;
-    
 
     // Game logic
     let gamestate = "RESET";
@@ -272,39 +254,6 @@ import { Table, Player } from "./blackjack";
         cardBackSprite.y = -app.screen.height / 4;
         cardBackSprite.alpha = 1;
     }
-    cardEmptySprite1.scale.set(scale);
-    cardEmptySprite1.x = -spacing/2;
-    cardEmptySprite1.y = app.screen.height/4;
-    cardBackSprite.y = 0;
-    cardEmptySprite2.scale.set(scale);
-    cardEmptySprite2.x = spacing/2;
-    cardEmptySprite2.y = app.screen.height/4;
-    cardBackSprite.y = 0;
-
-    keyZSprite.scale.set(scale/6);
-    keyXSprite.scale.set(scale/6);
-    keyVSprite.scale.set(scale/6);
-    keyCSprite.scale.set(scale/6);
-    keySpaceSprite.scale.set(scale/3);
-    keyZSprite.y = app.screen.height/2 - spacing*2.5;
-    keyXSprite.y = app.screen.height/2 - spacing*2;
-    keyVSprite.y = app.screen.height/2 - spacing*1.5;
-    keyCSprite.y = app.screen.height/2 - spacing;
-    keyZSprite.x = app.screen.width/2 - spacing*1.4;
-    keyXSprite.x = app.screen.width/2 - spacing*1.4;
-    keyVSprite.x = app.screen.width/2 - spacing*1.4;
-    keyCSprite.x = app.screen.width/2 - spacing*1.4;
-
-    keySpaceSprite.x = app.screen.width/2 - spacing*1.6;
-    keySpaceSprite.y = app.screen.height/4 + spacing;
-
-    playerSprite.scale.set(scale/1.6);
-    dealerSprite.scale.set(scale/1.6);
-    playerSprite.anchor.y = 1;
-    playerSprite.x = -app.screen.width/2 + spacing/6;
-    dealerSprite.x = -app.screen.width/2 + spacing/6;
-    dealerSprite.y = -app.screen.height/2 + spacing/6;
-    playerSprite.y = app.screen.height/2 - spacing/6;
 
     container.addChild(keySpaceSprite);
     container.addChild(keySpaceText);
