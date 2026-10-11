@@ -1,4 +1,4 @@
-import { Application, Assets, Sprite, Container, Text, SCALE_MODES } from "pixi.js";
+import { Application, Assets, Sprite, Container, Text } from "pixi.js";
 import { Table, Player } from "./blackjack";
 
 (async () => {
@@ -134,6 +134,16 @@ import { Table, Player } from "./blackjack";
         anchor: 0.5,
         position: {x: 0, y: 0}
     });
+    const shopText = new Text({
+        text: "Shop",
+        style: {
+            fill: "#FFFFFF",
+            fontSize: Math.round(scale * 6),
+            fontFamily: "PrimaryFont"
+        },
+        anchor: {x: 0.5, y: 0.5},
+        position: {x: 0, y: -app.screen.height/2 + spacing/1.2}
+    })
 
     // Sprites
     const keyZTexture = await Assets.load({src: "/assets/keyboard_z.png", data: {scaleMode: "nearest"}});
@@ -156,29 +166,33 @@ import { Table, Player } from "./blackjack";
     const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
     const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
     const dealerSprite = new Sprite({texture: dealerTexture, position: {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6});
-    const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6, eventMode: "static"});
-    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: {x: 1, y: 0.5}, position: {x: 0, y: 0}, scale: scale*1.4, label: "shopBg"})
+    const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6, eventMode: "static", zIndex: 2});
+    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: {x: 1, y: 0}, position: {x: 0, y: -app.screen.height/2 + spacing*1.1}, scale: scale/1.4, label: "shopBg"})
     shopSprite.on("pointerover", () => {shopSprite.alpha = 0.4;});
     shopSprite.on("pointerout", () => {shopSprite.alpha = 1;});
     shopSprite.on("click", () => {
         if (container.getChildByLabel("shopBg")) {
             const animate = () => {
                 shopBgSprite.x += scale*2;
-                if (shopBgSprite.x >= app.screen.width/1.4) {
-                    shopBgSprite.x = app.screen.width/1.4;
+                shopText.x += scale*2
+                if (shopBgSprite.x >= app.screen.width/2 + shopBgSprite.width) {
+                    shopBgSprite.x = app.screen.width/2 + shopBgSprite.width;
                     app.ticker.remove(animate);
-                    container.removeChild(shopBgSprite);
+                    container.removeChild(shopBgSprite, shopText);
                 }
             };
             app.ticker.add(animate);
         }
         else {
-            shopBgSprite.x = app.screen.width/1.4;
-            container.addChild(shopBgSprite);
+            shopBgSprite.x = app.screen.width/2 + shopBgSprite.width;
+            shopText.x = app.screen.width/2 + spacing/1.2;
+            shopSprite.alpha = 0.6;
+            container.addChild(shopBgSprite, shopText);
             const animate = () => {
                 shopBgSprite.x -= scale*2;
-                if (shopBgSprite.x <= app.screen.width/2 + spacing/2) {
-                    shopBgSprite.x = app.screen.width/2 + spacing/2;
+                shopText.x -= scale*2;
+                if (shopBgSprite.x <= app.screen.width/2 - scale*4) {
+                    shopBgSprite.x = app.screen.width/2 - scale*4;
                     app.ticker.remove(animate);
                 }
             };
