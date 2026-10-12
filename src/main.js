@@ -215,6 +215,13 @@ import { Table, Player } from "./blackjack";
         table.spriteDeck[i].sprite.eventMode = "static";
     }
 
+    // Shop items
+    table.inventory = [
+        { name: "profit", maxprice: 1000, amount: 10, texture: "path", title: "Profit+", description: "Winnings give 1% of the bet" },
+        { name: "backcard3", maxprice: 100, amount: 1, texture: "path", title: "Backcard", description: "Show backcard on the next 3 rounds" },
+        { name: "kill", maxprice: 10000, amount: 1, texture: "path", title: "Kill", description: "End dealer's life" },
+    ]
+
     // Game logic
     let gamestate = "MENU";
 
