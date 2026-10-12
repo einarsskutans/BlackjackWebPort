@@ -10,6 +10,7 @@ export class Player { // Also the dealer
         this.bet;
         this.balanceDefault = 200;
         this.betDefault = 50;
+        this.inventory = [];
         this.Reset();
     }
 
@@ -35,6 +36,7 @@ export class Player { // Also the dealer
 export class Table {
     deck = [];
     spriteDeck = [];
+    inventory = [];
 
     GenerateSpriteDeck() {
         this.spriteDeck = [];
