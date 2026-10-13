@@ -51,7 +51,7 @@ import { Table, Player } from "./blackjack";
             fontSize: Math.round(scale * 6),
             fontFamily: "PrimaryFont"
         },
-        anchor: {x: 0, y: 0},
+        anchor: 0,
         position: {x: -app.screen.width/2 + spacing*1.1, y: app.screen.height/2 - spacing/1.3}
     });
     const playerBetText = new Text({
@@ -60,7 +60,7 @@ import { Table, Player } from "./blackjack";
             fontSize: Math.round(scale * 6),
             fontFamily: "PrimaryFont"
         },
-        anchor: {x: 0, y: 0},
+        anchor: 0,
         position: {x: -app.screen.width/2 + spacing*1.1, y: app.screen.height/2 - spacing/2}
     });
     const playerNameText = new Text({
@@ -70,7 +70,7 @@ import { Table, Player } from "./blackjack";
             fontSize: Math.round(scale * 5),
             fontFamily: "PrimaryFont"
         },
-        anchor: {x: 0, y: 0},
+        anchor: 0,
         position: {x: -app.screen.width/2 + spacing*1.12, y: app.screen.height/2 - spacing}
     });
     const dealerNameText = new Text({
@@ -80,7 +80,7 @@ import { Table, Player } from "./blackjack";
             fontSize: Math.round(scale * 5),
             fontFamily: "PrimaryFont"
         },
-        anchor: {x: 0, y: 0},
+        anchor: 0,
         position: {x: -app.screen.width/2 + spacing*1.12, y: -app.screen.height/2 + spacing/6}
     });
 
@@ -141,8 +141,24 @@ import { Table, Player } from "./blackjack";
             fontSize: Math.round(scale * 6),
             fontFamily: "PrimaryFont"
         },
-        anchor: {x: 0.5, y: 0.5},
-        position: {x: 0, y: -app.screen.height/2 + spacing/1.2}
+        anchor: 0.5,
+        position: {x: 0, y: 0}
+    })
+    const backcard3Text = new Text({
+        style: {
+            fill: "#FFFFFF",
+            fontSize: Math.round(scale*4),
+            fontFamily: "PrimaryFont"
+        },
+        anchor: {x: 0, y: 0.5}
+    })
+    const profitText = new Text({
+        style: {
+            fill: "#FFFFFF",
+            fontSize: Math.round(scale*4),
+            fontFamily: "PrimaryFont"
+        },
+        anchor: {x: 0, y: 0.5}
     })
 
     // Sprites
@@ -159,6 +175,9 @@ import { Table, Player } from "./blackjack";
     const cardEmptyTexture1 = await Assets.load({src: "/assets/card59.png", data: {scaleMode: "nearest"}});
     const cardEmptyTexture2 = await Assets.load({src: "/assets/card59.png", data: {scaleMode: "nearest"}});
 
+    const backcard3Texture = await Assets.load({src: "/assets/upBackcard.png", data: {scaleMode: "nearest"}});
+    const profitTexture = await Assets.load({src: "/assets/upProfit.png", data: {scaleMode: "nearest"}});
+
     const keyZSprite = new Sprite({texture: keyZTexture, anchor: 0.5, position: {x: 0, y: -app.screen.height / 4}, scale: scale/6});
     const keyXSprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/4}, scale: scale/6});
     const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: -menuText.width/1.7, y: scale}, scale: scale/6});
@@ -167,38 +186,7 @@ import { Table, Player } from "./blackjack";
     const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
     const dealerSprite = new Sprite({texture: dealerTexture, position: {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6});
     const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6, eventMode: "static", zIndex: 2});
-    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: {x: 1, y: 0}, position: {x: 0, y: -app.screen.height/2 + spacing*1.1}, scale: scale/1.4, label: "shopBg"})
-    shopSprite.on("pointerover", () => {shopSprite.alpha = 0.4;});
-    shopSprite.on("pointerout", () => {shopSprite.alpha = 1;});
-    shopSprite.on("click", () => {
-        if (container.getChildByLabel("shopBg")) {
-            const animate = () => {
-                shopBgSprite.x += scale*2;
-                shopText.x += scale*2
-                if (shopBgSprite.x >= app.screen.width/2 + shopBgSprite.width) {
-                    shopBgSprite.x = app.screen.width/2 + shopBgSprite.width;
-                    app.ticker.remove(animate);
-                    container.removeChild(shopBgSprite, shopText);
-                }
-            };
-            app.ticker.add(animate);
-        }
-        else {
-            shopBgSprite.x = app.screen.width/2 + shopBgSprite.width;
-            shopText.x = app.screen.width/2 + spacing/1.2;
-            shopSprite.alpha = 0.6;
-            container.addChild(shopBgSprite, shopText);
-            const animate = () => {
-                shopBgSprite.x -= scale*2;
-                shopText.x -= scale*2;
-                if (shopBgSprite.x <= app.screen.width/2 - scale*4) {
-                    shopBgSprite.x = app.screen.width/2 - scale*4;
-                    app.ticker.remove(animate);
-                }
-            };
-            app.ticker.add(animate);
-        }
-    });
+    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale})
 
     const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, position: {y: 0}});
     const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, position: {x: -spacing/2, y: app.screen.height/4}, alpha: 0.9, scale: scale});
@@ -214,13 +202,53 @@ import { Table, Player } from "./blackjack";
         table.spriteDeck[i].sprite = sprite;
         table.spriteDeck[i].sprite.eventMode = "static";
     }
-
-    // Shop items
+ 
+        // Shop items
     table.inventory = [
-        { name: "profit", maxprice: 1000, amount: 10, texture: "path", title: "Profit+", description: "Winnings give 1% of the bet" },
-        { name: "backcard3", maxprice: 100, amount: 1, texture: "path", title: "Backcard", description: "Show backcard on the next 3 rounds" },
-        { name: "kill", maxprice: 10000, amount: 1, texture: "path", title: "Kill", description: "End dealer's life" },
+        { name: "profit", maxprice: 1000, amount: 10, title: "Profit+", description: "Winnings give 1% of the bet" },
+        { name: "backcard3", maxprice: 100, amount: 1, title: "Backcard", description: "Show backcard on the next 3 rounds" },
+        { name: "kill", maxprice: 10000, amount: 1, title: "Kill", description: "End dealer's life" },
     ]
+    const shopContainer = new Container({position: {x: 0, y: -scale*2}, zIndex: 2, label: "shopBg"});
+
+    const backcard3Sprite = new Sprite({texture: backcard3Texture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing/2}, scale: scale});
+    backcard3Text.text = "Backcard\nShow backcard\non the next 3 rounds";
+    backcard3Text.position = {x: backcard3Sprite.x + spacing/2, y: backcard3Sprite.y};
+    const profitSprite = new Sprite({texture: profitTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*1.4}, scale: scale});
+    profitText.text = "Profit+\nWinnings give\n1% of the bet";
+    profitText.position = {x: profitSprite.x + spacing/2, y: profitSprite.y};
+    shopText.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 - spacing/4};
+
+    shopContainer.addChild(shopBgSprite, backcard3Sprite, profitSprite, shopText, backcard3Text, profitText);
+
+    shopSprite.on("pointerover", () => {shopSprite.alpha = 0.4;});
+    shopSprite.on("pointerout", () => {shopSprite.alpha = 1;});
+    shopSprite.on("click", () => {
+        if (container.getChildByLabel("shopBg")) {
+            const animate = () => {
+                shopContainer.x += scale*2;
+                if (shopContainer.x >= app.screen.width/2 + shopBgSprite.width/2) {
+                    shopContainer.x = app.screen.width/2 + shopBgSprite.width/2;
+                    app.ticker.remove(animate);
+                    container.removeChild(shopContainer);
+                }
+            };
+            app.ticker.add(animate);
+        }
+        else {
+            shopContainer.x = app.screen.width/2 + shopBgSprite.width/2;
+            shopSprite.alpha = 0.6;
+            container.addChild(shopContainer);
+            const animate = () => {
+                shopContainer.x -= scale*2;
+                if (shopContainer.x <= app.screen.width/3) {
+                    shopContainer.x = app.screen.width/3;
+                    app.ticker.remove(animate);
+                }
+            };
+            app.ticker.add(animate);
+        }
+    });
 
     // Game logic
     let gamestate = "MENU";
