@@ -12,12 +12,58 @@ import { Table, Player } from "./blackjack";
     document.getElementById("pixi-container").appendChild(app.canvas);
 
     // Render setup
-    const container = new Container();
-    app.stage.addChild(container);
-    container.x = app.screen.width / 2;
-    container.y = app.screen.height / 2;
     const scale = ((app.screen.width / 2560) * 0.7 + (app.screen.height / 1440) * 0.3)*8;
     const spacing = scale*24;
+
+    const container = new Container({position: {x: app.screen.width/2, y: app.screen.height/2}});
+    const shopContainer = new Container({position: {x: 0, y: 0}, zIndex: 2, label: "shopBg"});
+    app.stage.addChild(container);
+
+    // Sprites
+    const shopBgTexture = await Assets.load({src: "/assets/shopbg.png", data: {scaleMode: "nearest"}});
+    const keyZTexture = await Assets.load({src: "/assets/keyboard_z.png", data: {scaleMode: "nearest"}});
+    const keyXTexture = await Assets.load({src: "/assets/keyboard_x.png", data: {scaleMode: "nearest"}});
+    const keyVTexture = await Assets.load({src: "/assets/keyboard_w.png", data: {scaleMode: "nearest"}});
+    const keyCTexture = await Assets.load({src: "/assets/keyboard_s.png", data: {scaleMode: "nearest"}});
+    const playerTexture = await Assets.load({src: "/assets/player.png", data: {scaleMode: "nearest"}});
+    const dealerTexture = await Assets.load({src: "/assets/dealer.png", data: {scaleMode: "nearest"}});
+    const shopTexture = await Assets.load({src: "/assets/shop.png", data: {scaleMode: "nearest"}});
+    const cardBackTexture = await Assets.load({src: "/assets/card53.png", data: {scaleMode: "nearest"}});
+    const cardEmptyTexture1 = await Assets.load({src: "/assets/card59.png", data: {scaleMode: "nearest"}});
+    const cardEmptyTexture2 = await Assets.load({src: "/assets/card59.png", data: {scaleMode: "nearest"}});
+    const backcard3Texture = await Assets.load({src: "/assets/upBackcard.png", data: {scaleMode: "nearest"}});
+    const profitTexture = await Assets.load({src: "/assets/upProfit.png", data: {scaleMode: "nearest"}});
+    const bitTexture = await Assets.load({src: "/assets/bit.png", data: {scaleMode: "nearest"}});
+    
+    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale*1.2})
+
+    const keyZSprite = new Sprite({texture: keyZTexture, anchor: 0.5, position: {x: 0, y: -app.screen.height / 4}, scale: scale/6});
+    const keyXSprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/4}, scale: scale/6});
+    const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: -app.screen.width/6, y: scale}, scale: scale/6});
+    const keyVSprite = new Sprite({texture: keyVTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
+    const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
+    const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
+    const dealerSprite = new Sprite({texture: dealerTexture, position: {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6});
+    
+    const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, position: {y: 0}});
+    const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, position: {x: -spacing/2, y: app.screen.height/4}, alpha: 0.9, scale: scale});
+    const cardEmptySprite2 = new Sprite({texture: cardEmptyTexture2, anchor: 0.5, position: {x: spacing/2, y: app.screen.height/4}, alpha: 0.7, scale: scale});
+
+    const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6, eventMode: "static", zIndex: 2});
+    shopContainer.y = shopBgSprite.height/2 + shopSprite.y + shopSprite.height + scale;
+    const backcard3Sprite = new Sprite({texture: backcard3Texture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing/2}, scale: scale});
+    const profitSprite = new Sprite({texture: profitTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*1.4}, scale: scale});
+    
+    const table = new Table();
+    table.GenerateSpriteDeck();
+    for (let i = 0; i < 52; i++) {
+        const texture = await Assets.load(`/assets/card${i+1}.png`);
+        texture.source.scaleMode = "nearest";
+        const sprite = new Sprite(texture);
+        sprite.anchor.set(0.5);
+        table.spriteDeck[i].sprite = sprite;
+        table.spriteDeck[i].sprite.eventMode = "static";
+    }
 
     // Text
     const font = new FontFace(
@@ -94,36 +140,6 @@ import { Table, Player } from "./blackjack";
         anchor: {x: 0, y: 0.6},
         position: {x: app.screen.width/2 - spacing*1.1, y: app.screen.height/2 - spacing*2.5}
     });
-    const keyXText = new Text({
-        text: "Hit",
-        style: {
-            fill: "#FFFFFF",
-            fontSize: Math.round(scale * 6),
-            fontFamily: "PrimaryFont"
-        },
-        anchor: {x: 0, y: 0.6},
-        position: {x: app.screen.width/2 - spacing*1.1, y: app.screen.height/2 - spacing*2}
-    });
-    const keyVText = new Text({
-        text: "Bet+",
-        style: {
-            fill: "#FFFFFF",
-            fontSize: Math.round(scale * 6),
-            fontFamily: "PrimaryFont"
-        },
-        anchor: {x: 0, y: 0.6},
-        position: {x: app.screen.width/2 - spacing*1.1, y: app.screen.height/2 - spacing*1.5}
-    });
-    const keyCText = new Text({
-        text: "Bet-",
-        style: {
-            fill: "#FFFFFF",
-            fontSize: Math.round(scale * 6),
-            fontFamily: "PrimaryFont"
-        },
-        anchor: {x: 0, y: 0.6},
-        position: {x: app.screen.width/2 - spacing*1.1, y: app.screen.height/2 - spacing}
-    });
     const menuText = new Text({
         text: "Start a new Ventti",
         style: {
@@ -142,88 +158,42 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: 0.5,
-        position: {x: 0, y: 0}
+        position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 - spacing/4}
     })
     const backcard3Text = new Text({
+        text: "Backcard\nShow backcard\non the next 3 rounds",
         style: {
             fill: "#FFFFFF",
             fontSize: Math.round(scale*4),
             fontFamily: "PrimaryFont"
         },
-        anchor: {x: 0, y: 0.5}
+        anchor: {x: 0, y: 0.5},
+        position: {x: backcard3Sprite.x + spacing/2, y: backcard3Sprite.y}
     })
     const profitText = new Text({
+        text: "Profit+\nWinnings give\n1% of the bet",
         style: {
             fill: "#FFFFFF",
             fontSize: Math.round(scale*4),
             fontFamily: "PrimaryFont"
         },
-        anchor: {x: 0, y: 0.5}
+        anchor: {x: 0, y: 0.5},
+        position: {x: profitSprite.x + spacing/2, y: profitSprite.y}
     })
-
-    // Sprites
-    const keyZTexture = await Assets.load({src: "/assets/keyboard_z.png", data: {scaleMode: "nearest"}});
-    const keyXTexture = await Assets.load({src: "/assets/keyboard_x.png", data: {scaleMode: "nearest"}});
-    const keyVTexture = await Assets.load({src: "/assets/keyboard_w.png", data: {scaleMode: "nearest"}});
-    const keyCTexture = await Assets.load({src: "/assets/keyboard_s.png", data: {scaleMode: "nearest"}});
-    const playerTexture = await Assets.load({src: "/assets/player.png", data: {scaleMode: "nearest"}});
-    const dealerTexture = await Assets.load({src: "/assets/dealer.png", data: {scaleMode: "nearest"}});
-    const shopTexture = await Assets.load({src: "/assets/shop.png", data: {scaleMode: "nearest"}});
-    const shopBgTexture = await Assets.load({src: "/assets/shopbg.png", data: {scaleMode: "nearest"}});
-
-    const cardBackTexture = await Assets.load({src: "/assets/card53.png", data: {scaleMode: "nearest"}});
-    const cardEmptyTexture1 = await Assets.load({src: "/assets/card59.png", data: {scaleMode: "nearest"}});
-    const cardEmptyTexture2 = await Assets.load({src: "/assets/card59.png", data: {scaleMode: "nearest"}});
-
-    const backcard3Texture = await Assets.load({src: "/assets/upBackcard.png", data: {scaleMode: "nearest"}});
-    const profitTexture = await Assets.load({src: "/assets/upProfit.png", data: {scaleMode: "nearest"}});
-
-    const keyZSprite = new Sprite({texture: keyZTexture, anchor: 0.5, position: {x: 0, y: -app.screen.height / 4}, scale: scale/6});
-    const keyXSprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/4}, scale: scale/6});
-    const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: -menuText.width/1.7, y: scale}, scale: scale/6});
-    const keyVSprite = new Sprite({texture: keyVTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
-    const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
-    const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
-    const dealerSprite = new Sprite({texture: dealerTexture, position: {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6});
-    const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6, eventMode: "static", zIndex: 2});
-    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale})
-
-    const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, position: {y: 0}});
-    const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, position: {x: -spacing/2, y: app.screen.height/4}, alpha: 0.9, scale: scale});
-    const cardEmptySprite2 = new Sprite({texture: cardEmptyTexture2, anchor: 0.5, position: {x: spacing/2, y: app.screen.height/4}, alpha: 0.7, scale: scale});
-    
-    const table = new Table();
-    table.GenerateSpriteDeck();
-    for (let i = 0; i < 52; i++) {
-        const texture = await Assets.load(`/assets/card${i+1}.png`);
-        texture.source.scaleMode = "nearest";
-        const sprite = new Sprite(texture);
-        sprite.anchor.set(0.5);
-        table.spriteDeck[i].sprite = sprite;
-        table.spriteDeck[i].sprite.eventMode = "static";
-    }
  
         // Shop items
     table.inventory = [
-        { name: "profit", maxprice: 1000, amount: 10, title: "Profit+", description: "Winnings give 1% of the bet" },
-        { name: "backcard3", maxprice: 100, amount: 1, title: "Backcard", description: "Show backcard on the next 3 rounds" },
-        { name: "kill", maxprice: 10000, amount: 1, title: "Kill", description: "End dealer's life" },
+        { name: "profit", maxprice: 1000, amount: 10 },
+        { name: "backcard3", maxprice: 100, amount: 1 },
+        { name: "kill", maxprice: 10000, amount: 1 },
     ]
-    const shopContainer = new Container({position: {x: 0, y: -scale*2}, zIndex: 2, label: "shopBg"});
-
-    const backcard3Sprite = new Sprite({texture: backcard3Texture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing/2}, scale: scale});
-    backcard3Text.text = "Backcard\nShow backcard\non the next 3 rounds";
-    backcard3Text.position = {x: backcard3Sprite.x + spacing/2, y: backcard3Sprite.y};
-    const profitSprite = new Sprite({texture: profitTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*1.4}, scale: scale});
-    profitText.text = "Profit+\nWinnings give\n1% of the bet";
-    profitText.position = {x: profitSprite.x + spacing/2, y: profitSprite.y};
-    shopText.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 - spacing/4};
 
     shopContainer.addChild(shopBgSprite, backcard3Sprite, profitSprite, shopText, backcard3Text, profitText);
 
     shopSprite.on("pointerover", () => {shopSprite.alpha = 0.4;});
     shopSprite.on("pointerout", () => {shopSprite.alpha = 1;});
     shopSprite.on("click", () => {
+        drawAmountBits(profitText.x + spacing/4 + profitText.width/2, profitText.y - profitText.height/3, 2, 4);
         if (container.getChildByLabel("shopBg")) {
             const animate = () => {
                 shopContainer.x += scale*2;
@@ -249,6 +219,14 @@ import { Table, Player } from "./blackjack";
             app.ticker.add(animate);
         }
     });
+
+    function drawAmountBits(x, y, amount, maxAmount) {
+        for (let i = 1; i <= maxAmount; i++) {
+            const bitSprite = new Sprite({texture: bitTexture, anchor: 0.5, position: {x: x + scale*i*4, y: y}, scale: scale});
+            if (i > amount) bitSprite.alpha = 0.2;
+            shopContainer.addChild(bitSprite);
+        }
+    }
 
     // Game logic
     let gamestate = "MENU";
