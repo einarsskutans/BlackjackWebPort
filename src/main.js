@@ -34,12 +34,23 @@ import { Table, Player } from "./blackjack";
     const backcard3Texture = await Assets.load({src: "/assets/upBackcard.png", data: {scaleMode: "nearest"}});
     const profitTexture = await Assets.load({src: "/assets/upProfit.png", data: {scaleMode: "nearest"}});
     const bitTexture = await Assets.load({src: "/assets/bit.png", data: {scaleMode: "nearest"}});
+    const buyBgGreenTexture = await Assets.load({src: "/assets/buyBgGreen.png", data: {scaleMode: "nearest"}});
     
     const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale*1.2})
 
     const keyZSprite = new Sprite({texture: keyZTexture, anchor: 0.5, position: {x: 0, y: -app.screen.height / 4}, scale: scale/6});
     const keyXSprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/4}, scale: scale/6});
-    const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: -app.screen.width/6, y: scale}, scale: scale/6});
+    const menuText = new Text({
+        text: "Start a new Ventti",
+        style: {
+            fill: "#FFFFFF",
+            fontSize: Math.round(scale * 7),
+            fontFamily: "PrimaryFont"
+        },
+        anchor: 0.5,
+        position: {x: 0, y: 0}
+    });
+    const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: menuText.x-menuText.width/2-spacing/2, y: menuText.y}, scale: scale/6});
     const keyVSprite = new Sprite({texture: keyVTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
     const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
     const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
@@ -140,16 +151,6 @@ import { Table, Player } from "./blackjack";
         anchor: {x: 0, y: 0.6},
         position: {x: app.screen.width/2 - spacing*1.1, y: app.screen.height/2 - spacing*2.5}
     });
-    const menuText = new Text({
-        text: "Start a new Ventti",
-        style: {
-            fill: "#FFFFFF",
-            fontSize: Math.round(scale * 7),
-            fontFamily: "PrimaryFont"
-        },
-        anchor: 0.5,
-        position: {x: 0, y: 0}
-    });
     const shopText = new Text({
         text: "Shop",
         style: {
@@ -194,9 +195,11 @@ import { Table, Player } from "./blackjack";
     shopSprite.on("pointerout", () => {shopSprite.alpha = 1;});
     shopSprite.on("click", () => {
         drawAmountBits(profitText.x + spacing/4 + profitText.width/2, profitText.y - profitText.height/3, 2, 4);
+        drawBuyButton(shopBgSprite.width/2 - spacing/1.5, profitText.y, 200);
+        drawBuyButton(shopBgSprite.width/2 - spacing/1.5, backcard3Text.y, 10);
         if (container.getChildByLabel("shopBg")) {
             const animate = () => {
-                shopContainer.x += scale*2;
+                shopContainer.x += app.ticker.deltaMS*scale/2;
                 if (shopContainer.x >= app.screen.width/2 + shopBgSprite.width/2) {
                     shopContainer.x = app.screen.width/2 + shopBgSprite.width/2;
                     app.ticker.remove(animate);
@@ -210,9 +213,9 @@ import { Table, Player } from "./blackjack";
             shopSprite.alpha = 0.6;
             container.addChild(shopContainer);
             const animate = () => {
-                shopContainer.x -= scale*2;
-                if (shopContainer.x <= app.screen.width/3) {
-                    shopContainer.x = app.screen.width/3;
+                shopContainer.x -= app.ticker.deltaMS*scale/2;
+                if (shopContainer.x <= app.screen.width/2-shopContainer.width/2-spacing/4) {
+                    shopContainer.x = app.screen.width/2-shopContainer.width/2-spacing/4;
                     app.ticker.remove(animate);
                 }
             };
@@ -226,6 +229,20 @@ import { Table, Player } from "./blackjack";
             if (i > amount) bitSprite.alpha = 0.2;
             shopContainer.addChild(bitSprite);
         }
+    }
+    function drawBuyButton(x, y, cost) {
+        const buyButtonBg = new Sprite({texture: buyBgGreenTexture, position: {x: x, y: y}, scale: scale*1.2, anchor: 0.5});
+        const buyButtonText = new Text({
+            text: cost,
+            style: {
+            fill: "#FFFFFF",
+            fontSize: Math.round(scale * 6),
+            fontFamily: "PrimaryFont"
+        },
+        anchor: 0.5,
+        position: {x: x, y: y}
+        })
+        shopContainer.addChild(buyButtonBg, buyButtonText);
     }
 
     // Game logic
