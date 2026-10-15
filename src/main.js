@@ -20,6 +20,16 @@ import { Table, Player } from "./blackjack";
     app.stage.addChild(container);
 
     // Sprites
+    const centerText = new Text({
+        style: {
+            fill: "#FFFFFF",
+            fontSize: Math.round(scale * 7),
+            fontFamily: "PrimaryFont"
+        },
+        anchor: 0.5,
+        position: {x: 0, y: 0}
+    });
+
     const shopBgTexture = await Assets.load({src: "/assets/shopbg.png", data: {scaleMode: "nearest"}});
     const keyZTexture = await Assets.load({src: "/assets/keyboard_z.png", data: {scaleMode: "nearest"}});
     const keyXTexture = await Assets.load({src: "/assets/keyboard_x.png", data: {scaleMode: "nearest"}});
@@ -40,17 +50,7 @@ import { Table, Player } from "./blackjack";
 
     const keyZSprite = new Sprite({texture: keyZTexture, anchor: 0.5, position: {x: 0, y: -app.screen.height / 4}, scale: scale/6});
     const keyXSprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/4}, scale: scale/6});
-    const menuText = new Text({
-        text: "Start a new Ventti",
-        style: {
-            fill: "#FFFFFF",
-            fontSize: Math.round(scale * 7),
-            fontFamily: "PrimaryFont"
-        },
-        anchor: 0.5,
-        position: {x: 0, y: 0}
-    });
-    const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: menuText.x-menuText.width/2-spacing/2, y: menuText.y}, scale: scale/6});
+    const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: centerText.x-centerText.width/2-spacing/2, y: centerText.y}, scale: scale/6});
     const keyVSprite = new Sprite({texture: keyVTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
     const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
     const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
@@ -141,16 +141,6 @@ import { Table, Player } from "./blackjack";
         position: {x: -app.screen.width/2 + spacing*1.12, y: -app.screen.height/2 + spacing/6}
     });
 
-    const keyZText = new Text({
-        text: "Hold",
-        style: {
-            fill: "#FFFFFF",
-            fontSize: Math.round(scale * 6),
-            fontFamily: "PrimaryFont"
-        },
-        anchor: {x: 0, y: 0.6},
-        position: {x: app.screen.width/2 - spacing*1.1, y: app.screen.height/2 - spacing*2.5}
-    });
     const shopText = new Text({
         text: "Shop",
         style: {
@@ -357,9 +347,10 @@ import { Table, Player } from "./blackjack";
                     container.removeChild(card.sprite);
                 }
                 container.removeChildren();
-                if (player.balance <= 0) menuText.text = "It's so over..\nstart a new game?";
-                else menuText.text = "Start a new Ventti";
-                container.addChild(menuText, keyX2Sprite);
+                if (player.balance <= 0) centerText.text = "It's so over..\nstart a new game?";
+                else centerText.text = "Start a new Ventti";
+                keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/2, y: centerText.y};
+                container.addChild(centerText, keyX2Sprite);
 
                 player.Reset();
 
@@ -380,9 +371,10 @@ import { Table, Player } from "./blackjack";
                 for (const card of dealer.deck) {
                     container.removeChild(card.sprite);
                 }
-                menuText.text = "Take two cards <--";
+                centerText.text = "Take two cards <--";
+                keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/2, y: centerText.y};
                 container.removeChild(cardBackSprite, keyXSprite, keyZSprite);
-                container.addChild(playerSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, menuText, keyVSprite, keyCSprite, playerSumText, dealerSumText, playerBalanceText, playerBetText);
+                container.addChild(playerSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, centerText, keyVSprite, keyCSprite, playerSumText, dealerSumText, playerBalanceText, playerBetText);
 
                 player.deck = [];
                 dealer.deck = [];
@@ -401,7 +393,7 @@ import { Table, Player } from "./blackjack";
 
                 break;
             case "START":
-                container.removeChild(cardEmptySprite1, cardEmptySprite2, keyVSprite, keyCSprite, menuText, keyX2Sprite);
+                container.removeChild(cardEmptySprite1, cardEmptySprite2, keyVSprite, keyCSprite, centerText, keyX2Sprite);
                 container.addChild(keyXSprite, keyZSprite);
 
                 dealer.Hit();
