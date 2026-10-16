@@ -11,6 +11,13 @@ import { Table, Player } from "./blackjack";
     // Append the application canvas to the document body
     document.getElementById("pixi-container").appendChild(app.canvas);
 
+    const font = new FontFace(
+        "PrimaryFont",
+        "url('/assets/Silkscreen-Regular.ttf')"
+    );
+    await font.load();
+    document.fonts.add(font);
+
     // Render setup
     const scale = ((app.screen.width / 2560) * 0.7 + (app.screen.height / 1440) * 0.3)*8;
     const spacing = scale*24;
@@ -77,13 +84,6 @@ import { Table, Player } from "./blackjack";
     }
 
     // Text
-    const font = new FontFace(
-        "PrimaryFont",
-        "url('/assets/Silkscreen-Regular.ttf')"
-    );
-    await font.load();
-    document.fonts.add(font);
-
     const playerSumText = new Text({ 
         style: {
             fill: "#FFFFFF",
