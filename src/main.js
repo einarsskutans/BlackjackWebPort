@@ -171,6 +171,15 @@ import { Table, Player } from "./blackjack";
         anchor: {x: 0, y: 0.5},
         position: {x: profitSprite.x + spacing/2, y: profitSprite.y}
     })
+    const deckCountText = new Text({
+        style: {
+            fill: "#FFFFFF",
+            fontSize: Math.round(scale*4),
+            fontFamily: "PrimaryFont"
+        },
+        anchor: {x: 0, y: 0.5},
+        position: {x: 0, y: spacing}
+    })
  
         // Shop items
     table.inventory = [
@@ -353,6 +362,7 @@ import { Table, Player } from "./blackjack";
                 container.addChild(centerText, keyX2Sprite);
 
                 player.Reset();
+                table.GenerateDeck();
 
                 gamestate = "MENU_WAIT";
 
@@ -365,6 +375,7 @@ import { Table, Player } from "./blackjack";
                     gamestate = "MENU";
                     break;
                 }
+                if (table.deck.length < 1) table.GenerateDeck();
                 for (const card of player.deck) {
                     container.removeChild(card.sprite);
                 }
@@ -378,7 +389,6 @@ import { Table, Player } from "./blackjack";
 
                 player.deck = [];
                 dealer.deck = [];
-                table.GenerateDeck();
 
                 if (player.bet > player.balance) player.bet = player.balance;
 
@@ -468,7 +478,13 @@ import { Table, Player } from "./blackjack";
                     break;
                 }
                 if (player.GetDeckSum() >= dealer.GetDeckSum() && dealer.GetDeckSum() != 21) {
-                    dealer.Hit();
+                    if (table.deck > 0) {
+                        dealer.Hit();
+                    }
+                    else {
+                        table.GenerateDeck();
+                    }
+                    
                     sleep = 1000;
                     waiting = true;
 
