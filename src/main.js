@@ -83,6 +83,11 @@ import { Table, Player } from "./blackjack";
         table.spriteDeck[i].sprite.eventMode = "static";
     }
 
+    let player = new Player("Player", table);
+    let dealer = new Player("Dealer", table);
+    player.Reset();
+    let gamestate = "MENU";
+
     // Text
     const playerSumText = new Text({ 
         style: {
@@ -182,20 +187,41 @@ import { Table, Player } from "./blackjack";
     })
  
         // Shop items
-    table.inventory = [
-        { name: "profit", maxprice: 1000, amount: 10 },
-        { name: "backcard3", maxprice: 100, amount: 1 },
-        { name: "kill", maxprice: 10000, amount: 1 },
-    ]
+    const ITEMS = {
+        profit: {
+            id: "profit",
+            name: "Profit+",
+            description: "Winnings give 1% of the bet",
+            price: 200,
+            maxAmount: 10,
+        },
+
+        backcard3: {
+            id: "backcard3",
+            name: "Backcard",
+            description: "Show backcard on the next 3 rounds",
+            price: 10,
+            maxAmount: 1,
+        },
+
+        kill: {
+            id: "kill",
+            name: "Kill",
+            description: "Special item",
+            price: 10000,
+            maxAmount: 1,
+        },
+    };
 
     shopContainer.addChild(shopBgSprite, backcard3Sprite, profitSprite, shopText, backcard3Text, profitText);
 
     shopSprite.on("pointerover", () => {shopSprite.alpha = 0.4;});
-    shopSprite.on("pointerout", () => {shopSprite.alpha = 1;});
+    shopSprite.on("pointerout", () => {if (gamestate === "BET")shopSprite.alpha = 1;});
     shopSprite.on("click", () => {
-        drawAmountBits(profitText.x + spacing/4 + profitText.width/2, profitText.y - profitText.height/3, 2, 4);
-        drawBuyButton(shopBgSprite.width/2 - spacing/1.5, profitText.y, 200);
-        drawBuyButton(shopBgSprite.width/2 - spacing/1.5, backcard3Text.y, 10);
+        if (gamestate !== "BET") return;
+        drawAmountBits(profitText.x + spacing/4 + profitText.width/2, profitText.y - profitText.height/3, player.inventory.profit, ITEMS["profit"].maxAmount);
+        drawBuyButton(shopBgSprite.width/2 - spacing/1.5, profitText.y, "profit");
+        drawBuyButton(shopBgSprite.width/2 - spacing/1.5, backcard3Text.y, "backcard3");
         if (container.getChildByLabel("shopBg")) {
             const animate = () => {
                 shopContainer.x += app.ticker.deltaMS*scale/2;
@@ -222,6 +248,16 @@ import { Table, Player } from "./blackjack";
         }
     });
 
+    function buyItem(itemID) {
+        const item = ITEMS[itemID];
+
+        if (item.price >= player.balance-player.betDefault) return;
+
+        player.balance -= item.price;
+        playerBalanceText.text = "CASH $" + player.balance;
+        player.inventory[itemID] += 1;
+    }
+
     function drawAmountBits(x, y, amount, maxAmount) {
         for (let i = 1; i <= maxAmount; i++) {
             const bitSprite = new Sprite({texture: bitTexture, anchor: 0.5, position: {x: x + scale*i*4, y: y}, scale: scale});
@@ -229,27 +265,34 @@ import { Table, Player } from "./blackjack";
             shopContainer.addChild(bitSprite);
         }
     }
-    function drawBuyButton(x, y, cost) {
-        const buyButtonBg = new Sprite({texture: buyBgGreenTexture, position: {x: x, y: y}, scale: scale*1.2, anchor: 0.5});
+    function drawBuyButton(x, y, itemID) {
+        const item = ITEMS[itemID];
+
+        const buyButtonBg = new Sprite({texture: buyBgGreenTexture, position: {x: x, y: y}, scale: scale*1.2, anchor: 0.5, eventMode: "static"});
         const buyButtonText = new Text({
-            text: cost,
+            text: item.price,
             style: {
-            fill: "#FFFFFF",
-            fontSize: Math.round(scale * 6),
-            fontFamily: "PrimaryFont"
-        },
-        anchor: 0.5,
-        position: {x: x, y: y}
+                fill: "#FFFFFF",
+                fontSize: Math.round(scale * 4),
+                fontFamily: "PrimaryFont"
+            },
+            anchor: 0.5,
+            position: {x: x, y: y}
         })
         shopContainer.addChild(buyButtonBg, buyButtonText);
+        buyButtonBg.on("pointerover", () => {
+            buyButtonBg.alpha = 0.4;
+        })
+        buyButtonBg.on("pointerout", () => {
+            buyButtonBg.alpha = 1;
+        })
+        buyButtonBg.on("click", () => {
+            buyItem(itemID);
+            console.log(player.inventory);
+        })
     }
 
     // Game logic
-    let gamestate = "MENU";
-
-    let player = new Player("Player", table);
-    let dealer = new Player("Dealer", table);
-
     function updateKeys() {
         keyVSprite.x = playerBetText.x + playerBetText.width + spacing/4;
         keyCSprite.x = playerBetText.x + playerBetText.width + spacing/1.8;
@@ -273,6 +316,7 @@ import { Table, Player } from "./blackjack";
             }
         }
         if (event.key ==  "z" && gamestate === "LOOP") {
+            if (container.getChildByLabel("shopBg")) return;
             gamestate = "PREHOLD";
             keyZSprite.alpha = 0.6;
         }
@@ -386,6 +430,7 @@ import { Table, Player } from "./blackjack";
                 keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/2, y: centerText.y};
                 container.removeChild(cardBackSprite, keyXSprite, keyZSprite);
                 container.addChild(playerSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, centerText, keyVSprite, keyCSprite, playerSumText, dealerSumText, playerBalanceText, playerBetText);
+                shopSprite.alpha = 1;
 
                 player.deck = [];
                 dealer.deck = [];
@@ -403,6 +448,17 @@ import { Table, Player } from "./blackjack";
 
                 break;
             case "START":
+                if (container.getChildByLabel("shopBg")) {
+                    const animate = () => {
+                        shopContainer.x += app.ticker.deltaMS*scale/2;
+                        if (shopContainer.x >= app.screen.width/2 + shopBgSprite.width/2) {
+                            shopContainer.x = app.screen.width/2 + shopBgSprite.width/2;
+                            app.ticker.remove(animate);
+                            container.removeChild(shopContainer);
+                        }
+                    };
+                    app.ticker.add(animate);
+                }
                 container.removeChild(cardEmptySprite1, cardEmptySprite2, keyVSprite, keyCSprite, centerText, keyX2Sprite);
                 container.addChild(keyXSprite, keyZSprite);
 
@@ -427,6 +483,7 @@ import { Table, Player } from "./blackjack";
                 }
 
                 gamestate = "LOOP";
+                shopSprite.alpha = 0.4;
 
                 break;
         

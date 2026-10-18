@@ -10,7 +10,7 @@ export class Player { // Also the dealer
         this.bet;
         this.balanceDefault = 200;
         this.betDefault = 50;
-        this.inventory = [];
+        this.inventory = {};
         this.Reset();
     }
 
@@ -30,6 +30,11 @@ export class Player { // Also the dealer
     Reset() {
         this.balance = this.balanceDefault;
         this.bet = this.betDefault;
+        this.inventory = {
+            profit: 0,
+            backcard3: 0,
+            kill: 0
+        };
     }
 }
 
