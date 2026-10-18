@@ -52,6 +52,8 @@ import { Table, Player } from "./blackjack";
     const profitTexture = await Assets.load({src: "/assets/upProfit.png", data: {scaleMode: "nearest"}});
     const bitTexture = await Assets.load({src: "/assets/bit.png", data: {scaleMode: "nearest"}});
     const buyBgGreenTexture = await Assets.load({src: "/assets/buyBgGreen.png", data: {scaleMode: "nearest"}});
+    const buyBgRedTexture = await Assets.load({src: "/assets/buyBgRed.png", data: {scaleMode: "nearest"}});
+    const buyBgGrayTexture = await Assets.load({src: "/assets/buyBgGray.png", data: {scaleMode: "nearest"}});
     
     const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale})
 
@@ -275,6 +277,20 @@ import { Table, Player } from "./blackjack";
         }
     });
 
+    const buyButtons = {};
+
+    function updateButtonColor(itemID) {
+        const item = ITEMS[itemID];
+        let colorTexture;
+        if (player.inventory[itemID] >= item.maxAmount) colorTexture = buyBgGrayTexture;
+        else if (player.balance - player.betDefault >= item.price) colorTexture = buyBgGreenTexture;
+        else colorTexture = buyBgRedTexture;
+
+        buyButtons[itemID].bg.texture = colorTexture;
+        buyButtons[itemID].texture = colorTexture;
+        buyButtons[itemID].text.text = "$" + item.price;
+    }
+
     function buyItem(itemID) {
         const item = ITEMS[itemID];
 
@@ -287,9 +303,7 @@ import { Table, Player } from "./blackjack";
         item.price = Math.round(item.price*item.priceCf);
 
         drawAmountBits(item.x, item.y, player.inventory[itemID], item.maxAmount, itemID);
-        if (buyButtons[itemID]) {
-            buyButtons[itemID].text.text = "$" + item.price;
-        }
+        updateButtonColor(itemID);
     }
 
     const itemBits = {};
@@ -323,7 +337,6 @@ import { Table, Player } from "./blackjack";
             shopContainer.addChild(bitSprite);
         }
     }
-    const buyButtons = {};
     function drawBuyButton(x, y, itemID) {
         const item = ITEMS[itemID];
 
@@ -331,8 +344,7 @@ import { Table, Player } from "./blackjack";
             buyButtons[itemID].text.text = "$" + item.price;
             return;
         }
-
-        const buyButtonBg = new Sprite({texture: buyBgGreenTexture, position: {x: x, y: y}, scale: scale, anchor: {x: 0, y: 0.5}, eventMode: "static"});
+        const buyButtonBg = new Sprite({texture: buyBgRedTexture, position: {x: x, y: y}, scale: scale, anchor: {x: 0, y: 0.5}, eventMode: "static"});
         const buyButtonText = new Text({
             text: "$" + item.price,
             style: {
@@ -358,6 +370,7 @@ import { Table, Player } from "./blackjack";
             buyItem(itemID);
             console.log(player.inventory);
         })
+        updateButtonColor(itemID);
     }
 
     // Game logic
@@ -554,7 +567,6 @@ import { Table, Player } from "./blackjack";
                     gamestate = "REVEAL_BACKCARD";
                     break;
                 }
-                
 
                 gamestate = "LOOP";
                 shopSprite.alpha = 0.4;
@@ -572,9 +584,6 @@ import { Table, Player } from "./blackjack";
                     drawAmountBits(ITEMS.backcard3.x, ITEMS.backcard3.y, player.inventory.backcard3, ITEMS.backcard3.maxAmount, "backcard3");
 
                     dealerSumText.text = dealer.GetDeckSum();
-
-                    sleep = 1000;
-                    waiting = true;
 
                     if (player.GetDeckSum() > 21 || dealer.GetDeckSum() === 21) {
                         gamestate = "LOSE";
@@ -622,8 +631,6 @@ import { Table, Player } from "./blackjack";
                 cardBackSprite.y += ticker.deltaTime * 1;
                 if (cardBackSprite.alpha <= 0) {
                     container.removeChild(cardBackSprite);
-                    sleep = 1000;
-                    waiting = true;
                     gamestate = "HOLD";
                 }
 
