@@ -194,6 +194,12 @@ import { Table, Player } from "./blackjack";
             description: "Winnings give 1% of the bet",
             price: 200,
             maxAmount: 10,
+            get x() {
+                return profitText.x + spacing / 4 + profitText.width / 2;
+            },
+            get y() {
+                return profitText.y - profitText.height / 3;
+            }
         },
 
         backcard3: {
@@ -202,6 +208,12 @@ import { Table, Player } from "./blackjack";
             description: "Show backcard on the next 3 rounds",
             price: 10,
             maxAmount: 1,
+            get x() {
+                return backcard3Text.x + spacing / 4 + backcard3Text.width / 2;
+            },
+            get y() {
+                return backcard3Text.y - backcard3Text.height / 3;
+            }
         },
 
         kill: {
@@ -219,7 +231,7 @@ import { Table, Player } from "./blackjack";
     shopSprite.on("pointerout", () => {if (gamestate === "BET")shopSprite.alpha = 1;});
     shopSprite.on("click", () => {
         if (gamestate !== "BET") return;
-        drawAmountBits(profitText.x + spacing/4 + profitText.width/2, profitText.y - profitText.height/3, player.inventory.profit, ITEMS["profit"].maxAmount);
+        drawAmountBits(profitText.x + spacing / 4 + profitText.width / 2, profitText.y - profitText.height / 3, player.inventory.profit, ITEMS.profit.maxAmount, "profit");
         drawBuyButton(shopBgSprite.width/2 - spacing/1.5, profitText.y, "profit");
         drawBuyButton(shopBgSprite.width/2 - spacing/1.5, backcard3Text.y, "backcard3");
         if (container.getChildByLabel("shopBg")) {
@@ -252,16 +264,42 @@ import { Table, Player } from "./blackjack";
         const item = ITEMS[itemID];
 
         if (item.price >= player.balance-player.betDefault) return;
+        if (item.maxAmount <= player.inventory[itemID]) return;
 
         player.balance -= item.price;
         playerBalanceText.text = "CASH $" + player.balance;
         player.inventory[itemID] += 1;
+
+        drawAmountBits(item.x, item.y, player.inventory[itemID], item.maxAmount, itemID);
     }
 
-    function drawAmountBits(x, y, amount, maxAmount) {
+    const itemBits = {};
+    function drawAmountBits(x, y, amount, maxAmount, itemID) {
+        if (itemBits[itemID]) {
+            for (const sprite of itemBits[itemID]) {
+                shopContainer.removeChild(sprite);
+                sprite.destroy();
+            }
+        }
+
+        itemBits[itemID] = [];
+
         for (let i = 1; i <= maxAmount; i++) {
-            const bitSprite = new Sprite({texture: bitTexture, anchor: 0.5, position: {x: x + scale*i*4, y: y}, scale: scale});
-            if (i > amount) bitSprite.alpha = 0.2;
+            const bitSprite = new Sprite({
+                texture: bitTexture,
+                anchor: 0.5,
+                position: {
+                    x: x + scale * i * 4,
+                    y: y
+                },
+                scale: scale
+            });
+
+            if (i > amount) {
+                bitSprite.alpha = 0.2;
+            }
+
+            itemBits[itemID].push(bitSprite);
             shopContainer.addChild(bitSprite);
         }
     }
@@ -493,7 +531,7 @@ import { Table, Player } from "./blackjack";
                 drawCards(player);
                 playerSumText.text = player.GetDeckSum();
 
-                if (player.GetDeckSum() > 21 && dealer.GetDeckSum() > 21) {
+                if (player.GetDeckSum() >= 21 && dealer.GetDeckSum() >= 21) {
                     gamestate = "TIE";
                     break;
                 }
@@ -535,7 +573,7 @@ import { Table, Player } from "./blackjack";
                     break;
                 }
                 if (player.GetDeckSum() >= dealer.GetDeckSum() && dealer.GetDeckSum() != 21) {
-                    if (table.deck > 0) {
+                    if (table.deck.length > 0) {
                         dealer.Hit();
                     }
                     else {
