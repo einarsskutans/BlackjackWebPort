@@ -196,7 +196,7 @@ import { Table, Player } from "./blackjack";
             priceCf: 1.25,
             maxAmount: 10,
             get x() {
-                return profitText.x + spacing / 4 + profitText.width / 2;
+                return profitText.x + spacing / 6 + profitText.width / 2;
             },
             get y() {
                 return profitText.y - profitText.height / 3;
@@ -217,7 +217,7 @@ import { Table, Player } from "./blackjack";
             priceCf: 1,
             maxAmount: 1,
             get x() {
-                return backcard3Text.x + spacing / 4 + backcard3Text.width / 2;
+                return backcard3Text.x + backcard3Text.width / 2;
             },
             get y() {
                 return backcard3Text.y - backcard3Text.height / 3;
@@ -245,7 +245,8 @@ import { Table, Player } from "./blackjack";
     shopSprite.on("pointerout", () => {if (gamestate === "BET")shopSprite.alpha = 1;});
     shopSprite.on("click", () => {
         if (gamestate !== "BET") return;
-        drawAmountBits(profitText.x + spacing / 4 + profitText.width / 2, profitText.y - profitText.height / 3, player.inventory.profit, ITEMS.profit.maxAmount, "profit");
+        drawAmountBits(ITEMS.profit.x, ITEMS.profit.y, player.inventory.profit, ITEMS.profit.maxAmount, "profit");
+        drawAmountBits(ITEMS.backcard3.x, ITEMS.backcard3.y, player.inventory.backcard3, ITEMS.backcard3.maxAmount, "backcard3");
         drawBuyButton(profitSprite.x-backcard3Sprite.width/2, profitSprite.y+profitSprite.height-scale*2, "profit");
         drawBuyButton(backcard3Sprite.x-backcard3Sprite.width/2, backcard3Sprite.y+backcard3Sprite.height-scale*2, "backcard3");
         if (container.getChildByLabel("shopBg")) {
