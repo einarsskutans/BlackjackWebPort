@@ -215,7 +215,7 @@ import { Table, Player } from "./blackjack";
             id: "backcard3",
             name: "Backcard",
             description: "Show backcard on the next 3 rounds",
-            price: 10,
+            price: 100,
             priceCf: 1,
             maxAmount: 1,
             get x() {
@@ -263,6 +263,8 @@ import { Table, Player } from "./blackjack";
             app.ticker.add(animate);
         }
         else {
+            updateButtonColor("profit");
+            updateButtonColor("backcard3");
             shopContainer.x = app.screen.width/2 + shopBgSprite.width/2;
             shopSprite.alpha = 0.6;
             container.addChild(shopContainer);
@@ -374,6 +376,8 @@ import { Table, Player } from "./blackjack";
     }
 
     // Game logic
+    let backcardRounds = 0;
+
     function updateKeys() {
         keyVSprite.x = playerBetText.x + playerBetText.width + spacing/4;
         keyCSprite.x = playerBetText.x + playerBetText.width + spacing/1.8;
@@ -564,6 +568,7 @@ import { Table, Player } from "./blackjack";
                 }
 
                 if (player.inventory.backcard3 > 0) {
+                    backcardRounds++;
                     gamestate = "REVEAL_BACKCARD";
                     break;
                 }
@@ -580,7 +585,7 @@ import { Table, Player } from "./blackjack";
                 if (cardBackSprite.alpha <= 0) {
                     cardBackSprite.alpha = 0;
                     container.removeChild(cardBackSprite);
-                    player.inventory.backcard3--;
+                    if (backcardRounds > 2) player.inventory.backcard3--;
                     drawAmountBits(ITEMS.backcard3.x, ITEMS.backcard3.y, player.inventory.backcard3, ITEMS.backcard3.maxAmount, "backcard3");
 
                     dealerSumText.text = dealer.GetDeckSum();
