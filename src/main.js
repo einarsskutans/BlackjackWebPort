@@ -53,7 +53,7 @@ import { Table, Player } from "./blackjack";
     const bitTexture = await Assets.load({src: "/assets/bit.png", data: {scaleMode: "nearest"}});
     const buyBgGreenTexture = await Assets.load({src: "/assets/buyBgGreen.png", data: {scaleMode: "nearest"}});
     
-    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale*1.2})
+    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale})
 
     const keyZSprite = new Sprite({texture: keyZTexture, anchor: 0.5, position: {x: 0, y: -app.screen.height / 4}, scale: scale/6});
     const keyXSprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/4}, scale: scale/6});
@@ -70,7 +70,7 @@ import { Table, Player } from "./blackjack";
     const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6, eventMode: "static", zIndex: 2});
     shopContainer.y = shopBgSprite.height/2 + shopSprite.y + shopSprite.height + scale;
     const backcard3Sprite = new Sprite({texture: backcard3Texture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing/2}, scale: scale});
-    const profitSprite = new Sprite({texture: profitTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*1.4}, scale: scale});
+    const profitSprite = new Sprite({texture: profitTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*2}, scale: scale});
     
     const table = new Table();
     table.GenerateSpriteDeck();
@@ -191,14 +191,21 @@ import { Table, Player } from "./blackjack";
         profit: {
             id: "profit",
             name: "Profit+",
-            description: "Winnings give 1% of the bet",
-            price: 200,
+            description: "Winnings give 5% of the bet",
+            price: 300,
+            priceCf: 1.25,
             maxAmount: 10,
             get x() {
                 return profitText.x + spacing / 4 + profitText.width / 2;
             },
             get y() {
                 return profitText.y - profitText.height / 3;
+            },
+            get buttonX() {
+                return profitSprite.x - backcard3Sprite.width / 2;
+            },
+            get buttonY() {
+                return profitSprite.y + profitSprite.height - scale * 2;
             }
         },
 
@@ -207,12 +214,19 @@ import { Table, Player } from "./blackjack";
             name: "Backcard",
             description: "Show backcard on the next 3 rounds",
             price: 10,
+            priceCf: 1,
             maxAmount: 1,
             get x() {
                 return backcard3Text.x + spacing / 4 + backcard3Text.width / 2;
             },
             get y() {
                 return backcard3Text.y - backcard3Text.height / 3;
+            },
+            get buttonX() {
+                return backcard3Sprite.x - backcard3Sprite.width / 2;
+            },
+            get buttonY() {
+                return backcard3Sprite.y + backcard3Sprite.height - scale * 2;
             }
         },
 
@@ -232,8 +246,8 @@ import { Table, Player } from "./blackjack";
     shopSprite.on("click", () => {
         if (gamestate !== "BET") return;
         drawAmountBits(profitText.x + spacing / 4 + profitText.width / 2, profitText.y - profitText.height / 3, player.inventory.profit, ITEMS.profit.maxAmount, "profit");
-        drawBuyButton(shopBgSprite.width/2 - spacing/1.5, profitText.y, "profit");
-        drawBuyButton(shopBgSprite.width/2 - spacing/1.5, backcard3Text.y, "backcard3");
+        drawBuyButton(profitSprite.x-backcard3Sprite.width/2, profitSprite.y+profitSprite.height-scale*2, "profit");
+        drawBuyButton(backcard3Sprite.x-backcard3Sprite.width/2, backcard3Sprite.y+backcard3Sprite.height-scale*2, "backcard3");
         if (container.getChildByLabel("shopBg")) {
             const animate = () => {
                 shopContainer.x += app.ticker.deltaMS*scale/2;
@@ -269,8 +283,12 @@ import { Table, Player } from "./blackjack";
         player.balance -= item.price;
         playerBalanceText.text = "CASH $" + player.balance;
         player.inventory[itemID] += 1;
+        item.price = Math.round(item.price*item.priceCf);
 
         drawAmountBits(item.x, item.y, player.inventory[itemID], item.maxAmount, itemID);
+        if (buyButtons[itemID]) {
+            buyButtons[itemID].text.text = "$" + item.price;
+        }
     }
 
     const itemBits = {};
@@ -298,26 +316,37 @@ import { Table, Player } from "./blackjack";
             if (i > amount) {
                 bitSprite.alpha = 0.2;
             }
+            else bitSprite.alpha = 1;
 
             itemBits[itemID].push(bitSprite);
             shopContainer.addChild(bitSprite);
         }
     }
+    const buyButtons = {};
     function drawBuyButton(x, y, itemID) {
         const item = ITEMS[itemID];
 
-        const buyButtonBg = new Sprite({texture: buyBgGreenTexture, position: {x: x, y: y}, scale: scale*1.2, anchor: 0.5, eventMode: "static"});
+        if (buyButtons[itemID]) {
+            buyButtons[itemID].text.text = "$" + item.price;
+            return;
+        }
+
+        const buyButtonBg = new Sprite({texture: buyBgGreenTexture, position: {x: x, y: y}, scale: scale, anchor: {x: 0, y: 0.5}, eventMode: "static"});
         const buyButtonText = new Text({
-            text: item.price,
+            text: "$" + item.price,
             style: {
                 fill: "#FFFFFF",
                 fontSize: Math.round(scale * 4),
                 fontFamily: "PrimaryFont"
             },
             anchor: 0.5,
-            position: {x: x, y: y}
+            position: {x: buyButtonBg.x+buyButtonBg.width/2, y: buyButtonBg.y}
         })
         shopContainer.addChild(buyButtonBg, buyButtonText);
+            buyButtons[itemID] = {
+            bg: buyButtonBg,
+            text: buyButtonText
+        };
         buyButtonBg.on("pointerover", () => {
             buyButtonBg.alpha = 0.4;
         })
@@ -520,8 +549,43 @@ import { Table, Player } from "./blackjack";
                     break;
                 }
 
+                if (player.inventory.backcard3 > 0) {
+                    gamestate = "REVEAL_BACKCARD";
+                    break;
+                }
+                
+
                 gamestate = "LOOP";
                 shopSprite.alpha = 0.4;
+
+                break;
+
+            case "REVEAL_BACKCARD":
+                cardBackSprite.alpha -= ticker.deltaTime * 0.05;
+                cardBackSprite.y += ticker.deltaTime * 1;
+
+                if (cardBackSprite.alpha <= 0) {
+                    cardBackSprite.alpha = 0;
+                    container.removeChild(cardBackSprite);
+                    player.inventory.backcard3--;
+                    drawAmountBits(ITEMS.backcard3.x, ITEMS.backcard3.y, player.inventory.backcard3, ITEMS.backcard3.maxAmount, "backcard3");
+
+                    dealerSumText.text = dealer.GetDeckSum();
+
+                    sleep = 1000;
+                    waiting = true;
+
+                    if (player.GetDeckSum() > 21 || dealer.GetDeckSum() === 21) {
+                        gamestate = "LOSE";
+                    }
+                    else if (player.GetDeckSum() === 21 || dealer.GetDeckSum() > 21) {
+                        gamestate = "WIN";
+                    } 
+                    else {
+                        gamestate = "LOOP";
+                        shopSprite.alpha = 0.4;
+                    }
+                }
 
                 break;
         
@@ -548,6 +612,10 @@ import { Table, Player } from "./blackjack";
 
                 break;
             case "PREHOLD": // Time to drop backcard
+                if (player.inventory.backcard3 > 0) {
+                    gamestate = "HOLD";
+                    break;
+                }
                 dealerSumText.text = dealer.GetDeckSum();
                 cardBackSprite.alpha -= ticker.deltaTime * 0.05;
                 cardBackSprite.y += ticker.deltaTime * 1;
@@ -600,7 +668,7 @@ import { Table, Player } from "./blackjack";
                 break;
             case "WIN":
                 playerSumText.text = "WIN";
-                player.balance += player.bet;
+                player.balance += player.bet + (player.bet*player.inventory.profit)*0.05;
 
                 sleep = 2000;
                 waiting = true;
