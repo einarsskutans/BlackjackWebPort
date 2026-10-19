@@ -169,7 +169,7 @@ import { Table, Player } from "./blackjack";
         position: {x: backcard3Sprite.x + spacing/2, y: backcard3Sprite.y}
     })
     const profitText = new Text({
-        text: "Profit+\nWinnings give\n1% of the bet",
+        text: "Profit+\nWinnings give\n5% of the bet",
         style: {
             fill: "#FFFFFF",
             fontSize: Math.round(scale*4),
@@ -300,7 +300,9 @@ import { Table, Player } from "./blackjack";
         if (item.maxAmount <= player.inventory[itemID]) return;
 
         player.balance -= item.price;
+        if (player.bet > player.balance) player.bet = player.balance;
         playerBalanceText.text = "CASH $" + player.balance;
+        playerBetText.text = "BET $" + player.bet;
         player.inventory[itemID] += 1;
         item.price = Math.round(item.price*item.priceCf);
 
@@ -408,7 +410,8 @@ import { Table, Player } from "./blackjack";
         if (event.key ==  "w" && gamestate === "BET") {
             if (player.bet < player.balance) {
                 keyVSprite.alpha = 0.6;
-                player.bet += 50;
+                if (player.bet > player.balance) player.bet = player.balance;
+                else player.bet += player.betDefault;
                 playerBetText.text = "BET $" + player.bet;
                 updateKeys();
             }
