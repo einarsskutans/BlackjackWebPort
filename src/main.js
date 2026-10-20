@@ -390,39 +390,45 @@ import { Table, Player } from "./blackjack";
     document.addEventListener("keydown", (event) => {
         if (event.key ==  "x") {
             if (gamestate === "LOOP") {
-                keyXSprite.alpha = 0.6;
+                keyXSprite.alpha = 0.4;
                 gamestate = "HIT";
             }
             else if (gamestate === "BET") {
-                keyXSprite.alpha = 0.6;
+                keyXSprite.alpha = 0.4;
                 gamestate = "START";
             }
             else if (gamestate === "MENU_WAIT") {
-                keyX2Sprite.alpha = 0.6;
+                keyX2Sprite.alpha = 0.4;
                 gamestate = "RESET";
             }
         }
         if (event.key ==  "z" && gamestate === "LOOP") {
             if (container.getChildByLabel("shopBg")) return;
             gamestate = "PREHOLD";
-            keyZSprite.alpha = 0.6;
+            keyZSprite.alpha = 0.4;
         }
-        if (event.key ==  "w" && gamestate === "BET") {
-            if (player.bet < player.balance) {
-                keyVSprite.alpha = 0.6;
-                if (player.bet > player.balance) player.bet = player.balance;
-                else player.bet += player.betDefault;
-                playerBetText.text = "BET $" + player.bet;
-                updateKeys();
+        if (event.key === "w" && gamestate === "BET") {
+            const increment = player.betDefault;
+            const nextBet = (Math.floor(player.bet / increment) + 1) * increment;
+
+            if (nextBet <= player.balance) {
+                player.bet = nextBet;
             }
+
+            keyVSprite.alpha = 0.4;
+            playerBetText.text = "BET $" + player.bet;
+            updateKeys();
         }
-        if (event.key ==  "s" && gamestate === "BET") {
-            if (player.bet > 50) {
-                keyCSprite.alpha = 0.6;
-                player.bet -= 50;
-                playerBetText.text = "BET $" + player.bet;
-                updateKeys();
-            }
+
+        if (event.key === "s" && gamestate === "BET") {
+            const increment = player.betDefault;
+            const nextBet = (Math.ceil(player.bet / increment) - 1) * increment;
+
+            player.bet = Math.max(Math.min(increment, player.balance), nextBet);
+
+            keyCSprite.alpha = 0.4;
+            playerBetText.text = "BET $" + player.bet;
+            updateKeys();
         }
     })
     document.addEventListener("keyup", (event) => {
