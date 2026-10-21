@@ -241,6 +241,48 @@ import { Table, Player } from "./blackjack";
         },
     };
 
+    window.addEventListener("resize", reSize);
+    function reSize() {
+        app.renderer.resize(window.innerWidth, window.innerHeight);
+
+        const scale = ((app.screen.width / 2560) * 0.7 + (app.screen.height / 1440) * 0.3)*8;
+        const spacing = scale*24;
+
+        container.position = {x: app.screen.width/2, y: app.screen.height/2};
+
+        shopBgSprite.scale = scale/1.6;
+        shopBgSprite.position = {x: 0, y: 0};
+        keyZSprite.scale = scale/6;
+        keyZSprite.position = {x: 0, y: -app.screen.height / 4};
+        keyXSprite.scale = scale/6;
+        keyXSprite.position = {x: 0, y: app.screen.height/4};
+        keyX2Sprite.scale = scale/6;
+        keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/2, y: centerText.y};
+        keyVSprite.scale = scale/8;
+        keyVSprite.position = {x: 0, y: app.screen.height/2 - spacing/3};
+        keyCSprite.scale = scale/8;
+        keyCSprite.position = {x: 0, y: app.screen.height/2 - spacing/3};
+
+        playerSprite.scale = scale/1.6;
+        playerSprite.position = {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6};
+        dealerSprite.scale = scale/1.6;
+        dealerSprite.position = {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6};
+
+        cardEmptySprite1.position = {x: -spacing/2, y: app.screen.height/4};
+        cardBackSprite.position.y = 0;
+        cardEmptySprite2.position = {x: spacing/2, y: app.screen.height/4};
+        cardEmptySprite1.scale = scale;
+        cardEmptySprite2.scale = scale;
+        
+        shopSprite.position = {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6};
+        shopContainer.y = shopBgSprite.height/2 + shopSprite.y + shopSprite.height + scale;
+
+        backcard3Sprite.scale = scale;
+        backcard3Sprite.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing/2};
+        profitSprite.scale = scale;
+        profitSprite.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*2};
+    }
+
     shopContainer.addChild(shopBgSprite, backcard3Sprite, profitSprite, shopText, backcard3Text, profitText);
 
     shopSprite.on("pointerover", () => {shopSprite.alpha = 0.4;});
