@@ -313,6 +313,15 @@ import { Table, Player } from "./blackjack";
         deckCountText.style.fontSize = Math.round(scale * 4);
         deckCountText.position = {x: 0, y: spacing};
 
+        
+        for (let card of player.deck) {
+            card.sprite.scale = scale;
+            card.sprite.position = {x: -(player.deck.length - 1) * spacing / 2 + i * spacing, y: app.screen.height / 4};
+        } 
+        for (let card of dealer.deck) {
+            card.sprite.scale = scale;
+            card.sprite.position = {x: -(dealer.deck.length - 1) * spacing / 2 + i * spacing, y: -app.screen.height / 4};
+        }
         updateKeys();
     }
 
