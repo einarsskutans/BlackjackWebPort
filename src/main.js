@@ -274,6 +274,7 @@ import { Table, Player } from "./blackjack";
         cardEmptySprite1.scale = scale;
         cardEmptySprite2.scale = scale;
         
+        shopSprite.scale = scale/1.6
         shopSprite.position = {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6};
         shopContainer.y = shopBgSprite.height/2 + shopSprite.y + shopSprite.height + scale;
 
@@ -281,6 +282,38 @@ import { Table, Player } from "./blackjack";
         backcard3Sprite.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing/2};
         profitSprite.scale = scale;
         profitSprite.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*2};
+
+        playerSumText.style.fontSize = Math.round(scale * 8);
+        playerSumText.position = {x: 0, y: app.screen.height/4 + spacing};
+
+        dealerSumText.style.fontSize = Math.round(scale * 8);
+        dealerSumText.position = {x: 0, y: -app.screen.height/4 + spacing};
+
+        playerBalanceText.style.fontSize = Math.round(scale * 6);
+        playerBalanceText.position = {x: -app.screen.width/2 + spacing*1.1, y: app.screen.height/2 - spacing/1.3};
+
+        playerBetText.style.fontSize = Math.round(scale * 6);
+        playerBetText.position = {x: -app.screen.width/2 + spacing*1.1, y: app.screen.height/2 - spacing/2};
+        
+        playerNameText.style.fontSize = Math.round(scale * 5);
+        playerNameText.position = {x: -app.screen.width/2 + spacing*1.12, y: app.screen.height/2 - spacing};
+
+        dealerNameText.style.fontSize = Math.round(scale * 5);
+        dealerNameText.position = {x: -app.screen.width/2 + spacing*1.12, y: -app.screen.height/2 + spacing/6};
+
+        shopText.style.fontSize = Math.round(scale * 6);
+        shopText.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 - spacing/4};
+
+        backcard3Text.style.fontSize = Math.round(scale * 4);
+        backcard3Text.position = {x: backcard3Sprite.x + spacing/2, y: backcard3Sprite.y};
+
+        profitText.style.fontSize = Math.round(scale * 4);
+        profitText.position = {x: profitSprite.x + spacing/2, y: profitSprite.y};
+
+        deckCountText.style.fontSize = Math.round(scale * 4);
+        deckCountText.position = {x: 0, y: spacing};
+
+        updateKeys();
     }
 
     shopContainer.addChild(shopBgSprite, backcard3Sprite, profitSprite, shopText, backcard3Text, profitText);
