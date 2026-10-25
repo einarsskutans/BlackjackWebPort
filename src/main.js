@@ -19,8 +19,8 @@ import { Table, Player } from "./blackjack";
     document.fonts.add(font);
 
     // Render setup
-    const scale = ((app.screen.width / 2560) * 0.7 + (app.screen.height / 1440) * 0.3)*8;
-    const spacing = scale*24;
+    let scale = ((app.screen.width / 2560) * 0.7 + (app.screen.height / 1440) * 0.3)*8;
+    let spacing = scale*24;
 
     const container = new Container({position: {x: app.screen.width/2, y: app.screen.height/2}});
     const shopContainer = new Container({position: {x: 0, y: 0}, zIndex: 2, label: "shopBg"});
@@ -241,90 +241,6 @@ import { Table, Player } from "./blackjack";
         },
     };
 
-    window.addEventListener("resize", reSize);
-    function reSize() {
-        app.renderer.resize(window.innerWidth, window.innerHeight);
-
-        const scale = ((app.screen.width / 2560) * 0.7 + (app.screen.height / 1440) * 0.3)*8;
-        const spacing = scale*24;
-
-        container.position = {x: app.screen.width/2, y: app.screen.height/2};
-
-        shopBgSprite.scale = scale/1.6;
-        shopBgSprite.position = {x: 0, y: 0};
-        keyZSprite.scale = scale/6;
-        keyZSprite.position = {x: 0, y: -app.screen.height / 4};
-        keyXSprite.scale = scale/6;
-        keyXSprite.position = {x: 0, y: app.screen.height/4};
-        keyX2Sprite.scale = scale/6;
-        keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/2, y: centerText.y};
-        keyVSprite.scale = scale/8;
-        keyVSprite.position = {x: 0, y: app.screen.height/2 - spacing/3};
-        keyCSprite.scale = scale/8;
-        keyCSprite.position = {x: 0, y: app.screen.height/2 - spacing/3};
-
-        playerSprite.scale = scale/1.6;
-        playerSprite.position = {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6};
-        dealerSprite.scale = scale/1.6;
-        dealerSprite.position = {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6};
-
-        cardEmptySprite1.position = {x: -spacing/2, y: app.screen.height/4};
-        cardBackSprite.position.y = 0;
-        cardEmptySprite2.position = {x: spacing/2, y: app.screen.height/4};
-        cardEmptySprite1.scale = scale;
-        cardEmptySprite2.scale = scale;
-        
-        shopSprite.scale = scale/1.6
-        shopSprite.position = {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6};
-        shopContainer.y = shopBgSprite.height/2 + shopSprite.y + shopSprite.height + scale;
-
-        backcard3Sprite.scale = scale;
-        backcard3Sprite.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing/2};
-        profitSprite.scale = scale;
-        profitSprite.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*2};
-
-        playerSumText.style.fontSize = Math.round(scale * 8);
-        playerSumText.position = {x: 0, y: app.screen.height/4 + spacing};
-
-        dealerSumText.style.fontSize = Math.round(scale * 8);
-        dealerSumText.position = {x: 0, y: -app.screen.height/4 + spacing};
-
-        playerBalanceText.style.fontSize = Math.round(scale * 6);
-        playerBalanceText.position = {x: -app.screen.width/2 + spacing*1.1, y: app.screen.height/2 - spacing/1.3};
-
-        playerBetText.style.fontSize = Math.round(scale * 6);
-        playerBetText.position = {x: -app.screen.width/2 + spacing*1.1, y: app.screen.height/2 - spacing/2};
-        
-        playerNameText.style.fontSize = Math.round(scale * 5);
-        playerNameText.position = {x: -app.screen.width/2 + spacing*1.12, y: app.screen.height/2 - spacing};
-
-        dealerNameText.style.fontSize = Math.round(scale * 5);
-        dealerNameText.position = {x: -app.screen.width/2 + spacing*1.12, y: -app.screen.height/2 + spacing/6};
-
-        shopText.style.fontSize = Math.round(scale * 6);
-        shopText.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 - spacing/4};
-
-        backcard3Text.style.fontSize = Math.round(scale * 4);
-        backcard3Text.position = {x: backcard3Sprite.x + spacing/2, y: backcard3Sprite.y};
-
-        profitText.style.fontSize = Math.round(scale * 4);
-        profitText.position = {x: profitSprite.x + spacing/2, y: profitSprite.y};
-
-        deckCountText.style.fontSize = Math.round(scale * 4);
-        deckCountText.position = {x: 0, y: spacing};
-
-        
-        for (let card of player.deck) {
-            card.sprite.scale = scale;
-            card.sprite.position = {x: -(player.deck.length - 1) * spacing / 2 + i * spacing, y: app.screen.height / 4};
-        } 
-        for (let card of dealer.deck) {
-            card.sprite.scale = scale;
-            card.sprite.position = {x: -(dealer.deck.length - 1) * spacing / 2 + i * spacing, y: -app.screen.height / 4};
-        }
-        updateKeys();
-    }
-
     shopContainer.addChild(shopBgSprite, backcard3Sprite, profitSprite, shopText, backcard3Text, profitText);
 
     shopSprite.on("pointerover", () => {shopSprite.alpha = 0.4;});
@@ -429,7 +345,15 @@ import { Table, Player } from "./blackjack";
         const item = ITEMS[itemID];
 
         if (buyButtons[itemID]) {
-            buyButtons[itemID].text.text = "$" + item.price;
+            const button = buyButtons[itemID];
+
+            button.bg.scale = scale;
+            button.bg.position = {x: x, y: y};
+
+            button.text.style.fontSize = Math.round(scale * 4);
+            button.text.position = {x: x + button.bg.width / 2, y: y};
+
+            button.text.text = "$" + item.price;
             return;
         }
         const buyButtonBg = new Sprite({texture: buyBgRedTexture, position: {x: x, y: y}, scale: scale, anchor: {x: 0, y: 0.5}, eventMode: "static"});
@@ -459,6 +383,102 @@ import { Table, Player } from "./blackjack";
             console.log(player.inventory);
         })
         updateButtonColor(itemID);
+    }
+
+    window.addEventListener("resize", reSize);
+    function reSize() {
+        scale = ((app.screen.width / 2560) * 0.7 + (app.screen.height / 1440) * 0.3)*8;
+        spacing = scale*24;
+
+        container.position = {x: app.screen.width/2, y: app.screen.height/2};
+        shopContainer.x = app.screen.width/2-shopContainer.width/2-spacing/4;
+
+        centerText.style.fontSize = Math.round(scale * 7);
+        centerText.position = {x: 0, y: 0};
+
+        shopBgSprite.scale = scale;
+        shopBgSprite.position = {x: 0, y: 0};
+        keyZSprite.scale = scale/6;
+        keyZSprite.position = {x: 0, y: -app.screen.height / 4};
+        keyXSprite.scale = scale/6;
+        keyXSprite.position = {x: 0, y: app.screen.height/4};
+        keyX2Sprite.scale = scale/6;
+        keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/2, y: centerText.y};
+        keyVSprite.scale = scale/8;
+        keyVSprite.position = {x: 0, y: app.screen.height/2 - spacing/3};
+        keyCSprite.scale = scale/8;
+        keyCSprite.position = {x: 0, y: app.screen.height/2 - spacing/3};
+
+        playerSprite.scale = scale/1.6;
+        playerSprite.position = {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6};
+        dealerSprite.scale = scale/1.6;
+        dealerSprite.position = {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6};
+
+        cardEmptySprite1.position = {x: -spacing/2, y: app.screen.height/4};
+        cardBackSprite.scale = scale;
+        cardBackSprite.position = {x: -(dealer.deck.length - 1) * spacing / 2, y: -app.screen.height / 4};
+        cardEmptySprite2.position = {x: spacing/2, y: app.screen.height/4};
+        cardEmptySprite1.scale = scale;
+        cardEmptySprite2.scale = scale;
+        
+        shopSprite.scale = scale/1.6
+        shopSprite.position = {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6};
+        shopContainer.y = shopBgSprite.height/2 + shopSprite.y + shopSprite.height + scale;
+
+        backcard3Sprite.scale = scale;
+        backcard3Sprite.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing/2};
+        profitSprite.scale = scale;
+        profitSprite.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*2};
+
+        playerSumText.style.fontSize = Math.round(scale * 8);
+        playerSumText.position = {x: 0, y: app.screen.height/4 + spacing};
+
+        dealerSumText.style.fontSize = Math.round(scale * 8);
+        dealerSumText.position = {x: 0, y: -app.screen.height/4 + spacing};
+
+        playerBalanceText.style.fontSize = Math.round(scale * 6);
+        playerBalanceText.position = {x: -app.screen.width/2 + spacing*1.1, y: app.screen.height/2 - spacing/1.3};
+
+        playerBetText.style.fontSize = Math.round(scale * 6);
+        playerBetText.position = {x: -app.screen.width/2 + spacing*1.1, y: app.screen.height/2 - spacing/2};
+        
+        playerNameText.style.fontSize = Math.round(scale * 5);
+        playerNameText.position = {x: -app.screen.width/2 + spacing*1.12, y: app.screen.height/2 - spacing};
+
+        dealerNameText.style.fontSize = Math.round(scale * 5);
+        dealerNameText.position = {x: -app.screen.width/2 + spacing*1.12, y: -app.screen.height/2 + spacing/6};
+
+        shopText.style.fontSize = Math.round(scale * 6);
+        shopText.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 - spacing/4};
+
+        backcard3Text.style.fontSize = Math.round(scale * 4);
+        backcard3Text.position = {x: backcard3Sprite.x + spacing/2, y: backcard3Sprite.y};
+
+        profitText.style.fontSize = Math.round(scale * 4);
+        profitText.position = {x: profitSprite.x + spacing/2, y: profitSprite.y};
+
+        deckCountText.style.fontSize = Math.round(scale * 4);
+        deckCountText.position = {x: 0, y: spacing};
+
+        
+        player.deck.forEach((card, i) => {
+            card.sprite.scale = scale;
+            card.sprite.position = {x: -(player.deck.length - 1) * spacing / 2 + i * spacing, y: app.screen.height / 4};
+        });
+
+        dealer.deck.forEach((card, i) => {
+            card.sprite.scale.set(scale);
+            card.sprite.position = {x: -(dealer.deck.length - 1) * spacing / 2 + i * spacing, y: -app.screen.height / 4};
+        });
+        keyVSprite.x = playerBetText.x + playerBetText.width + spacing/4;
+        keyCSprite.x = playerBetText.x + playerBetText.width + spacing/1.8;
+        keyXSprite.x = player.deck.length * spacing/1.4;
+        keyZSprite.x = dealer.deck.length * spacing/1.4;
+
+        drawAmountBits(ITEMS.profit.x, ITEMS.profit.y, player.inventory.profit, ITEMS.profit.maxAmount, "profit");
+        drawAmountBits(ITEMS.backcard3.x, ITEMS.backcard3.y, player.inventory.backcard3, ITEMS.backcard3.maxAmount, "backcard3");
+        drawBuyButton(profitSprite.x-backcard3Sprite.width/2, profitSprite.y+profitSprite.height-scale*2, "profit");
+        drawBuyButton(backcard3Sprite.x-backcard3Sprite.width/2, backcard3Sprite.y+backcard3Sprite.height-scale*2, "backcard3");
     }
 
     // Game logic
@@ -544,6 +564,8 @@ import { Table, Player } from "./blackjack";
             card.sprite.scale.set(scale);
             updateKeys();
             console.log(card.value);
+
+            reSize();
         }
     }
     function drawDealerBackCard() {
@@ -552,6 +574,8 @@ import { Table, Player } from "./blackjack";
         cardBackSprite.x = -(dealer.deck.length - 1) * spacing / 2;
         cardBackSprite.y = -app.screen.height / 4;
         cardBackSprite.alpha = 1;
+
+        reSize();
     }
 
     app.ticker.add((ticker) => {
