@@ -54,6 +54,8 @@ import { Table, Player } from "./blackjack";
     const buyBgGreenTexture = await Assets.load({src: "/assets/buyBgGreen.png", data: {scaleMode: "nearest"}});
     const buyBgRedTexture = await Assets.load({src: "/assets/buyBgRed.png", data: {scaleMode: "nearest"}});
     const buyBgGrayTexture = await Assets.load({src: "/assets/buyBgGray.png", data: {scaleMode: "nearest"}});
+    const profitGoldTexture = await Assets.load({src: "/assets/upProfitGold.png", data: {scaleMode: "nearest"}});
+    const endTexture = await Assets.load({src: "/assets/upEnd.png", data: {scaleMode: "nearest"}});
     
     const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale})
 
@@ -71,8 +73,10 @@ import { Table, Player } from "./blackjack";
 
     const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6, eventMode: "static", zIndex: 2});
     shopContainer.y = shopBgSprite.height/2 + shopSprite.y + shopSprite.height + scale;
-    const backcard3Sprite = new Sprite({texture: backcard3Texture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing/2}, scale: scale});
+    const backcard3Sprite = new Sprite({texture: backcard3Texture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*0.5}, scale: scale});
     const profitSprite = new Sprite({texture: profitTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*2}, scale: scale});
+    const profitGoldSprite = new Sprite({texture: profitGoldTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*3.5}, scale: scale});
+    const endSprite = new Sprite({texture: endTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*5}, scale: scale});
     
     const table = new Table();
     table.GenerateSpriteDeck();
@@ -178,6 +182,26 @@ import { Table, Player } from "./blackjack";
         anchor: {x: 0, y: 0.5},
         position: {x: profitSprite.x + spacing/2, y: profitSprite.y}
     })
+    const profitGoldText = new Text({
+        text: "Profit++\nWinnings give\n12% of the bet",
+        style: {
+            fill: "#FFFFFF",
+            fontSize: Math.round(scale*4),
+            fontFamily: "PrimaryFont"
+        },
+        anchor: {x: 0, y: 0.5},
+        position: {x: profitGoldSprite.x + spacing/2, y: profitGoldSprite.y}
+    })
+    const endText = new Text({
+        text: "The End\nEarn 25k\nto unlock this",
+        style: {
+            fill: "#FFFFFF",
+            fontSize: Math.round(scale*4),
+            fontFamily: "PrimaryFont"
+        },
+        anchor: {x: 0, y: 0.5},
+        position: {x: endSprite.x + spacing/2, y: endSprite.y}
+    })
     const deckCountText = new Text({
         style: {
             fill: "#FFFFFF",
@@ -232,16 +256,49 @@ import { Table, Player } from "./blackjack";
             }
         },
 
+        profitGold: {
+            id: "profitGold",
+            name: "Profit++",
+            description: "Winnings give 12% of the bet",
+            price: 1000,
+            priceCf: 1.75,
+            maxAmount: 5,
+            get x() {
+                return profitGoldText.x + spacing / 6 + profitGoldText.width / 2;
+            },
+            get y() {
+                return profitGoldText.y - profitGoldText.height / 3;
+            },
+            get buttonX() {
+                return profitGoldSprite.x - profitGoldSprite.width / 2;
+            },
+            get buttonY() {
+                return profitGoldSprite.y + profitGoldSprite.height - scale * 2;
+            }
+        },
+
         kill: {
             id: "kill",
             name: "Kill",
             description: "Special item",
             price: 10000,
             maxAmount: 1,
+            get x() {
+                return endText.x + spacing / 6 + endText.width / 2;
+            },
+            get y() {
+                return endText.y - endText.height / 3;
+            },
+            get buttonX() {
+                return endSprite.x - endSprite.width / 2;
+            },
+            get buttonY() {
+                return endSprite.y + endSprite.height - scale * 2;
+            }
         },
     };
 
-    shopContainer.addChild(shopBgSprite, backcard3Sprite, profitSprite, shopText, backcard3Text, profitText);
+    shopContainer.addChild(shopBgSprite, backcard3Sprite, profitSprite, profitGoldSprite, endSprite, shopText, backcard3Text, profitText, profitGoldText, endText);
 
     shopSprite.on("pointerover", () => {shopSprite.alpha = 0.4;});
     shopSprite.on("pointerout", () => {if (gamestate === "BET")shopSprite.alpha = 1;});
@@ -249,8 +306,12 @@ import { Table, Player } from "./blackjack";
         if (gamestate !== "BET") return;
         drawAmountBits(ITEMS.profit.x, ITEMS.profit.y, player.inventory.profit, ITEMS.profit.maxAmount, "profit");
         drawAmountBits(ITEMS.backcard3.x, ITEMS.backcard3.y, player.inventory.backcard3, ITEMS.backcard3.maxAmount, "backcard3");
+        drawAmountBits(ITEMS.profitGold.x, ITEMS.profitGold.y, player.inventory.profitGold, ITEMS.profitGold.maxAmount, "profitGold");
+        drawAmountBits(ITEMS.kill.x, ITEMS.kill.y, player.inventory.kill, ITEMS.kill.maxAmount, "kill");
         drawBuyButton(profitSprite.x-backcard3Sprite.width/2, profitSprite.y+profitSprite.height-scale*2, "profit");
         drawBuyButton(backcard3Sprite.x-backcard3Sprite.width/2, backcard3Sprite.y+backcard3Sprite.height-scale*2, "backcard3");
+        drawBuyButton(profitGoldSprite.x-backcard3Sprite.width/2, profitGoldSprite.y+profitGoldSprite.height-scale*2, "profitGold");
+        drawBuyButton(endSprite.x-endSprite.width/2, endSprite.y+endSprite.height-scale*2, "kill");
         if (container.getChildByLabel("shopBg")) {
             const animate = () => {
                 shopContainer.x += app.ticker.deltaMS*scale/2;
