@@ -56,12 +56,13 @@ import { Table, Player } from "./blackjack";
     const buyBgGrayTexture = await Assets.load({src: "/assets/buyBgGray.png", data: {scaleMode: "nearest"}});
     const profitGoldTexture = await Assets.load({src: "/assets/upProfitGold.png", data: {scaleMode: "nearest"}});
     const endTexture = await Assets.load({src: "/assets/upEnd.png", data: {scaleMode: "nearest"}});
+    const endVisTexture = await Assets.load({src: "/assets/upEndVis.png", data: {scaleMode: "nearest"}});
     
     const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale})
 
     const keyZSprite = new Sprite({texture: keyZTexture, anchor: 0.5, position: {x: 0, y: -app.screen.height / 4}, scale: scale/6});
     const keyXSprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/4}, scale: scale/6});
-    const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: centerText.x-centerText.width/2-spacing/2, y: centerText.y}, scale: scale/6});
+    const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: centerText.x-centerText.width/2-spacing*0.2, y: centerText.y}, scale: scale/6});
     const keyVSprite = new Sprite({texture: keyVTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
     const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
     const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
@@ -77,6 +78,7 @@ import { Table, Player } from "./blackjack";
     const profitSprite = new Sprite({texture: profitTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*2}, scale: scale});
     const profitGoldSprite = new Sprite({texture: profitGoldTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*3.5}, scale: scale});
     const endSprite = new Sprite({texture: endTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*5}, scale: scale});
+    const endVisSprite = new Sprite({texture: endVisTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*5}, scale: scale, alpha: 0});
     
     const table = new Table();
     table.GenerateSpriteDeck();
@@ -281,7 +283,8 @@ import { Table, Player } from "./blackjack";
             id: "kill",
             name: "Kill",
             description: "Special item",
-            price: 10000,
+            price: 30000,
+            priceCf: 1,
             maxAmount: 1,
             get x() {
                 return endText.x + spacing / 6 + endText.width / 2;
@@ -298,7 +301,9 @@ import { Table, Player } from "./blackjack";
         },
     };
 
-    shopContainer.addChild(shopBgSprite, backcard3Sprite, profitSprite, profitGoldSprite, endSprite, shopText, backcard3Text, profitText, profitGoldText, endText);
+    let endgame = false;
+
+    shopContainer.addChild(shopBgSprite, backcard3Sprite, profitSprite, profitGoldSprite, endSprite, endVisSprite, shopText, backcard3Text, profitText, profitGoldText, endText);
 
     shopSprite.on("pointerover", () => {shopSprite.alpha = 0.4;});
     shopSprite.on("pointerout", () => {if (gamestate === "BET")shopSprite.alpha = 1;});
@@ -307,11 +312,12 @@ import { Table, Player } from "./blackjack";
         drawAmountBits(ITEMS.profit.x, ITEMS.profit.y, player.inventory.profit, ITEMS.profit.maxAmount, "profit");
         drawAmountBits(ITEMS.backcard3.x, ITEMS.backcard3.y, player.inventory.backcard3, ITEMS.backcard3.maxAmount, "backcard3");
         drawAmountBits(ITEMS.profitGold.x, ITEMS.profitGold.y, player.inventory.profitGold, ITEMS.profitGold.maxAmount, "profitGold");
-        drawAmountBits(ITEMS.kill.x, ITEMS.kill.y, player.inventory.kill, ITEMS.kill.maxAmount, "kill");
         drawBuyButton(profitSprite.x-backcard3Sprite.width/2, profitSprite.y+profitSprite.height-scale*2, "profit");
         drawBuyButton(backcard3Sprite.x-backcard3Sprite.width/2, backcard3Sprite.y+backcard3Sprite.height-scale*2, "backcard3");
         drawBuyButton(profitGoldSprite.x-backcard3Sprite.width/2, profitGoldSprite.y+profitGoldSprite.height-scale*2, "profitGold");
         drawBuyButton(endSprite.x-endSprite.width/2, endSprite.y+endSprite.height-scale*2, "kill");
+        if (endgame) buyButtons["kill"].text.text = "$" + ITEMS.kill.price;
+        else if (!endgame) buyButtons["kill"].text.text = "?";
         if (container.getChildByLabel("shopBg")) {
             const animate = () => {
                 shopContainer.x += app.ticker.deltaMS*scale/2;
@@ -326,6 +332,8 @@ import { Table, Player } from "./blackjack";
         else {
             updateButtonColor("profit");
             updateButtonColor("backcard3");
+            updateButtonColor("profitGold");
+            updateButtonColor("kill");
             shopContainer.x = app.screen.width/2 + shopBgSprite.width/2;
             shopSprite.alpha = 0.6;
             container.addChild(shopContainer);
@@ -351,7 +359,7 @@ import { Table, Player } from "./blackjack";
 
         buyButtons[itemID].bg.texture = colorTexture;
         buyButtons[itemID].texture = colorTexture;
-        buyButtons[itemID].text.text = "$" + item.price;
+        buyButtons[itemID].text.text = itemID === "kill" && !endgame ? "?" : "$" + item.price;
     }
 
     function buyItem(itemID) {
@@ -367,8 +375,11 @@ import { Table, Player } from "./blackjack";
         player.inventory[itemID] += 1;
         item.price = Math.round(item.price*item.priceCf);
 
-        drawAmountBits(item.x, item.y, player.inventory[itemID], item.maxAmount, itemID);
-        updateButtonColor(itemID);
+        if (itemID != "kill") drawAmountBits(item.x, item.y, player.inventory[itemID], item.maxAmount, itemID);
+        updateButtonColor("profit");
+        updateButtonColor("backcard3");
+        updateButtonColor("profitGold");
+        updateButtonColor("kill");
     }
 
     const itemBits = {};
@@ -464,7 +475,7 @@ import { Table, Player } from "./blackjack";
         keyXSprite.scale = scale/6;
         keyXSprite.position = {x: 0, y: app.screen.height/4};
         keyX2Sprite.scale = scale/6;
-        keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/2, y: centerText.y};
+        keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing, y: centerText.y};
         keyVSprite.scale = scale/8;
         keyVSprite.position = {x: 0, y: app.screen.height/2 - spacing/3};
         keyCSprite.scale = scale/8;
@@ -665,8 +676,13 @@ import { Table, Player } from "./blackjack";
                 container.removeChildren();
                 if (player.balance <= 0) centerText.text = "It's so over..\nstart a new game?";
                 else centerText.text = "Start a new Ventti";
-                keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/2, y: centerText.y};
+                keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/3, y: centerText.y};
                 container.addChild(centerText, keyX2Sprite);
+
+                endgame = false;
+                endVisSprite.alpha = 0;
+                endSprite.alpha = 1;
+                endText.text = "The End\nEarn 25k\nto unlock this";
 
                 player.Reset();
                 table.GenerateDeck();
@@ -690,7 +706,7 @@ import { Table, Player } from "./blackjack";
                     container.removeChild(card.sprite);
                 }
                 centerText.text = "Take two cards <--";
-                keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/2, y: centerText.y};
+                keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/3, y: centerText.y};
                 container.removeChild(cardBackSprite, keyXSprite, keyZSprite);
                 container.addChild(playerSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, centerText, keyVSprite, keyCSprite, playerSumText, dealerSumText, playerBalanceText, playerBetText);
                 shopSprite.alpha = 1;
@@ -706,6 +722,13 @@ import { Table, Player } from "./blackjack";
                 playerBetText.text = "BET $" + player.bet;
                 updateKeys();
                 keyXSprite.x = spacing*1.24;
+
+                if (player.balance >= 25000 && !endgame) {
+                    endgame = true;
+                    endVisSprite.alpha = 1;
+                    endSprite.alpha = 0;
+                    endText.text = "Kill\nEnd dealer's life";
+                }
 
                 gamestate = "BET";
 
@@ -859,7 +882,7 @@ import { Table, Player } from "./blackjack";
                 break;
             case "WIN":
                 playerSumText.text = "WIN";
-                player.balance += player.bet + (player.bet*player.inventory.profit)*0.05;
+                player.balance += player.bet + (player.bet*player.inventory.profit)*0.05 + (player.bet*player.inventory.profitGold)*0.12;
 
                 sleep = 2000;
                 waiting = true;
