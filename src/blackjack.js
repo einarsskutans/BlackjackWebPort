@@ -17,6 +17,7 @@ export class Player { // Also the dealer
     Hit() {
         let card = this.table.TakeCard();
         this.deck.push(card);
+        console.log("Deck length: " + this.table.deck.length)
     }
     GetDeckSum() {
         let sum = 0

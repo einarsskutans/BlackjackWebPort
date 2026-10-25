@@ -635,7 +635,6 @@ import { Table, Player } from "./blackjack";
             card.sprite.y = target === player ? app.screen.height / 4 : -app.screen.height / 4;
             card.sprite.scale.set(scale);
             updateKeys();
-            console.log(card.value);
 
             reSize();
         }
@@ -698,7 +697,7 @@ import { Table, Player } from "./blackjack";
                     gamestate = "MENU";
                     break;
                 }
-                if (table.deck.length < 1) table.GenerateDeck();
+                if (table.deck.length <= 4) table.GenerateDeck();
                 for (const card of player.deck) {
                     container.removeChild(card.sprite);
                 }
@@ -806,6 +805,7 @@ import { Table, Player } from "./blackjack";
                 break;
         
             case "HIT":
+                if (table.deck.length < 1) table.GenerateDeck();
                 player.Hit();
 
                 drawCards(player);
@@ -855,12 +855,8 @@ import { Table, Player } from "./blackjack";
                     break;
                 }
                 if (player.GetDeckSum() >= dealer.GetDeckSum() && dealer.GetDeckSum() != 21) {
-                    if (table.deck.length > 0) {
-                        dealer.Hit();
-                    }
-                    else {
-                        table.GenerateDeck();
-                    }
+                    if (table.deck.length < 1) table.GenerateDeck();
+                    dealer.Hit();
                     
                     sleep = 1000;
                     waiting = true;
