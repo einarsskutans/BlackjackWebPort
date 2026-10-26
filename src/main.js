@@ -698,6 +698,7 @@ import { Table, Player } from "./blackjack";
                 if (player.balance <= 0) {
                     localStorage.setItem("save", 0);
                     centerText.text = "It's so over..\nstart a new game?";
+                    player.Reset();
                 }
                 else if (parseInt(localStorage.getItem("save")) == 1) {
                     player.LoadData();
@@ -712,7 +713,6 @@ import { Table, Player } from "./blackjack";
                 endSprite.alpha = 1;
                 endText.text = "The End\nEarn 25k\nto unlock this";
 
-                player.Reset();
                 table.GenerateDeck();
 
                 gamestate = "MENU_WAIT";

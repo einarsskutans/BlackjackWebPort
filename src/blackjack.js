@@ -41,10 +41,10 @@ export class Player { // Also the dealer
     SaveData() {
         localStorage.setItem("save", 1);
         localStorage.setItem("balance", this.balance);
-        localStorage.setItem("item1", this.inventory.profit);
-        localStorage.setItem("item2", this.inventory.profitGold);
-        localStorage.setItem("item3", this.inventory.backcard3);
-        localStorage.setItem("item4", this.inventory.kill);
+        localStorage.setItem("profit", this.inventory.profit);
+        localStorage.setItem("profitGold", this.inventory.profitGold);
+        localStorage.setItem("backcard3", this.inventory.backcard3);
+        localStorage.setItem("kill", this.inventory.kill);
     }
     LoadData() {
         if (parseInt(localStorage.getItem("save")) == 1) {
