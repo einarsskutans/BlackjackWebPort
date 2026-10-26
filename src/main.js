@@ -475,7 +475,7 @@ import { Table, Player } from "./blackjack";
         keyXSprite.scale = scale/6;
         keyXSprite.position = {x: 0, y: app.screen.height/4};
         keyX2Sprite.scale = scale/6;
-        keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing, y: centerText.y};
+        keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing*0.2, y: centerText.y};
         keyVSprite.scale = scale/8;
         keyVSprite.position = {x: 0, y: app.screen.height/2 - spacing/3};
         keyCSprite.scale = scale/8;
@@ -501,6 +501,15 @@ import { Table, Player } from "./blackjack";
         backcard3Sprite.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing/2};
         profitSprite.scale = scale;
         profitSprite.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*2};
+
+        profitGoldSprite.scale = scale;
+        profitGoldSprite.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*3.5};
+
+        endSprite.scale = scale;
+        endSprite.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*5};
+
+        endVisSprite.scale = scale;
+        endVisSprite.position = {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*5};
 
         playerSumText.style.fontSize = Math.round(scale * 8);
         playerSumText.position = {x: 0, y: app.screen.height/4 + spacing};
@@ -529,6 +538,12 @@ import { Table, Player } from "./blackjack";
         profitText.style.fontSize = Math.round(scale * 4);
         profitText.position = {x: profitSprite.x + spacing/2, y: profitSprite.y};
 
+        profitGoldText.style.fontSize = Math.round(scale*4);
+        profitGoldText.position = {x: profitGoldSprite.x + spacing/2, y: profitGoldSprite.y};
+
+        endText.style.fontSize = Math.round(scale*4);
+        endText.position = {x: endSprite.x + spacing/2, y: endSprite.y};
+
         deckCountText.style.fontSize = Math.round(scale * 4);
         deckCountText.position = {x: 0, y: spacing};
 
@@ -549,8 +564,15 @@ import { Table, Player } from "./blackjack";
 
         drawAmountBits(ITEMS.profit.x, ITEMS.profit.y, player.inventory.profit, ITEMS.profit.maxAmount, "profit");
         drawAmountBits(ITEMS.backcard3.x, ITEMS.backcard3.y, player.inventory.backcard3, ITEMS.backcard3.maxAmount, "backcard3");
+        drawAmountBits(ITEMS.profitGold.x, ITEMS.profitGold.y, player.inventory.profitGold, ITEMS.profitGold.maxAmount, "profitGold");
+        drawAmountBits(ITEMS.kill.x, ITEMS.kill.y, player.inventory.kill, ITEMS.kill.maxAmount, "kill");
         drawBuyButton(profitSprite.x-backcard3Sprite.width/2, profitSprite.y+profitSprite.height-scale*2, "profit");
         drawBuyButton(backcard3Sprite.x-backcard3Sprite.width/2, backcard3Sprite.y+backcard3Sprite.height-scale*2, "backcard3");
+        drawBuyButton(profitGoldSprite.x-profitGoldSprite.width/2, profitGoldSprite.y+profitGoldSprite.height-scale*2, "profitGold");
+        drawBuyButton(endSprite.x-endSprite.width/2, endSprite.y+endSprite.height-scale*2, "kill");
+        if (endgame) buyButtons["kill"].text.text = "$" + ITEMS.kill.price;
+        else if (!endgame) buyButtons["kill"].text.text = "?";
+
     }
 
     // Game logic
@@ -878,7 +900,7 @@ import { Table, Player } from "./blackjack";
                 break;
             case "WIN":
                 playerSumText.text = "WIN";
-                player.balance += player.bet + (player.bet*player.inventory.profit)*0.05 + (player.bet*player.inventory.profitGold)*0.12;
+                player.balance = Math.round(player.balance + player.bet + (player.bet*player.inventory.profit)*0.05 + (player.bet*player.inventory.profitGold)*0.12);
 
                 sleep = 2000;
                 waiting = true;
