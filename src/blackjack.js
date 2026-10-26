@@ -6,9 +6,9 @@ export class Player { // Also the dealer
         this.table = table;
 
         this.deck = [];
-        this.balance;
+        this.balance = 0;
         this.bet;
-        this.balanceDefault = 24500;
+        this.balanceDefault = 100;
         this.betDefault = 50;
         this.inventory = {};
         this.Reset();
@@ -37,6 +37,25 @@ export class Player { // Also the dealer
             kill: 0,
             profitGold: 0,
         };
+    }
+    SaveData() {
+        localStorage.setItem("save", 1);
+        localStorage.setItem("balance", this.balance);
+        localStorage.setItem("item1", this.inventory.profit);
+        localStorage.setItem("item2", this.inventory.profitGold);
+        localStorage.setItem("item3", this.inventory.backcard3);
+        localStorage.setItem("item4", this.inventory.kill);
+    }
+    LoadData() {
+        if (parseInt(localStorage.getItem("save")) == 1) {
+            console.log("Save exists");
+            this.balance = parseInt(localStorage.getItem("balance"));
+            this.inventory.profit = parseInt(localStorage.getItem("profit"));
+            this.inventory.profitGold = parseInt(localStorage.getItem("profitGold"));
+            this.inventory.backcard3 = parseInt(localStorage.getItem("backcard3"));
+            this.inventory.kill = parseInt(localStorage.getItem("kill"));
+        }
+        else console.log("Save not found");
     }
 }
 

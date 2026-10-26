@@ -565,7 +565,6 @@ import { Table, Player } from "./blackjack";
         drawAmountBits(ITEMS.profit.x, ITEMS.profit.y, player.inventory.profit, ITEMS.profit.maxAmount, "profit");
         drawAmountBits(ITEMS.backcard3.x, ITEMS.backcard3.y, player.inventory.backcard3, ITEMS.backcard3.maxAmount, "backcard3");
         drawAmountBits(ITEMS.profitGold.x, ITEMS.profitGold.y, player.inventory.profitGold, ITEMS.profitGold.maxAmount, "profitGold");
-        drawAmountBits(ITEMS.kill.x, ITEMS.kill.y, player.inventory.kill, ITEMS.kill.maxAmount, "kill");
         drawBuyButton(profitSprite.x-backcard3Sprite.width/2, profitSprite.y+profitSprite.height-scale*2, "profit");
         drawBuyButton(backcard3Sprite.x-backcard3Sprite.width/2, backcard3Sprite.y+backcard3Sprite.height-scale*2, "backcard3");
         drawBuyButton(profitGoldSprite.x-profitGoldSprite.width/2, profitGoldSprite.y+profitGoldSprite.height-scale*2, "profitGold");
@@ -695,7 +694,15 @@ import { Table, Player } from "./blackjack";
                     container.removeChild(card.sprite);
                 }
                 container.removeChildren();
-                if (player.balance <= 0) centerText.text = "It's so over..\nstart a new game?";
+
+                if (player.balance <= 0) {
+                    localStorage.setItem("save", 0);
+                    centerText.text = "It's so over..\nstart a new game?";
+                }
+                else if (parseInt(localStorage.getItem("save")) == 1) {
+                    player.LoadData();
+                    centerText.text = "Continue Ventti";
+                }
                 else centerText.text = "Start a new Ventti";
                 keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/3, y: centerText.y};
                 container.addChild(centerText, keyX2Sprite);
@@ -752,6 +759,8 @@ import { Table, Player } from "./blackjack";
                 }
 
                 gamestate = "BET";
+
+                player.SaveData();
 
                 break;
             case "START":
