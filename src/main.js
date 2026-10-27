@@ -57,6 +57,7 @@ import { Table, Player } from "./blackjack";
     const profitGoldTexture = await Assets.load({src: "/assets/upProfitGold.png", data: {scaleMode: "nearest"}});
     const endTexture = await Assets.load({src: "/assets/upEnd.png", data: {scaleMode: "nearest"}});
     const endVisTexture = await Assets.load({src: "/assets/upEndVis.png", data: {scaleMode: "nearest"}});
+    const heartTexture = await Assets.load({src: "/assets/heart.png", data: {scaleMode: "nearest"}});
     
     const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale})
 
@@ -94,6 +95,9 @@ import { Table, Player } from "./blackjack";
     let player = new Player("Player", table);
     let dealer = new Player("Dealer", table);
     player.Reset();
+    player.LoadData();
+    dealer.LoadData();
+
     let gamestate = "MENU";
 
     // Text
@@ -301,8 +305,6 @@ import { Table, Player } from "./blackjack";
         },
     };
 
-    let endgame = false;
-
     shopContainer.addChild(shopBgSprite, backcard3Sprite, profitSprite, profitGoldSprite, endSprite, endVisSprite, shopText, backcard3Text, profitText, profitGoldText, endText);
 
     shopSprite.on("pointerover", () => {shopSprite.alpha = 0.4;});
@@ -316,8 +318,8 @@ import { Table, Player } from "./blackjack";
         drawBuyButton(backcard3Sprite.x-backcard3Sprite.width/2, backcard3Sprite.y+backcard3Sprite.height-scale*2, "backcard3");
         drawBuyButton(profitGoldSprite.x-backcard3Sprite.width/2, profitGoldSprite.y+profitGoldSprite.height-scale*2, "profitGold");
         drawBuyButton(endSprite.x-endSprite.width/2, endSprite.y+endSprite.height-scale*2, "kill");
-        if (endgame) buyButtons["kill"].text.text = "$" + ITEMS.kill.price;
-        else if (!endgame) buyButtons["kill"].text.text = "?";
+        if (player.endgame >= 1) buyButtons["kill"].text.text = "$" + ITEMS.kill.price;
+        else if (player.endgame == 0) buyButtons["kill"].text.text = "?";
         if (container.getChildByLabel("shopBg")) {
             const animate = () => {
                 shopContainer.x += app.ticker.deltaMS*scale/2;
@@ -359,7 +361,7 @@ import { Table, Player } from "./blackjack";
 
         buyButtons[itemID].bg.texture = colorTexture;
         buyButtons[itemID].texture = colorTexture;
-        buyButtons[itemID].text.text = itemID === "kill" && !endgame ? "?" : "$" + item.price;
+        buyButtons[itemID].text.text = itemID === "kill" && !player.endgame ? "?" : "$" + item.price;
     }
 
     function buyItem(itemID) {
@@ -380,6 +382,8 @@ import { Table, Player } from "./blackjack";
         updateButtonColor("backcard3");
         updateButtonColor("profitGold");
         updateButtonColor("kill");
+        player.SaveData();
+        dealer.SaveData();
     }
 
     const itemBits = {};
@@ -455,6 +459,34 @@ import { Table, Player } from "./blackjack";
             console.log(player.inventory);
         })
         updateButtonColor(itemID);
+    }
+
+    const hearts = [];
+    function drawHearts(x, y, amount, maxAmount) {
+        for (const sprite of hearts) {
+            container.removeChild(sprite);
+            sprite.destroy();
+        }
+
+        for (let i = 1; i <= maxAmount; i++) {
+            const heartSprite = new Sprite({
+                texture: heartTexture,
+                anchor: 0.5,
+                position: {
+                    x: x + spacing*0.25 * i,
+                    y: y
+                },
+                scale: scale*0.8
+            });
+
+            if (i > amount) {
+                heartSprite.alpha = 0.2;
+            }
+            else heartSprite.alpha = 1;
+
+            hearts.push(heartSprite);
+            container.addChild(heartSprite);
+        }
     }
 
     window.addEventListener("resize", reSize);
@@ -569,9 +601,10 @@ import { Table, Player } from "./blackjack";
         drawBuyButton(backcard3Sprite.x-backcard3Sprite.width/2, backcard3Sprite.y+backcard3Sprite.height-scale*2, "backcard3");
         drawBuyButton(profitGoldSprite.x-profitGoldSprite.width/2, profitGoldSprite.y+profitGoldSprite.height-scale*2, "profitGold");
         drawBuyButton(endSprite.x-endSprite.width/2, endSprite.y+endSprite.height-scale*2, "kill");
-        if (endgame) buyButtons["kill"].text.text = "$" + ITEMS.kill.price;
-        else if (!endgame) buyButtons["kill"].text.text = "?";
+        if (player.endgame) buyButtons["kill"].text.text = "$" + ITEMS.kill.price;
+        else if (!player.endgame) buyButtons["kill"].text.text = "?";
 
+        if (player.inventory.kill > 0 && player.endgame != 2) drawHearts(-app.screen.width/2 + spacing, -app.screen.height/2 + spacing*0.8, dealer.hp, 3);
     }
 
     // Game logic
@@ -669,6 +702,46 @@ import { Table, Player } from "./blackjack";
 
         reSize();
     }
+    let deckCards = [];
+        function drawDeckCards(x, y) {
+        for (const card of deckCards) {
+            if (table.deck.includes(card)) {
+                container.removeChild(card.sprite);
+            }
+        }
+
+        deckCards.length = 0;
+
+        const rows = 4;
+        const cardsPerRow = Math.ceil(table.deck.length / rows);
+        const totalRows = Math.ceil(table.deck.length / cardsPerRow);
+        const rowSpacing = spacing * 0.8;
+        const startY = y - (totalRows - 1) * rowSpacing / 2;
+
+        for (let i = 0; i < table.deck.length; i++) {
+            const card = table.deck[i];
+
+            container.addChild(card.sprite);
+            deckCards.push(card);
+
+            const row = Math.floor(i / cardsPerRow);
+            const col = i % cardsPerRow;
+
+            const cardsInRow = Math.min(
+                cardsPerRow,
+                table.deck.length - row * cardsPerRow
+            );
+
+            card.sprite.x =
+                x - (cardsInRow - 1) * spacing / 4 + col * spacing / 2;
+
+            card.sprite.y = startY + row * rowSpacing;
+            card.sprite.scale.set(scale / 2);
+        }
+
+        updateKeys();
+        reSize();
+    }
 
     app.ticker.add((ticker) => {
         
@@ -696,22 +769,17 @@ import { Table, Player } from "./blackjack";
                 container.removeChildren();
 
                 if (player.balance <= 0) {
-                    localStorage.setItem("save", 0);
+                    localStorage.setItem(`${player.name}.save`, 0);
                     centerText.text = "It's so over..\nstart a new game?";
                     player.Reset();
                 }
-                else if (parseInt(localStorage.getItem("save")) == 1) {
+                else if (parseInt(localStorage.getItem(`${player.name}.save`)) == 1) {
                     player.LoadData();
                     centerText.text = "Continue Ventti";
                 }
                 else centerText.text = "Start a new Ventti";
                 keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/3, y: centerText.y};
                 container.addChild(centerText, keyX2Sprite);
-
-                endgame = false;
-                endVisSprite.alpha = 0;
-                endSprite.alpha = 1;
-                endText.text = "The End\nEarn 25k\nto unlock this";
 
                 table.GenerateDeck();
 
@@ -733,6 +801,13 @@ import { Table, Player } from "./blackjack";
                 for (const card of dealer.deck) {
                     container.removeChild(card.sprite);
                 }
+                for (const card of deckCards) {
+                    if (table.deck.includes(card)) {
+                        container.removeChild(card.sprite);
+                    }
+                }
+                deckCards.length = 0;
+
                 centerText.text = "Take two cards <--";
                 keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/3, y: centerText.y};
                 container.removeChild(cardBackSprite, keyXSprite, keyZSprite);
@@ -751,16 +826,18 @@ import { Table, Player } from "./blackjack";
                 updateKeys();
                 keyXSprite.x = spacing*1.24;
 
-                if (player.balance >= 25000 && !endgame) {
-                    endgame = true;
+                if ((player.balance >= 25000 && player.endgame == 0) || (player.endgame >= 1)) {
+                    if (player.endgame != 2) player.endgame = 1;
                     endVisSprite.alpha = 1;
                     endSprite.alpha = 0;
                     endText.text = "Kill\nEnd dealer's life";
                 }
+                if (player.inventory.kill > 0 && player.endgame != 2) drawHearts(-app.screen.width/2 + spacing, -app.screen.height/2 + spacing*0.8, dealer.hp, 3);
 
                 gamestate = "BET";
 
                 player.SaveData();
+                dealer.SaveData();
 
                 break;
             case "START":
@@ -786,6 +863,12 @@ import { Table, Player } from "./blackjack";
                 drawCards(player);
                 drawCards(dealer);
                 drawDealerBackCard();
+                if (player.endgame == 2) {
+                    drawDeckCards(0, spacing/2);
+                    if (hearts.length != 0) {
+                        for (let heart of hearts) container.removeChild(heart);
+                    }
+                }
                 playerSumText.text = player.GetDeckSum();
                 dealerSumText.text = dealer.deck[1].gameValue + "+";
 
@@ -910,6 +993,14 @@ import { Table, Player } from "./blackjack";
             case "WIN":
                 playerSumText.text = "WIN";
                 player.balance = Math.round(player.balance + player.bet + (player.bet*player.inventory.profit)*0.05 + (player.bet*player.inventory.profitGold)*0.12);
+                if (player.inventory.kill > 0 && player.endgame != 2) {
+                    dealer.hp -= 1;
+                    drawHearts(-app.screen.width/2 + spacing, -app.screen.height/2 + spacing*0.8, dealer.hp, 3);
+                    if (dealer.hp <= 0) {
+                        gamestate = "MERCY";
+                        break;
+                    }
+                }
 
                 sleep = 2000;
                 waiting = true;
@@ -921,6 +1012,17 @@ import { Table, Player } from "./blackjack";
                 playerSumText.text = "TIE";
 
                 sleep = 2000;
+                waiting = true;
+
+                gamestate = "RESET";
+
+                break;
+            case "MERCY":
+                centerText.text = "Turns out\nthe dealer is so evil,\nhe is practically immortal.\n\nNow you will become the cheater."   
+                container.addChild(centerText); 
+                player.endgame = 2;
+
+                sleep = 6000;
                 waiting = true;
 
                 gamestate = "RESET";

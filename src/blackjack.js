@@ -8,9 +8,11 @@ export class Player { // Also the dealer
         this.deck = [];
         this.balance = 0;
         this.bet;
-        this.balanceDefault = 100;
+        this.balanceDefault = 35000;
         this.betDefault = 50;
         this.inventory = {};
+        this.hp = 3;
+        this.endgame = 0;
         this.Reset();
     }
 
@@ -31,6 +33,8 @@ export class Player { // Also the dealer
     Reset() {
         this.balance = this.balanceDefault;
         this.bet = this.betDefault;
+        this.hp = 3;
+        this.endgame = 0;
         this.inventory = {
             profit: 0,
             backcard3: 0,
@@ -39,21 +43,25 @@ export class Player { // Also the dealer
         };
     }
     SaveData() {
-        localStorage.setItem("save", 1);
-        localStorage.setItem("balance", this.balance);
-        localStorage.setItem("profit", this.inventory.profit);
-        localStorage.setItem("profitGold", this.inventory.profitGold);
-        localStorage.setItem("backcard3", this.inventory.backcard3);
-        localStorage.setItem("kill", this.inventory.kill);
+        localStorage.setItem(`${this.name}.save`, 1);
+        localStorage.setItem(`${this.name}.balance`, this.balance);
+        localStorage.setItem(`${this.name}.profit`, this.inventory.profit);
+        localStorage.setItem(`${this.name}.profitGold`, this.inventory.profitGold);
+        localStorage.setItem(`${this.name}.backcard3`, this.inventory.backcard3);
+        localStorage.setItem(`${this.name}.kill`, this.inventory.kill);
+        localStorage.setItem(`${this.name}.endgame`, this.endgame);
+        localStorage.setItem(`${this.name}.hp`, this.hp);
     }
     LoadData() {
-        if (parseInt(localStorage.getItem("save")) == 1) {
+        if (parseInt(localStorage.getItem(`${this.name}.save`)) == 1) {
             console.log("Save exists");
-            this.balance = parseInt(localStorage.getItem("balance"));
-            this.inventory.profit = parseInt(localStorage.getItem("profit"));
-            this.inventory.profitGold = parseInt(localStorage.getItem("profitGold"));
-            this.inventory.backcard3 = parseInt(localStorage.getItem("backcard3"));
-            this.inventory.kill = parseInt(localStorage.getItem("kill"));
+            this.balance = parseInt(localStorage.getItem(`${this.name}.balance`));
+            this.inventory.profit = parseInt(localStorage.getItem(`${this.name}.profit`));
+            this.inventory.profitGold = parseInt(localStorage.getItem(`${this.name}.profitGold`));
+            this.inventory.backcard3 = parseInt(localStorage.getItem(`${this.name}.backcard3`));
+            this.inventory.kill = parseInt(localStorage.getItem(`${this.name}.kill`));
+            this.endgame = parseInt(localStorage.getItem(`${this.name}.endgame`));
+            this.hp = parseInt(localStorage.getItem(`${this.name}.hp`));
         }
         else console.log("Save not found");
     }
