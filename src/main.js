@@ -211,12 +211,21 @@ import { Table, Player } from "./blackjack";
     const deckCountText = new Text({
         style: {
             fill: "#FFFFFF",
-            fontSize: Math.round(scale*4),
+            fontSize: Math.round(scale*6),
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
         position: {x: 0, y: spacing}
     })
+    const balanceAnimationText = new Text({
+        style: {
+            fill: "#FFFFFF",
+            fontSize: Math.round(scale*4),
+            fontFamily: "PrimaryFont"
+        },
+        anchor: {x: 1, y: 0.5},
+        alpha: 1
+    });
  
         // Shop items
     const ITEMS = {
@@ -819,9 +828,9 @@ import { Table, Player } from "./blackjack";
 
                 if (player.bet > player.balance) player.bet = player.balance;
 
+                playerBalanceText.text = "CASH $" + player.balance;
                 playerSumText.text = "";
                 dealerSumText.text = "";
-                playerBalanceText.text = "CASH $" + player.balance;
                 playerBetText.text = "BET $" + player.bet;
                 updateKeys();
                 keyXSprite.x = spacing*1.24;
@@ -983,6 +992,22 @@ import { Table, Player } from "./blackjack";
             case "LOSE":
                 playerSumText.text = "LOSE";
                 player.balance -= player.bet;
+                playerBalanceText.text = "CASH $" + player.balance;
+
+                balanceAnimationText.text = "-" + player.bet;
+                balanceAnimationText.alpha = 1;
+                balanceAnimationText.position = {x: playerBalanceText.x+playerBalanceText.width, y: playerBalanceText.y+playerBalanceText.height+scale};
+                balanceAnimationText.style.fill = "#ff0000";
+                container.addChild(balanceAnimationText);
+                const animateLose = () => {
+                    balanceAnimationText.alpha -= app.ticker.deltaMS/1500;
+                    balanceAnimationText.y += app.ticker.deltaMS/128;
+                    if (balanceAnimationText.alpha <= 0) {
+                        container.removeChild(balanceAnimationText);
+                        app.ticker.remove(animateLose);
+                    }
+                };
+                app.ticker.add(animateLose);
 
                 sleep = 2000;
                 waiting = true;
@@ -993,6 +1018,23 @@ import { Table, Player } from "./blackjack";
             case "WIN":
                 playerSumText.text = "WIN";
                 player.balance = Math.round(player.balance + player.bet + (player.bet*player.inventory.profit)*0.05 + (player.bet*player.inventory.profitGold)*0.12);
+                playerBalanceText.text = "CASH $" + player.balance;
+                
+                balanceAnimationText.text = "+" + player.bet;
+                balanceAnimationText.alpha = 1;
+                balanceAnimationText.position = {x: playerBalanceText.x+playerBalanceText.width, y: playerBalanceText.y-playerBalanceText.height/2};
+                balanceAnimationText.style.fill = "#FFFFFF";
+                container.addChild(balanceAnimationText);
+                const animateWin = () => {
+                    balanceAnimationText.alpha -= app.ticker.deltaMS/1500;
+                    balanceAnimationText.y -= app.ticker.deltaMS/128;
+                    if (balanceAnimationText.alpha <= 0) {
+                        container.removeChild(balanceAnimationText);
+                        app.ticker.remove(animateWin);
+                    }
+                };
+                app.ticker.add(animateWin);
+                
                 if (player.inventory.kill > 0 && player.endgame != 2) {
                     dealer.hp -= 1;
                     drawHearts(-app.screen.width/2 + spacing, -app.screen.height/2 + spacing*0.8, dealer.hp, 3);
@@ -1010,6 +1052,7 @@ import { Table, Player } from "./blackjack";
                 break;
             case "TIE":
                 playerSumText.text = "TIE";
+                playerBalanceText.text = "CASH $" + player.balance;
 
                 sleep = 2000;
                 waiting = true;
