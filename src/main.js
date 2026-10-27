@@ -908,7 +908,10 @@ import { Table, Player } from "./blackjack";
                 if (cardBackSprite.alpha <= 0) {
                     cardBackSprite.alpha = 0;
                     container.removeChild(cardBackSprite);
-                    if (backcardRounds > 2) player.inventory.backcard3--;
+                    if (backcardRounds > 2) {
+                        player.inventory.backcard3--;
+                        backcardRounds = 0;
+                    }
                     drawAmountBits(ITEMS.backcard3.x, ITEMS.backcard3.y, player.inventory.backcard3, ITEMS.backcard3.maxAmount, "backcard3");
 
                     dealerSumText.text = dealer.GetDeckSum();
@@ -1020,7 +1023,7 @@ import { Table, Player } from "./blackjack";
                 player.balance = Math.round(player.balance + player.bet + (player.bet*player.inventory.profit)*0.05 + (player.bet*player.inventory.profitGold)*0.12);
                 playerBalanceText.text = "CASH $" + player.balance;
                 
-                balanceAnimationText.text = "+" + player.bet;
+                balanceAnimationText.text = "+" + parseInt(player.bet + Math.round((player.bet*player.inventory.profit)*0.05 + (player.bet*player.inventory.profitGold)*0.12));
                 balanceAnimationText.alpha = 1;
                 balanceAnimationText.position = {x: playerBalanceText.x+playerBalanceText.width, y: playerBalanceText.y-playerBalanceText.height/2};
                 balanceAnimationText.style.fill = "#FFFFFF";
