@@ -64,6 +64,7 @@ import { Table, Player } from "./blackjack";
     const infoCardNumberTexture = await Assets.load({src: "/assets/card3.png", data: {scaleMode: "nearest"}});
     const infoCardFaceTexture = await Assets.load({src: "/assets/card52.png", data: {scaleMode: "nearest"}});
     const infoCardSpecialTexture = await Assets.load({src: "/assets/card3.png", data: {scaleMode: "nearest"}});
+    const cheatBgTexture = await Assets.load({src: "/assets/cheatBg.png", data: {scaleMode: "nearest"}});
     
     const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale})
 
@@ -92,6 +93,7 @@ import { Table, Player } from "./blackjack";
     const infoCardNumberSprite = new Sprite({texture: infoCardNumberTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing/3, y: -infoBgSprite.height/2 + spacing*0.5}, scale: scale/2});
     const infoCardFaceSprite = new Sprite({texture: infoCardFaceTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing/3, y: -infoBgSprite.height/2 + spacing*1.5}, scale: scale/2});
     const infoCardSpecialSprite = new Sprite({texture: infoCardSpecialTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing/3, y: -infoBgSprite.height/2 + spacing*2.5}, scale: scale/2});
+    const cheatBgSprite = new Sprite({texture: cheatBgTexture, anchor: 0.5, position: {x: 0, y: scale*6}, scale: scale*3});
     
     const table = new Table();
     table.GenerateSpriteDeck();
@@ -103,6 +105,13 @@ import { Table, Player } from "./blackjack";
         table.spriteDeck[i].sprite = sprite;
         table.spriteDeck[i].sprite.eventMode = "static";
     }
+
+    const texture = await Assets.load(`/assets/cardL1.png`);
+    texture.source.scaleMode = "nearest";
+    const sprite = new Sprite(texture);
+    sprite.anchor.set(0.5);
+    table.spriteDeck[52].sprite = sprite;
+    table.spriteDeck[52].sprite.eventMode = "static";
 
     let player = new Player("Player", table);
     let dealer = new Player("Dealer", table);
@@ -762,6 +771,9 @@ import { Table, Player } from "./blackjack";
     let sleep = 0;
     let waiting = false;
 
+    let cheat = true;
+    let blackjack = 21;
+
     function drawCards(target) {
         for (let i = 0; i < target.deck.length; i++) {
             const card = target.deck[i];
@@ -790,6 +802,7 @@ import { Table, Player } from "./blackjack";
                 container.removeChild(card.sprite);
             }
         }
+        container.removeChild(cheatBgSprite);
 
         deckCards.length = 0;
 
@@ -797,8 +810,9 @@ import { Table, Player } from "./blackjack";
         const cardsPerRow = Math.ceil(table.deck.length / rows);
         const totalRows = Math.ceil(table.deck.length / cardsPerRow);
         const rowSpacing = spacing * 0.8;
-        const startY = y - (totalRows - 1) * rowSpacing / 2;
+        const startY = y - (totalRows - 1) * rowSpacing / 1.65;
 
+        container.addChild(cheatBgSprite);
         for (let i = 0; i < table.deck.length; i++) {
             const card = table.deck[i];
 
@@ -897,6 +911,7 @@ import { Table, Player } from "./blackjack";
 
                 player.deck = [];
                 dealer.deck = [];
+                blackjack = 21;
 
                 if (player.bet > player.balance) player.bet = player.balance;
 
@@ -941,9 +956,14 @@ import { Table, Player } from "./blackjack";
                 player.Hit();
                 player.Hit();
 
+                if (player.deck.find((card) => card.gameValue == 15) || dealer.deck.find((card) => card.gameValue == 15)) blackjack = 42;
+
                 drawCards(player);
                 drawCards(dealer);
                 drawDealerBackCard();
+
+                if (cheat) drawDeckCards(0, spacing/2);
+
                 if (player.endgame == 2) {
                     drawDeckCards(0, spacing/2);
                     if (hearts.length != 0) {
@@ -953,11 +973,11 @@ import { Table, Player } from "./blackjack";
                 playerSumText.text = player.GetDeckSum();
                 dealerSumText.text = dealer.deck[1].gameValue + "+";
 
-                if (player.GetDeckSum() > 21 || dealer.GetDeckSum() === 21) {
+                if (player.GetDeckSum() > blackjack || dealer.GetDeckSum() === blackjack) {
                     gamestate = "LOSE";
                     break;
                 }
-                if (player.GetDeckSum() === 21 || dealer.GetDeckSum() > 21) {
+                if (player.GetDeckSum() === blackjack || dealer.GetDeckSum() > blackjack) {
                     gamestate = "WIN";
                     break;
                 }
@@ -988,10 +1008,10 @@ import { Table, Player } from "./blackjack";
 
                     dealerSumText.text = dealer.GetDeckSum();
 
-                    if (player.GetDeckSum() > 21 || dealer.GetDeckSum() === 21) {
+                    if (player.GetDeckSum() > blackjack || dealer.GetDeckSum() === blackjack) {
                         gamestate = "LOSE";
                     }
-                    else if (player.GetDeckSum() === 21 || dealer.GetDeckSum() > 21) {
+                    else if (player.GetDeckSum() === blackjack || dealer.GetDeckSum() > blackjack) {
                         gamestate = "WIN";
                     } 
                     else {
@@ -1005,19 +1025,20 @@ import { Table, Player } from "./blackjack";
             case "HIT":
                 if (table.deck.length < 1) table.GenerateDeck();
                 player.Hit();
+                if (player.deck.find((card) => card.gameValue == 15) || dealer.deck.find((card) => card.gameValue == 15)) blackjack = 42;
 
                 drawCards(player);
                 playerSumText.text = player.GetDeckSum();
 
-                if (player.GetDeckSum() >= 21 && dealer.GetDeckSum() >= 21) {
+                if (player.GetDeckSum() >= blackjack && dealer.GetDeckSum() >= blackjack) {
                     gamestate = "TIE";
                     break;
                 }
-                if (player.GetDeckSum() > 21 || dealer.GetDeckSum() === 21) {
+                if (player.GetDeckSum() > blackjack || dealer.GetDeckSum() === blackjack) {
                     gamestate = "LOSE";
                     break;
                 }
-                if (player.GetDeckSum() === 21 || dealer.GetDeckSum() > 21) {
+                if (player.GetDeckSum() === blackjack || dealer.GetDeckSum() > blackjack) {
                     gamestate = "WIN";
                     break;
                 }
@@ -1040,21 +1061,22 @@ import { Table, Player } from "./blackjack";
 
                 break;
             case "HOLD":
-                if (player.GetDeckSum() < dealer.GetDeckSum() && dealer.GetDeckSum() < 22) {
+                if (player.GetDeckSum() < dealer.GetDeckSum() && dealer.GetDeckSum() <= blackjack) {
                     gamestate = "LOSE";
                     break;
                 }
-                if (dealer.GetDeckSum() === 21 && player.GetDeckSum() === 21) {
+                if (dealer.GetDeckSum() === blackjack && player.GetDeckSum() === blackjack) {
                     gamestate = "TIE";
                     break;
                 }
-                if (dealer.GetDeckSum() > 21) {
+                if (dealer.GetDeckSum() > blackjack) {
                     gamestate = "WIN";
                     break;
                 }
-                if (player.GetDeckSum() >= dealer.GetDeckSum() && dealer.GetDeckSum() != 21) {
+                if (player.GetDeckSum() >= dealer.GetDeckSum() && dealer.GetDeckSum() != blackjack) {
                     if (table.deck.length < 1) table.GenerateDeck();
                     dealer.Hit();
+                    if (player.deck.find((card) => card.gameValue == 15) || dealer.deck.find((card) => card.gameValue == 15)) blackjack = 42;
                     
                     sleep = 1000;
                     waiting = true;

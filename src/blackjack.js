@@ -74,6 +74,8 @@ export class Table {
 
     GenerateSpriteDeck() {
         this.spriteDeck = [];
+
+        // Base cards
         for (let symbol = 1; symbol < 5; symbol++) {
             for (let value = 1; value < 14; value++) {
                 let card = new Card(value, value, symbol);
@@ -83,6 +85,10 @@ export class Table {
                 this.spriteDeck.push(card);
             }
         }
+
+        // Special cards
+        let card = new Card(15, 15, 0);
+        this.spriteDeck.push(card);
     }
 
     GenerateDeck() {
