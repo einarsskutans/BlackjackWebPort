@@ -1,4 +1,4 @@
-import { Application, Assets, Sprite, Container, Text } from "pixi.js";
+import { Application, Assets, Sprite, Container, Text, AnimatedSprite } from "pixi.js";
 import { Table, Player } from "./blackjack";
 
 (async () => {
@@ -63,8 +63,19 @@ import { Table, Player } from "./blackjack";
     const infoBgTexture  = await Assets.load({src: "/assets/flair_small_info.png", data: {scaleMode: "nearest"}});
     const infoCardNumberTexture = await Assets.load({src: "/assets/card3.png", data: {scaleMode: "nearest"}});
     const infoCardFaceTexture = await Assets.load({src: "/assets/card52.png", data: {scaleMode: "nearest"}});
-    const infoCardSpecialTexture = await Assets.load({src: "/assets/card3.png", data: {scaleMode: "nearest"}});
+    const infoCardSpecialTexture = await Assets.load({src: "/assets/cardL1.png", data: {scaleMode: "nearest"}});
     const cheatBgTexture = await Assets.load({src: "/assets/cheatBg.png", data: {scaleMode: "nearest"}});
+
+    const animationOutlineTextures = [];
+    for (let i = 0; i < 8; i++) {
+        const texture = await Assets.load({
+            src: `/assets/AnimationSpecialOutline/line${i+1}.png`,
+            data: {scaleMode: "nearest"}
+        });
+
+        animationOutlineTextures.push(texture);
+    }
+    const specialOutlines = new Map();
     
     const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale})
 
@@ -93,7 +104,7 @@ import { Table, Player } from "./blackjack";
     const infoCardNumberSprite = new Sprite({texture: infoCardNumberTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing/3, y: -infoBgSprite.height/2 + spacing*0.5}, scale: scale/2});
     const infoCardFaceSprite = new Sprite({texture: infoCardFaceTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing/3, y: -infoBgSprite.height/2 + spacing*1.5}, scale: scale/2});
     const infoCardSpecialSprite = new Sprite({texture: infoCardSpecialTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing/3, y: -infoBgSprite.height/2 + spacing*2.5}, scale: scale/2});
-    const cheatBgSprite = new Sprite({texture: cheatBgTexture, anchor: 0.5, position: {x: 0, y: scale*6}, scale: scale*3});
+    const cheatBgSprite = new Sprite({texture: cheatBgTexture, anchor: 0.5, position: {x: 0, y: scale*6}, scale: scale*2.6, zIndex: -2});
     
     const table = new Table();
     table.GenerateSpriteDeck();
@@ -372,7 +383,7 @@ import { Table, Player } from "./blackjack";
     infoSprite.on("click", () => {
         if (container.getChildByLabel("infoBg")) {
             const animate = () => {
-                infoContainer.x += app.ticker.deltaMS*scale/2;
+                infoContainer.x += app.ticker.deltaMS*scale;
                 if (infoContainer.x >= app.screen.width/2 + infoBgSprite.width/2) {
                     infoContainer.x = app.screen.width/2 + infoBgSprite.width/2;
                     app.ticker.remove(animate);
@@ -386,7 +397,7 @@ import { Table, Player } from "./blackjack";
             infoSprite.alpha = 0.6;
             container.addChild(infoContainer);
             const animate = () => {
-                infoContainer.x -= app.ticker.deltaMS*scale/2;
+                infoContainer.x -= app.ticker.deltaMS*scale;
                 if (infoContainer.x <= app.screen.width/2-infoBgSprite.width/2-spacing/4) {
                     infoContainer.x = app.screen.width/2-infoBgSprite.width/2-spacing/4;
                     app.ticker.remove(animate);
@@ -412,7 +423,7 @@ import { Table, Player } from "./blackjack";
         else if (player.endgame == 0) buyButtons["kill"].text.text = "?";
         if (container.getChildByLabel("shopBg")) {
             const animate = () => {
-                shopContainer.x += app.ticker.deltaMS*scale/2;
+                shopContainer.x += app.ticker.deltaMS*scale;
                 if (shopContainer.x >= app.screen.width/2 + shopBgSprite.width/2) {
                     shopContainer.x = app.screen.width/2 + shopBgSprite.width/2;
                     app.ticker.remove(animate);
@@ -430,7 +441,7 @@ import { Table, Player } from "./blackjack";
             shopSprite.alpha = 0.6;
             container.addChild(shopContainer);
             const animate = () => {
-                shopContainer.x -= app.ticker.deltaMS*scale/2;
+                shopContainer.x -= app.ticker.deltaMS*scale;
                 if (shopContainer.x <= app.screen.width/2-shopContainer.width/2-spacing/4) {
                     shopContainer.x = app.screen.width/2-shopContainer.width/2-spacing/4;
                     app.ticker.remove(animate);
@@ -695,6 +706,8 @@ import { Table, Player } from "./blackjack";
         else if (!player.endgame) buyButtons["kill"].text.text = "?";
 
         if (player.inventory.kill > 0 && player.endgame != 2) drawHearts(-app.screen.width/2 + spacing, -app.screen.height/2 + spacing*0.8, dealer.hp, 3);
+
+        updateKeys();
     }
 
     // Game logic
@@ -710,6 +723,7 @@ import { Table, Player } from "./blackjack";
     document.addEventListener("keydown", (event) => {
         if (event.key ==  "x") {
             if (gamestate === "LOOP") {
+                if (isAnimating()) return;
                 keyXSprite.alpha = 0.4;
                 gamestate = "HIT";
             }
@@ -771,19 +785,57 @@ import { Table, Player } from "./blackjack";
     let sleep = 0;
     let waiting = false;
 
-    let cheat = true;
+    let cheat = false;
     let blackjack = 21;
+
+    const renderedCards = new Set();
+    const animatingCards = new Set();
 
     function drawCards(target) {
         for (let i = 0; i < target.deck.length; i++) {
             const card = target.deck[i];
-            container.addChild(card.sprite);
-            card.sprite.x = -(target.deck.length - 1) * spacing / 2 + i * spacing;
-            card.sprite.y = target === player ? app.screen.height / 4 : -app.screen.height / 4;
-            card.sprite.scale.set(scale);
-            updateKeys();
 
-            reSize();
+            if (card.gameValue > 13) {
+                addSpecialOutline(card);
+                const outline = specialOutlines.get(card);
+
+                if (outline) {
+                    outline.position.copyFrom(card.sprite.position);
+                    outline.scale.set(card.sprite.scale.x);
+                }
+            }
+            
+
+            const targetX =
+                -(target.deck.length - 1) * spacing / 2 + i * spacing;
+
+            const targetY =
+                target === player
+                    ? app.screen.height / 4
+                    : -app.screen.height / 4;
+
+            container.addChild(card.sprite);
+            card.sprite.scale.set(scale);
+
+            // Don't animate cards that are already on the table
+            if (renderedCards.has(card)) {
+                if (!animatingCards.has(card)) {
+                    card.sprite.position.set(targetX, targetY);
+                }
+                continue;
+            }
+
+            renderedCards.add(card);
+            animatingCards.add(card);
+
+            animationCard(
+                card.sprite,
+                0,
+                0,
+                targetX,
+                targetY,
+                () => animatingCards.delete(card)
+            );
         }
     }
     function drawDealerBackCard() {
@@ -796,7 +848,7 @@ import { Table, Player } from "./blackjack";
         reSize();
     }
     let deckCards = [];
-        function drawDeckCards(x, y) {
+    function drawDeckCards(x, y) {
         for (const card of deckCards) {
             if (table.deck.includes(card)) {
                 container.removeChild(card.sprite);
@@ -813,10 +865,29 @@ import { Table, Player } from "./blackjack";
         const startY = y - (totalRows - 1) * rowSpacing / 1.65;
 
         container.addChild(cheatBgSprite);
+        cheatBgSprite.alpha = 0;
+        const animate = () => {
+            cheatBgSprite.alpha += app.ticker.deltaMS/100;
+            if (cheatBgSprite.alpha >= 1) {
+                cheatBgSprite.alpha = 1;
+                app.ticker.remove(animate);
+            }
+        };
+        app.ticker.add(animate);
+        
         for (let i = 0; i < table.deck.length; i++) {
             const card = table.deck[i];
 
             container.addChild(card.sprite);
+            card.sprite.alpha = 0;
+            const animate = () => {
+                card.sprite.alpha += app.ticker.deltaMS/100;
+                if (card.sprite.alpha >= 1) {
+                    card.sprite.alpha = 1;
+                    app.ticker.remove(animate);
+                }
+            };
+            app.ticker.add(animate);
             deckCards.push(card);
 
             const row = Math.floor(i / cardsPerRow);
@@ -827,15 +898,64 @@ import { Table, Player } from "./blackjack";
                 table.deck.length - row * cardsPerRow
             );
 
-            card.sprite.x =
-                x - (cardsInRow - 1) * spacing / 4 + col * spacing / 2;
+            card.sprite.x = x - (cardsInRow - 1) * spacing / 4 + col * spacing / 2;
 
             card.sprite.y = startY + row * rowSpacing;
             card.sprite.scale.set(scale / 2);
+            card.sprite.zIndex = -2;
         }
 
-        updateKeys();
         reSize();
+    }
+
+    function addSpecialOutline(card) {
+        if (specialOutlines.has(card)) return;
+
+        const outline = new AnimatedSprite(animationOutlineTextures);
+
+        outline.anchor.set(0.5);
+        outline.position.copyFrom(card.sprite.position);
+        outline.scale.set(card.sprite.scale.x);
+        outline.animationSpeed = 0.3;
+        outline.loop = true;
+        outline.play();
+
+        specialOutlines.set(card, outline);
+
+        container.addChild(outline);
+    }
+
+    function animationCard(sprite, startX, startY, targetX, targetY, onComplete) {
+        sprite.position.set(startX, startY);
+        sprite.scale.set(scale);
+        sprite.alpha = 1;
+
+        const duration = 300;
+        let elapsed = 0;
+
+        const animate = (ticker) => {
+            elapsed += ticker.deltaMS;
+
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+
+            sprite.x = startX + (targetX - startX) * eased;
+            sprite.y = startY + (targetY - startY) * eased;
+
+            if (progress >= 1) {
+                app.ticker.remove(animate);
+                sprite.position.set(targetX, targetY);
+
+                if (onComplete) {
+                    onComplete();
+                }
+            }
+        };
+
+        app.ticker.add(animate);
+    }
+    function isAnimating() {
+        return animatingCards.size > 0;
     }
 
     app.ticker.add((ticker) => {
@@ -850,6 +970,10 @@ import { Table, Player } from "./blackjack";
                 console.log('Finished waiting in ticker!');
             }
             return;
+        }
+        for (const [card, outline] of specialOutlines) {
+            outline.position.copyFrom(card.sprite.position);
+            outline.scale.set(card.sprite.scale.x);
         }
 
         // Main gameplay loop
@@ -902,10 +1026,19 @@ import { Table, Player } from "./blackjack";
                     }
                 }
                 deckCards.length = 0;
+                renderedCards.clear();
+                animatingCards.clear();
+                for (const outline of specialOutlines.values()) {
+                    container.removeChild(outline);
+                    outline.destroy();
+                }
 
+                specialOutlines.clear();
+                
                 centerText.text = "Take two cards <--";
+                
                 keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/3, y: centerText.y};
-                container.removeChild(cardBackSprite, keyXSprite, keyZSprite);
+                container.removeChild(cardBackSprite, keyXSprite, keyZSprite, cheatBgSprite);
                 container.addChild(playerSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, centerText, keyVSprite, keyCSprite, infoSprite, playerSumText, dealerSumText, playerBalanceText, playerBetText);
                 shopSprite.alpha = 1;
 
@@ -939,7 +1072,7 @@ import { Table, Player } from "./blackjack";
             case "START":
                 if (container.getChildByLabel("shopBg")) {
                     const animate = () => {
-                        shopContainer.x += app.ticker.deltaMS*scale/2;
+                        shopContainer.x += app.ticker.deltaMS*scale;
                         if (shopContainer.x >= app.screen.width/2 + shopBgSprite.width/2) {
                             shopContainer.x = app.screen.width/2 + shopBgSprite.width/2;
                             app.ticker.remove(animate);
@@ -955,6 +1088,7 @@ import { Table, Player } from "./blackjack";
                 dealer.Hit();
                 player.Hit();
                 player.Hit();
+                updateKeys();
 
                 if (player.deck.find((card) => card.gameValue == 15) || dealer.deck.find((card) => card.gameValue == 15)) blackjack = 42;
 
@@ -1024,7 +1158,10 @@ import { Table, Player } from "./blackjack";
         
             case "HIT":
                 if (table.deck.length < 1) table.GenerateDeck();
+                if (isAnimating()) return;
+
                 player.Hit();
+                updateKeys();
                 if (player.deck.find((card) => card.gameValue == 15) || dealer.deck.find((card) => card.gameValue == 15)) blackjack = 42;
 
                 drawCards(player);
@@ -1076,6 +1213,7 @@ import { Table, Player } from "./blackjack";
                 if (player.GetDeckSum() >= dealer.GetDeckSum() && dealer.GetDeckSum() != blackjack) {
                     if (table.deck.length < 1) table.GenerateDeck();
                     dealer.Hit();
+                    updateKeys();
                     if (player.deck.find((card) => card.gameValue == 15) || dealer.deck.find((card) => card.gameValue == 15)) blackjack = 42;
                     
                     sleep = 1000;
