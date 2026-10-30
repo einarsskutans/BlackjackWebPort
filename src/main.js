@@ -91,7 +91,7 @@ import { Table, Player } from "./blackjack";
     const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
     const dealerSprite = new Sprite({texture: dealerTexture, position: {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6});
     
-    const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, position: {y: 0}});
+    const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, position: {y: 0}, zIndex: 3});
     const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, position: {x: -spacing/2, y: app.screen.height/4}, alpha: 0.9, scale: scale});
     const cardEmptySprite2 = new Sprite({texture: cardEmptyTexture2, anchor: 0.5, position: {x: spacing/2, y: app.screen.height/4}, alpha: 0.7, scale: scale});
 
@@ -633,6 +633,12 @@ import { Table, Player } from "./blackjack";
         cardEmptySprite1.position = {x: -spacing/2, y: app.screen.height/4};
         cardBackSprite.scale = scale;
         cardBackSprite.position = {x: -(dealer.deck.length - 1) * spacing / 2, y: -app.screen.height / 4};
+        if (cardBackSprite.parent === container) {
+            container.setChildIndex(
+                cardBackSprite,
+                container.children.length - 1
+            );
+        }
         cardEmptySprite2.position = {x: spacing/2, y: app.screen.height/4};
         cardEmptySprite1.scale = scale;
         cardEmptySprite2.scale = scale;
@@ -799,51 +805,94 @@ import { Table, Player } from "./blackjack";
     let sleep = 0;
     let waiting = false;
 
-    let cheat = false;
+    let cheat = true;
     let blackjack = 21;
 
     const renderedCards = new Set();
     const animatingCards = new Set();
 
     function checkSpecialCard() {
-        const hasCard16 = [...player.deck, ...dealer.deck]
-            .some(card => card.gameValue === 16);
+        const allCards = [...player.deck, ...dealer.deck];
+        const specialCard = allCards.find(card => card.gameValue === 16);
 
-        if (!hasCard16) return false;
+        if (!specialCard) return false;
 
         console.log("Card 16 activated!");
 
-        // Remove player and dealer card sprites
-        for (const card of [...player.deck, ...dealer.deck]) {
-            if (card.sprite.parent) {
-                card.sprite.parent.removeChild(card.sprite);
-            }
+        // Make sure the special card is actually on screen.
+        if (!specialCard.sprite?.parent) {
+            console.error("Card 16 has not been drawn yet.");
+            return false;
+        }
 
-            // Remove special card outlines, if they exist
-            const outline = specialOutlines.get(card);
+        // Remove the dealer's backcard so it cannot cover the special card.
+        if (cardBackSprite.parent) {
+            container.removeChild(cardBackSprite);
+        }
+
+        const fadeDuration = 1800;
+        let fadeElapsed = 0;
+
+        gamestate = "SPECIAL_CARD";
+
+        const outline = specialOutlines.get(specialCard);
+
+        const animateSpecialCard = (ticker) => {
+            fadeElapsed += ticker.deltaMS;
+
+            const alpha = Math.max(0, 1 - fadeElapsed / fadeDuration);
+
+            if (backcard3Sprite.parent) {
+                backcard3Sprite.parent.removeChild(backcard3Sprite);
+            }
+            for (const card of allCards) {
+                if (card !== specialCard && card.sprite) {
+                    card.sprite.alpha = alpha;
+                }
+            }
+            specialCard.sprite.alpha = Math.min(1, alpha + 0.25);
 
             if (outline) {
-                if (outline.parent) outline.parent.removeChild(outline);
-                outline.destroy();
-                specialOutlines.delete(card);
+                outline.alpha = alpha;
             }
-        }
 
-        // Empty both hands
-        player.deck = [];
-        dealer.deck = [];
+            if (fadeElapsed >= fadeDuration) {
+                app.ticker.remove(animateSpecialCard);
 
-        // Update displayed values
-        playerSumText.text = "0";
-        dealerSumText.text = "0";
+                for (const card of allCards) {
+                    if (card.sprite?.parent) {
+                        card.sprite.parent.removeChild(card.sprite);
+                    }
 
-        // Remove dealer's hidden card
-        if (cardBackSprite.parent) {
-            cardBackSprite.parent.removeChild(cardBackSprite);
-        }
+                    const cardOutline = specialOutlines.get(card);
 
-        // End the round as a tie
-        gamestate = "TIE";
+                    if (cardOutline) {
+                        if (cardOutline.parent) {
+                            cardOutline.parent.removeChild(cardOutline);
+                        }
+
+                        cardOutline.destroy();
+                        specialOutlines.delete(card);
+                    }
+                }
+
+                player.deck = [];
+                dealer.deck = [];
+
+                playerSumText.text = "";
+                dealerSumText.text = "";
+
+                if (keyXSprite.parent) keyXSprite.parent.removeChild(keyXSprite);
+                if (keyZSprite.parent) keyZSprite.parent.removeChild(keyZSprite);
+
+                specialCard.sprite.alpha = 1;
+
+                // Let the normal tie and reset logic handle the round.
+                gamestate = "TIE";
+            }
+        };
+
+        app.ticker.add(animateSpecialCard);
 
         return true;
     }
@@ -877,7 +926,7 @@ import { Table, Player } from "./blackjack";
                     ? app.screen.height / 4
                     : -app.screen.height / 4;
 
-            container.addChild(card.sprite);
+            if (card.sprite.parent !== container) container.addChild(card.sprite);
             card.sprite.scale.set(scale);
 
             // Don't animate cards that are already on the table
@@ -903,12 +952,26 @@ import { Table, Player } from "./blackjack";
     }
     function drawDealerBackCard() {
         cardBackSprite.scale.set(scale);
-        container.addChild(cardBackSprite);
-        cardBackSprite.x = -(dealer.deck.length - 1) * spacing / 2;
-        cardBackSprite.y = -app.screen.height / 4;
         cardBackSprite.alpha = 1;
 
-        reSize();
+        const targetX = -(dealer.deck.length - 1) * spacing / 2;
+        const targetY = -app.screen.height / 4;
+
+        if (!cardBackSprite.parent) {
+            container.addChild(cardBackSprite);
+        }
+
+        animationCard(
+            cardBackSprite,
+            0, 0,
+            targetX, targetY,
+            () => {}
+        );
+
+        container.setChildIndex(
+            cardBackSprite,
+            container.children.length - 1
+        );
     }
     let deckCards = [];
     function drawDeckCards(x, y) {
@@ -1152,13 +1215,19 @@ import { Table, Player } from "./blackjack";
                 dealer.Hit();
                 player.Hit();
                 player.Hit();
+
                 updateKeys();
 
-                if (player.deck.find((card) => card.gameValue == 15) || dealer.deck.find((card) => card.gameValue == 15)) blackjack = 42;
-                if (checkSpecialCard()) break;
+                if (player.deck.find(card => card.gameValue == 15) || dealer.deck.find(card => card.gameValue == 15)) blackjack = 42;
 
+                // Draw the cards BEFORE checking for card 16.
                 drawCards(player);
                 drawCards(dealer);
+
+                if (checkSpecialCard()) {
+                    break;
+                }
+
                 drawDealerBackCard();
 
                 if (cheat) drawDeckCards(0, spacing/2);
@@ -1193,8 +1262,8 @@ import { Table, Player } from "./blackjack";
                 break;
 
             case "REVEAL_BACKCARD":
-                cardBackSprite.alpha -= ticker.deltaTime * 0.05;
-                cardBackSprite.y += ticker.deltaTime * 1;
+                cardBackSprite.alpha -= ticker.deltaMS / 500;
+                cardBackSprite.y += ticker.deltaMS * 0.06;
 
                 if (cardBackSprite.alpha <= 0) {
                     cardBackSprite.alpha = 0;
@@ -1226,11 +1295,14 @@ import { Table, Player } from "./blackjack";
                 if (isAnimating()) return;
 
                 player.Hit();
-                if (checkSpecialCard()) break;
                 updateKeys();
                 if (player.deck.find((card) => card.gameValue == 15) || dealer.deck.find((card) => card.gameValue == 15)) blackjack = 42;
 
+                drawCards(dealer);
                 drawCards(player);
+
+                if (checkSpecialCard()) break;
+
                 playerSumText.text = player.GetDeckSum();
 
                 if (player.GetDeckSum() >= blackjack && dealer.GetDeckSum() >= blackjack) {
@@ -1254,14 +1326,23 @@ import { Table, Player } from "./blackjack";
                     gamestate = "HOLD";
                     break;
                 }
+
+                if (!cardBackSprite.parent) {
+                    dealerSumText.text = dealer.GetDeckSum();
+                    gamestate = "HOLD";
+                    break;
+                }
+
                 dealerSumText.text = dealer.GetDeckSum();
-                cardBackSprite.alpha -= ticker.deltaTime * 0.05;
-                cardBackSprite.y += ticker.deltaTime * 1;
+
+                cardBackSprite.alpha -= ticker.deltaMS / 500;
+                cardBackSprite.y += ticker.deltaMS * 0.06;
+
                 if (cardBackSprite.alpha <= 0) {
+                    cardBackSprite.alpha = 0;
                     container.removeChild(cardBackSprite);
                     gamestate = "HOLD";
                 }
-
                 break;
             case "HOLD":
                 if (player.GetDeckSum() < dealer.GetDeckSum() && dealer.GetDeckSum() <= blackjack) {
@@ -1278,15 +1359,19 @@ import { Table, Player } from "./blackjack";
                 }
                 if (player.GetDeckSum() >= dealer.GetDeckSum() && dealer.GetDeckSum() != blackjack) {
                     if (table.deck.length < 1) table.GenerateDeck();
+
                     dealer.Hit();
-                    if (checkSpecialCard()) break;
                     updateKeys();
                     if (player.deck.find((card) => card.gameValue == 15) || dealer.deck.find((card) => card.gameValue == 15)) blackjack = 42;
-                    
+
+                    drawCards(dealer);
+                    drawCards(player);
+
+                    if (checkSpecialCard()) break;
+
                     sleep = 1000;
                     waiting = true;
 
-                    drawCards(dealer);
                     dealerSumText.text = dealer.GetDeckSum();
                 }
 
@@ -1372,6 +1457,8 @@ import { Table, Player } from "./blackjack";
 
                 gamestate = "RESET";
 
+                break;
+            case "SPECIAL_CARD":
                 break;
   
             default:
