@@ -17,9 +17,10 @@ export class Player { // Also the dealer
     }
 
     Hit() {
-        let card = this.table.TakeCard();
+        const card = this.table.TakeCard();
+        if (!card) return false;
         this.deck.push(card);
-        console.log("Deck length: " + this.table.deck.length)
+        return true;
     }
     GetDeckSum() {
         let sum = 0
@@ -87,8 +88,10 @@ export class Table {
         }
 
         // Special cards
-        let card = new Card(15, 15, 0);
-        this.spriteDeck.push(card);
+        let L1 = new Card(15, 15, 0);
+        this.spriteDeck.push(L1);
+        let L2 = new Card(16, 16, 0);
+        this.spriteDeck.push(L2);
     }
 
     GenerateDeck() {
@@ -99,9 +102,15 @@ export class Table {
         
     }
     TakeCard() {
+        if (this.deck.length === 0) {
+            return null;
+        }
+
         const n = Math.floor(Math.random() * this.deck.length);
-        const card = this.deck[n]; // Get a returnable before erasing
+        const card = this.deck[n];
+
         this.deck.splice(n, 1);
+
         return card;
     }
 }

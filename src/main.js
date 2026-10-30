@@ -7,6 +7,10 @@ import { Table, Player } from "./blackjack";
 
      // Initialize the application
     await app.init({ background: "#00563F", resizeTo: window });
+    app.canvas.tabIndex = 0;
+    app.canvas.addEventListener("pointerdown", () => {
+        app.canvas.focus();
+    });
 
     // Append the application canvas to the document body
     document.getElementById("pixi-container").appendChild(app.canvas);
@@ -117,12 +121,19 @@ import { Table, Player } from "./blackjack";
         table.spriteDeck[i].sprite.eventMode = "static";
     }
 
-    const texture = await Assets.load(`/assets/cardL1.png`);
-    texture.source.scaleMode = "nearest";
-    const sprite = new Sprite(texture);
-    sprite.anchor.set(0.5);
-    table.spriteDeck[52].sprite = sprite;
+    const texture1 = await Assets.load(`/assets/cardL1.png`);
+    texture1.source.scaleMode = "nearest";
+    const sprite1 = new Sprite(texture1);
+    sprite1.anchor.set(0.5);
+    table.spriteDeck[52].sprite = sprite1;
     table.spriteDeck[52].sprite.eventMode = "static";
+
+    const texture2 = await Assets.load(`/assets/cardL2.png`);
+    texture2.source.scaleMode = "nearest";
+    const sprite2 = new Sprite(texture2);
+    sprite2.anchor.set(0.5);
+    table.spriteDeck[53].sprite = sprite2;
+    table.spriteDeck[53].sprite.eventMode = "static";
 
     let player = new Player("Player", table);
     let dealer = new Player("Dealer", table);
@@ -780,6 +791,9 @@ import { Table, Player } from "./blackjack";
             keyCSprite.alpha = 1;
         }
     })
+    window.addEventListener("focus", () => {
+        app.canvas.focus();
+    });
 
     let elapsed = 0;
     let sleep = 0;
@@ -791,12 +805,61 @@ import { Table, Player } from "./blackjack";
     const renderedCards = new Set();
     const animatingCards = new Set();
 
+    function checkSpecialCard() {
+        const hasCard16 = [...player.deck, ...dealer.deck]
+            .some(card => card.gameValue === 16);
+
+        if (!hasCard16) return false;
+
+        console.log("Card 16 activated!");
+
+        // Remove player and dealer card sprites
+        for (const card of [...player.deck, ...dealer.deck]) {
+            if (card.sprite.parent) {
+                card.sprite.parent.removeChild(card.sprite);
+            }
+
+            // Remove special card outlines, if they exist
+            const outline = specialOutlines.get(card);
+
+            if (outline) {
+                if (outline.parent) outline.parent.removeChild(outline);
+                outline.destroy();
+                specialOutlines.delete(card);
+            }
+        }
+
+        // Empty both hands
+        player.deck = [];
+        dealer.deck = [];
+
+        // Update displayed values
+        playerSumText.text = "0";
+        dealerSumText.text = "0";
+
+        // Remove dealer's hidden card
+        if (cardBackSprite.parent) {
+            cardBackSprite.parent.removeChild(cardBackSprite);
+        }
+
+        // End the round as a tie
+        gamestate = "TIE";
+
+        return true;
+    }
+
     function drawCards(target) {
         for (let i = 0; i < target.deck.length; i++) {
             const card = target.deck[i];
 
+            if (!card || !card.sprite) {
+                console.error("Invalid card in player/dealer deck:", card);
+                continue;
+            }
+
             if (card.gameValue > 13) {
                 addSpecialOutline(card);
+
                 const outline = specialOutlines.get(card);
 
                 if (outline) {
@@ -909,6 +972,7 @@ import { Table, Player } from "./blackjack";
     }
 
     function addSpecialOutline(card) {
+        if (!card || !card.sprite) return;
         if (specialOutlines.has(card)) return;
 
         const outline = new AnimatedSprite(animationOutlineTextures);
@@ -921,7 +985,6 @@ import { Table, Player } from "./blackjack";
         outline.play();
 
         specialOutlines.set(card, outline);
-
         container.addChild(outline);
     }
 
@@ -979,6 +1042,7 @@ import { Table, Player } from "./blackjack";
         // Main gameplay loop
         switch (gamestate) {
             case "MENU":
+                app.canvas.focus();
                 for (const card of player.deck) {
                     container.removeChild(card.sprite);
                 }
@@ -1091,6 +1155,7 @@ import { Table, Player } from "./blackjack";
                 updateKeys();
 
                 if (player.deck.find((card) => card.gameValue == 15) || dealer.deck.find((card) => card.gameValue == 15)) blackjack = 42;
+                if (checkSpecialCard()) break;
 
                 drawCards(player);
                 drawCards(dealer);
@@ -1161,6 +1226,7 @@ import { Table, Player } from "./blackjack";
                 if (isAnimating()) return;
 
                 player.Hit();
+                if (checkSpecialCard()) break;
                 updateKeys();
                 if (player.deck.find((card) => card.gameValue == 15) || dealer.deck.find((card) => card.gameValue == 15)) blackjack = 42;
 
@@ -1213,6 +1279,7 @@ import { Table, Player } from "./blackjack";
                 if (player.GetDeckSum() >= dealer.GetDeckSum() && dealer.GetDeckSum() != blackjack) {
                     if (table.deck.length < 1) table.GenerateDeck();
                     dealer.Hit();
+                    if (checkSpecialCard()) break;
                     updateKeys();
                     if (player.deck.find((card) => card.gameValue == 15) || dealer.deck.find((card) => card.gameValue == 15)) blackjack = 42;
                     
