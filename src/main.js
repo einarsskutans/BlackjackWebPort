@@ -64,34 +64,22 @@ import { Table, Player } from "./blackjack";
     const endVisTexture = await Assets.load({src: "/assets/upEndVis.png", data: {scaleMode: "nearest"}});
     const heartTexture = await Assets.load({src: "/assets/heart.png", data: {scaleMode: "nearest"}});
     const infoTexture = await Assets.load({src: "/assets/flair_small_info.png", data: {scaleMode: "nearest"}});
-    const infoBgTexture  = await Assets.load({src: "/assets/flair_small_info.png", data: {scaleMode: "nearest"}});
     const infoCardNumberTexture = await Assets.load({src: "/assets/card3.png", data: {scaleMode: "nearest"}});
     const infoCardFaceTexture = await Assets.load({src: "/assets/card52.png", data: {scaleMode: "nearest"}});
     const infoCardSpecialTexture = await Assets.load({src: "/assets/cardL1.png", data: {scaleMode: "nearest"}});
     const cheatBgTexture = await Assets.load({src: "/assets/cheatBg.png", data: {scaleMode: "nearest"}});
-
     const cardL1Textures = [];
     for (let i = 0; i < 8; i++) {
-        const texture = await Assets.load({
-            src: `/assets/CardL1/cardL1_${i+1}.png`,
-            data: {scaleMode: "nearest"}
-        });
-
+        const texture = await Assets.load({src: `/assets/CardL1/cardL1_${i+1}.png`, data: {scaleMode: "nearest"}});
         cardL1Textures.push(texture);
     }
-
-    const CardL2Textures = [];
+    const cardL2Textures = [];
     for (let i = 0; i < 8; i++) {
-        const texture = await Assets.load({
-            src: `/assets/CardL2/cardL2_${i+1}.png`,
-            data: {scaleMode: "nearest"}
-        });
-
-        CardL2Textures.push(texture);
+        const texture = await Assets.load({src: `/assets/CardL2/cardL2_${i+1}.png`, data: {scaleMode: "nearest"}});
+        cardL2Textures.push(texture);
     }
 
     const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale})
-
     const keyZSprite = new Sprite({texture: keyZTexture, anchor: 0.5, position: {x: 0, y: -app.screen.height / 4}, scale: scale/6});
     const keyXSprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/4}, scale: scale/6});
     const keyX2Sprite = new Sprite({texture: keyXTexture, anchor: 0.5, position: {x: centerText.x-centerText.width/2-spacing*0.2, y: centerText.y}, scale: scale/6});
@@ -99,11 +87,9 @@ import { Table, Player } from "./blackjack";
     const keyCSprite = new Sprite({texture: keyCTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: scale/8});
     const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
     const dealerSprite = new Sprite({texture: dealerTexture, position: {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6});
-    
     const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, position: {y: 0}, zIndex: 3});
     const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, position: {x: -spacing/2, y: app.screen.height/4}, alpha: 0.9, scale: scale});
     const cardEmptySprite2 = new Sprite({texture: cardEmptyTexture2, anchor: 0.5, position: {x: spacing/2, y: app.screen.height/4}, alpha: 0.7, scale: scale});
-
     const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6, eventMode: "static", zIndex: 2});
     shopContainer.y = shopBgSprite.height/2 + shopSprite.y + shopSprite.height + scale;
     const backcard3Sprite = new Sprite({texture: backcard3Texture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*0.5}, scale: scale});
@@ -122,25 +108,16 @@ import { Table, Player } from "./blackjack";
     const table = new Table();
     table.GenerateSpriteDeck();
     for (let i = 0; i < 52; i++) {
-        const texture = await Assets.load(`/assets/card${i+1}.png`);
-        texture.source.scaleMode = "nearest";
-        const sprite = new Sprite(texture);
-        sprite.anchor.set(0.5);
+        const texture = await Assets.load({src: `/assets/card${i+1}.png`, data: {scaleMode: "nearest"}});
+        const sprite = new Sprite({texture: texture, anchor: 0.5, eventMode: "static"});
         table.spriteDeck[i].sprite = sprite;
-        table.spriteDeck[i].sprite.eventMode = "static";
     }
 
-    const sprite1 = new AnimatedSprite(cardL1Textures);
-    sprite1.animationSpeed = 0.2;
-    sprite1.anchor.set(0.5);
-    table.spriteDeck[52].sprite = sprite1;
-    table.spriteDeck[52].sprite.eventMode = "static";
+    const spriteL1 = new AnimatedSprite({textures: cardL1Textures, animationSpeed: 0.2, anchor: 0.5, eventMode: "static"});
+    table.spriteDeck[52].sprite = spriteL1;
 
-    const sprite2 = new AnimatedSprite(CardL2Textures);
-    sprite2.animationSpeed = 0.2;
-    sprite2.anchor.set(0.5);
-    table.spriteDeck[53].sprite = sprite2;
-    table.spriteDeck[53].sprite.eventMode = "static";
+    const spriteL2 = new AnimatedSprite({textures: cardL2Textures, animationSpeed: 0.2, anchor: 0.5, eventMode: "static"});
+    table.spriteDeck[53].sprite = spriteL2;
 
     let player = new Player("Player", table);
     let dealer = new Player("Dealer", table);
@@ -517,15 +494,7 @@ import { Table, Player } from "./blackjack";
         itemBits[itemID] = [];
 
         for (let i = 1; i <= maxAmount; i++) {
-            const bitSprite = new Sprite({
-                texture: bitTexture,
-                anchor: 0.5,
-                position: {
-                    x: x + scale * i * 4,
-                    y: y
-                },
-                scale: scale
-            });
+            const bitSprite = new Sprite({texture: bitTexture, anchor: 0.5, position: {x: x + scale * i * 4, y: y}, scale: scale});
 
             if (i > amount) {
                 bitSprite.alpha = 0.2;
@@ -591,12 +560,7 @@ import { Table, Player } from "./blackjack";
             const heartSprite = new Sprite({
                 texture: heartTexture,
                 anchor: 0.5,
-                position: {
-                    x: x + spacing*0.25 * i,
-                    y: y
-                },
-                scale: scale*0.8
-            });
+                position: {x: x + spacing*0.25 * i, y: y}, scale: scale*0.8});
 
             if (i > amount) {
                 heartSprite.alpha = 0.2;
