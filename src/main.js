@@ -2,18 +2,28 @@ import { Application, Assets, Sprite, Container, Text, AnimatedSprite } from "pi
 import { Table, Player } from "./blackjack";
 
 (async () => {
-     // Create a new application
-     const app = new Application();
+    // Create a new application
+    const app = new Application();
 
-     // Initialize the application
-    await app.init({ background: "#00563F", resizeTo: window });
+    // Initialize the application
+    const pixiContainer = document.getElementById("pixi-container") 
+    await app.init({ background: "#00563F", resizeTo: pixiContainer });
     app.canvas.tabIndex = 0;
     app.canvas.addEventListener("pointerdown", () => {
         app.canvas.focus();
     });
 
     // Append the application canvas to the document body
-    document.getElementById("pixi-container").appendChild(app.canvas);
+    pixiContainer.appendChild(app.canvas);
+
+    const resizeObserver = new ResizeObserver(([entry]) => {
+        const { width, height } = entry.contentRect;
+
+        if (!width || !height) return;
+
+        app.renderer.resize(width, height);
+        reSize();
+    });
 
     const font = new FontFace(
         "PrimaryFont",
@@ -25,9 +35,17 @@ import { Table, Player } from "./blackjack";
     // Render setup
     const BASE_WIDTH = 2560;
     const BASE_HEIGHT = 1440;
+    let aspectRatio = app.screen.width / app.screen.height;
+    let portraitBoost = Math.min(1.3, 0.75 / aspectRatio);
 
     const scale = 8;
     const spacing = scale * 24;
+
+    let gameScale = Math.min(app.screen.width / BASE_WIDTH * 0.6, app.screen.height / BASE_HEIGHT * 0.4)*2;
+    let hudScale = gameScale;
+
+    let halfWidth = app.screen.width / hudScale / 2;
+    let halfHeight = app.screen.height / hudScale / 2;
 
     const container = new Container({position: {x: app.screen.width/2, y: app.screen.height/2}});
     const gameContainer = new Container({position: {x: 0, y: 0}, zIndex: 0});
@@ -96,7 +114,6 @@ import { Table, Player } from "./blackjack";
     const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, position: {x: -spacing/2, y: app.screen.height/4}, alpha: 0.9, scale: scale});
     const cardEmptySprite2 = new Sprite({texture: cardEmptyTexture2, anchor: 0.5, position: {x: spacing/2, y: app.screen.height/4}, alpha: 0.7, scale: scale});
     const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6, eventMode: "static", zIndex: 2});
-    shopContainer.y = shopBgSprite.height/2 + shopSprite.y + shopSprite.height + scale;
     const backcard3Sprite = new Sprite({texture: backcard3Texture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*0.5}, scale: scale});
     const profitSprite = new Sprite({texture: profitTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*2}, scale: scale});
     const profitGoldSprite = new Sprite({texture: profitGoldTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*3.5}, scale: scale});
@@ -104,7 +121,6 @@ import { Table, Player } from "./blackjack";
     const endVisSprite = new Sprite({texture: endVisTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*5}, scale: scale, alpha: 0});
     const infoSprite = new Sprite({texture: infoTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: app.screen.height/2 - spacing*0.8}, scale: scale/2, eventMode: "static"});
     const infoBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale/2});
-    infoContainer.y = infoSprite.y - infoBgSprite.height/2 - scale;
     const infoCardNumberSprite = new Sprite({texture: infoCardNumberTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing/3, y: -infoBgSprite.height/2 + spacing*0.5}, scale: scale/2});
     const infoCardFaceSprite = new Sprite({texture: infoCardFaceTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing/3, y: -infoBgSprite.height/2 + spacing*1.5}, scale: scale/2});
     const infoCardSpecialSprite = new Sprite({texture: infoCardSpecialTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing/3, y: -infoBgSprite.height/2 + spacing*2.5}, scale: scale/2});
@@ -126,6 +142,7 @@ import { Table, Player } from "./blackjack";
 
     let player = new Player("Player", table);
     let dealer = new Player("Dealer", table);
+    dealer.Reset();
     player.Reset();
     player.LoadData();
     dealer.LoadData();
@@ -383,8 +400,8 @@ import { Table, Player } from "./blackjack";
         if (hudContainer.getChildByLabel("infoBg")) {
             const animate = () => {
                 infoContainer.x += app.ticker.deltaMS*scale;
-                if (infoContainer.x >= app.screen.width/2 + infoBgSprite.width/2) {
-                    infoContainer.x = app.screen.width/2 + infoBgSprite.width/2;
+                if (infoContainer.x >= halfWidth + infoBgSprite.width / 2 + spacing*0.2) {
+                    infoContainer.x = halfWidth + infoBgSprite.width / 2 + spacing*0.2;
                     app.ticker.remove(animate);
                     hudContainer.removeChild(infoContainer);
                 }
@@ -392,13 +409,13 @@ import { Table, Player } from "./blackjack";
             app.ticker.add(animate);
         }
         else {
-            infoContainer.x = app.screen.width/2 + infoBgSprite.width/2;
+            infoContainer.x = halfWidth + infoBgSprite.width / 2 + spacing*0.2;
             infoSprite.alpha = 0.6;
             hudContainer.addChild(infoContainer);
             const animate = () => {
                 infoContainer.x -= app.ticker.deltaMS*scale;
-                if (infoContainer.x <= app.screen.width/2-infoBgSprite.width/2-spacing/4) {
-                    infoContainer.x = app.screen.width/2-infoBgSprite.width/2-spacing/4;
+                if (infoContainer.x <= halfWidth - infoBgSprite.width / 2 - spacing*0.2) {
+                    infoContainer.x = halfWidth - infoBgSprite.width / 2 - spacing*0.2;
                     app.ticker.remove(animate);
                 }
             };
@@ -423,8 +440,8 @@ import { Table, Player } from "./blackjack";
         if (hudContainer.getChildByLabel("shopBg")) {
             const animate = () => {
                 shopContainer.x += app.ticker.deltaMS*scale;
-                if (shopContainer.x >= app.screen.width/2 + shopBgSprite.width/2) {
-                    shopContainer.x = app.screen.width/2 + shopBgSprite.width/2;
+                if (shopContainer.x >= halfWidth + shopBgSprite.width / 2 + spacing*0.2) {
+                    shopContainer.x = halfWidth + shopBgSprite.width / 2 + spacing*0.2;
                     app.ticker.remove(animate);
                     hudContainer.removeChild(shopContainer);
                 }
@@ -436,13 +453,13 @@ import { Table, Player } from "./blackjack";
             updateButtonColor("backcard3");
             updateButtonColor("profitGold");
             updateButtonColor("kill");
-            shopContainer.x = app.screen.width/2 + shopBgSprite.width/2;
+            shopContainer.x = halfWidth + shopBgSprite.width / 2 + spacing*0.2;
             shopSprite.alpha = 0.6;
             hudContainer.addChild(shopContainer);
             const animate = () => {
                 shopContainer.x -= app.ticker.deltaMS*scale;
-                if (shopContainer.x <= app.screen.width/2-shopContainer.width/2-spacing/4) {
-                    shopContainer.x = app.screen.width/2-shopContainer.width/2-spacing/4;
+                if (shopContainer.x <= halfWidth - shopBgSprite.width / 2 - spacing*0.2) {
+                    shopContainer.x = halfWidth - shopBgSprite.width / 2 - spacing*0.2;
                     app.ticker.remove(animate);
                 }
             };
@@ -578,25 +595,23 @@ import { Table, Player } from "./blackjack";
 
     window.addEventListener("resize", reSize);
     function reSize() {
-        const gameScale = Math.min(
-            app.screen.width / BASE_WIDTH * 0.6,
+        aspectRatio = app.screen.width / app.screen.height;
+        portraitBoost = Math.min(1.3, 0.75 / aspectRatio);
+
+        gameScale = Math.min(
+            app.screen.width / BASE_WIDTH * 0.6 * portraitBoost,
             app.screen.height / BASE_HEIGHT * 0.4
         )*2;
+        hudScale = gameScale;
+
+        halfWidth = app.screen.width / hudScale / 2;
+        halfHeight = app.screen.height / hudScale / 2;
 
         gameContainer.scale.set(gameScale);
-
-        const hudScale = gameScale;
-
         gameContainer.position.set(app.screen.width / 2, app.screen.height / 2);
 
         hudContainer.scale.set(hudScale);
         hudContainer.position.set(app.screen.width / 2, app.screen.height / 2);
-
-        const halfWidth = app.screen.width / hudScale / 2;
-        const halfHeight = app.screen.height / hudScale / 2;
-
-        shopContainer.x = halfWidth + shopBgSprite.width / 2;
-        infoContainer.x = halfWidth + infoBgSprite.width / 2;
 
         playerSprite.position.set(-halfWidth + spacing / 6, halfHeight - spacing / 6);
         playerNameText.position.set(-halfWidth + spacing * 1.12, halfHeight - spacing);
@@ -609,9 +624,13 @@ import { Table, Player } from "./blackjack";
         playerSumText.position.set(0, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing*2);
         dealerSumText.position.set(0, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4 + spacing);
 
+        shopContainer.y = shopSprite.y + shopSprite.height + shopBgSprite.height/2 + spacing*0.2;
+        infoContainer.y = infoSprite.y - infoBgSprite.height/2 - spacing*0.2;
+
         updateKeys();
     }
     reSize();
+    resizeObserver.observe(pixiContainer);
 
     // Game logic
     let backcardRounds = 0;
@@ -621,7 +640,7 @@ import { Table, Player } from "./blackjack";
         const keyY = playerBetText.y + playerBetText.height / 2;
 
         keyVSprite.position.set(keyStartX, keyY);
-        keyCSprite.position.set(keyStartX + keyVSprite.width + spacing / 6, keyY);
+        keyCSprite.position.set(keyStartX + keyVSprite.width/2 + spacing/8, keyY);
 
         keyXSprite.position.set(player.deck.length * spacing / 1.4, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing); 
         keyZSprite.position.set(dealer.deck.length * spacing / 1.4, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4);
@@ -695,7 +714,7 @@ import { Table, Player } from "./blackjack";
     let sleep = 0;
     let waiting = false;
 
-    let cheat = true;
+    let cheat = false;
     let blackjack = 21;
 
     const renderedCards = new Set();
@@ -948,6 +967,7 @@ import { Table, Player } from "./blackjack";
                     localStorage.setItem(`${player.name}.save`, 0);
                     centerText.text = "It's so over..\nstart a new game?";
                     player.Reset();
+                    dealer.Reset();
                 }
                 else if (parseInt(localStorage.getItem(`${player.name}.save`)) == 1) {
                     player.LoadData();
@@ -1014,7 +1034,7 @@ import { Table, Player } from "./blackjack";
                     endSprite.alpha = 0;
                     endText.text = "Kill\nEnd dealer's life";
                 }
-                if (player.inventory.kill > 0 && player.endgame != 2) drawHearts(-app.screen.width / hudContainer.scale.x / 2 + spacing, -BASE_HEIGHT / 2 + spacing * 0.8, dealer.hp, 3);
+                if (player.inventory.kill > 0 && player.endgame != 2) drawHearts(dealerSprite.x+dealerSprite.width, dealerSprite.y+dealerSprite.height-scale*4, dealer.hp, 3);
 
                 gamestate = "BET";
 
@@ -1026,8 +1046,8 @@ import { Table, Player } from "./blackjack";
                 if (hudContainer.getChildByLabel("shopBg")) {
                     const animate = () => {
                         shopContainer.x += app.ticker.deltaMS*scale;
-                        if (shopContainer.x >= halfWidth + shopBgSprite.width / 2) {
-                            shopContainer.x = halfWidth + shopBgSprite.width / 2;
+                        if (shopContainer.x >= halfWidth + shopBgSprite.width / 2 + spacing*0.2) {
+                            shopContainer.x = halfWidth + shopBgSprite.width / 2 + spacing*0.2;
                             app.ticker.remove(animate);
                             hudContainer.removeChild(shopContainer);
                         }
@@ -1250,7 +1270,7 @@ import { Table, Player } from "./blackjack";
                 
                 if (player.inventory.kill > 0 && player.endgame != 2) {
                     dealer.hp -= 1;
-                    drawHearts(-app.screen.width / hudContainer.scale.x / 2 + spacing, -BASE_HEIGHT / 2 + spacing * 0.8, dealer.hp, 3);
+                    drawHearts(dealerSprite.x+dealerSprite.width, dealerSprite.y+dealerSprite.height-scale*4, dealer.hp, 3);
                     if (dealer.hp <= 0) {
                         gamestate = "MERCY";
                         break;
@@ -1285,6 +1305,9 @@ import { Table, Player } from "./blackjack";
 
                 break;
             case "SPECIAL_CARD":
+                break;
+            case "LOOP":
+                if (player.inventory.kill > 0 && player.endgame != 2) drawHearts(dealerSprite.x+dealerSprite.width, dealerSprite.y+dealerSprite.height-scale*4, dealer.hp, 3);
                 break;
   
             default:
