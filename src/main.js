@@ -606,6 +606,8 @@ import { Table, Player } from "./blackjack";
         dealerNameText.position.set(-halfWidth + spacing * 1.12, -halfHeight + spacing / 6);
         shopSprite.position.set(halfWidth - spacing / 6, -halfHeight + spacing / 6);
         infoSprite.position.set(halfWidth - spacing / 6, halfHeight - spacing * 0.8);
+        playerSumText.position.set(0, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing*2);
+        dealerSumText.position.set(0, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4 + spacing);
 
         updateKeys();
     }
@@ -621,8 +623,8 @@ import { Table, Player } from "./blackjack";
         keyVSprite.position.set(keyStartX, keyY);
         keyCSprite.position.set(keyStartX + keyVSprite.width + spacing / 6, keyY);
 
-        keyXSprite.x = player.deck.length * spacing / 1.4;
-        keyZSprite.x = dealer.deck.length * spacing / 1.4;
+        keyXSprite.position.set(player.deck.length * spacing / 1.4, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing); 
+        keyZSprite.position.set(dealer.deck.length * spacing / 1.4, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4);
     }
 
     document.addEventListener("keydown", (event) => {
@@ -693,7 +695,7 @@ import { Table, Player } from "./blackjack";
     let sleep = 0;
     let waiting = false;
 
-    let cheat = false;
+    let cheat = true;
     let blackjack = 21;
 
     const renderedCards = new Set();
@@ -780,7 +782,7 @@ import { Table, Player } from "./blackjack";
             const targetX =
                 -(target.deck.length - 1) * spacing / 2 + i * spacing;
 
-            const targetY = target === player ? BASE_HEIGHT / 4 : -BASE_HEIGHT / 4;
+            const targetY = target === player ? cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing : cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4;
 
             if (card.sprite.parent !== gameContainer) gameContainer.addChild(card.sprite);
             card.sprite.scale.set(scale);
@@ -808,7 +810,7 @@ import { Table, Player } from "./blackjack";
         cardBackSprite.alpha = 1;
 
         const targetX = -(dealer.deck.length - 1) * spacing / 2;
-        const targetY = -BASE_HEIGHT / 4;
+        const targetY = cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4;
 
         if (!cardBackSprite.parent) {
             gameContainer.addChild(cardBackSprite);
@@ -988,7 +990,7 @@ import { Table, Player } from "./blackjack";
                 
                 keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/3, y: centerText.y};
                 gameContainer.removeChild(keyXSprite, keyZSprite)
-                hudContainer.removeChild(cardBackSprite, cheatBgSprite);
+                gameContainer.removeChild(cardBackSprite, cheatBgSprite);
                 gameContainer.addChild(playerSumText, dealerSumText)
                 hudContainer.addChild(playerSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, centerText, keyVSprite, keyCSprite, infoSprite, playerBalanceText, playerBetText);
                 shopSprite.alpha = 1;
