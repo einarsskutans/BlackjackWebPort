@@ -537,7 +537,7 @@ import { Table, Player } from "./blackjack";
             gamestate = "HIT";
         }
     })
-    keyVSprite.on("pointertap", () => {
+    keyVSprite.on("pointerdown", () => {
         if (gamestate === "BET") {
             const increment = player.betDefault;
             const nextBet = (Math.floor(player.bet / increment) + 1) * increment;
@@ -550,7 +550,7 @@ import { Table, Player } from "./blackjack";
             updateKeys();
         }
     })
-    keyCSprite.on("pointertap", () => {
+    keyCSprite.on("pointerdown", () => {
         if (gamestate === "BET") {
             const increment = player.betDefault;
             const nextBet = (Math.ceil(player.bet / increment) - 1) * increment;
@@ -872,8 +872,8 @@ import { Table, Player } from "./blackjack";
 
             const alpha = Math.max(0, 1 - fadeElapsed / fadeDuration);
 
-            if (backcard3Sprite.parent) {
-                backcard3Sprite.parent.removeChild(backcard3Sprite);
+            if (cardBackSprite.parent) {
+                cardBackSprite.parent.removeChild(cardBackSprite);
             }
             for (const card of allCards) {
                 if (card !== specialCard && card.sprite) {
