@@ -1,4 +1,4 @@
-import { Application, Assets, Sprite, Container, Text, AnimatedSprite } from "pixi.js";
+import { Application, Assets, Sprite, Container, Text, AnimatedSprite, isMobile } from "pixi.js";
 import { Table, Player } from "./blackjack";
 
 (async () => {
@@ -41,7 +41,7 @@ import { Table, Player } from "./blackjack";
     const scale = 8;
     const spacing = scale * 24;
 
-    let gameScale = Math.min(app.screen.width / BASE_WIDTH * 0.6, app.screen.height / BASE_HEIGHT * 0.4)*2;
+    let gameScale = Math.min(app.screen.width / BASE_WIDTH * 0.6 * portraitBoost, app.screen.height / BASE_HEIGHT * 0.4)*2;
     let hudScale = gameScale;
 
     let halfWidth = app.screen.width / hudScale / 2;
@@ -52,7 +52,10 @@ import { Table, Player } from "./blackjack";
     const hudContainer = new Container({position: {x: 0, y: 0}, zIndex: 1});
     const shopContainer = new Container({position: {x: 0, y: 0}, zIndex: 2, label: "shopBg"});
     const infoContainer = new Container({position: {x: 0, y: 0}, zIndex: 3, label: "infoBg"});
-    app.stage.addChild(container, gameContainer, hudContainer);
+    const clickOverlaySprite = new Sprite({position: {x: 0, y: 0}, anchor: {x: 0.5, y: 0.5}, width: app.screen.width, height: app.screen.height, eventMode: "static", tint: "0xAAAAAA"});
+    const clickOverlayTopSprite = new Sprite({position: {x: 0, y: -halfWidth/2}, width: app.screen.width, height: halfHeight, eventMode: "static"});
+    const clickOverlayBottomSprite = new Sprite({position: {x: 0, y: halfWidth/2}, width: app.screen.width, height: halfHeight, eventMode: "static"});
+    app.stage.addChild(container, gameContainer, hudContainer, clickOverlaySprite, clickOverlayTopSprite, clickOverlayBottomSprite);
 
     // Sprites
     const centerText = new Text({
@@ -62,7 +65,7 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: 0.5,
-        position: {x: 0, y: 0}
+        position: {x: 0, y: 0},
     });
 
     const shopBgTexture = await Assets.load({src: "/assets/shopbg.png", data: {scaleMode: "nearest"}});
@@ -466,6 +469,27 @@ import { Table, Player } from "./blackjack";
             app.ticker.add(animate);
         }
     });
+
+    clickOverlaySprite.on("click", () => {
+        if (gamestate === "BET") {
+            gamestate = "START";
+        }
+        else if (gamestate === "MENU_WAIT") {
+            gamestate = "RESET";
+        }
+    })
+    clickOverlayTopSprite.on("click", () => {
+        if (gamestate === "LOOP") {
+            if (hudContainer.getChildByLabel("shopBg")) return;
+            gamestate = "PREHOLD";
+        }
+    })
+    clickOverlayBottomSprite.on("click", () => {
+        if (gamestate === "LOOP") {
+            if (isAnimating()) return;
+            gamestate = "HIT";
+        }
+    })
 
     const buyButtons = {};
 
@@ -975,7 +999,8 @@ import { Table, Player } from "./blackjack";
                 }
                 else centerText.text = "Start a new Ventti";
                 keyX2Sprite.position = {x: centerText.x-centerText.width/2-spacing/3, y: centerText.y};
-                hudContainer.addChild(centerText, keyX2Sprite);
+                hudContainer.addChild(centerText, clickOverlaySprite);
+                if (!isMobile.phone) hudContainer.addChild(keyX2Sprite);
 
                 table.GenerateDeck();
 
@@ -1012,7 +1037,7 @@ import { Table, Player } from "./blackjack";
                 gameContainer.removeChild(keyXSprite, keyZSprite)
                 gameContainer.removeChild(cardBackSprite, cheatBgSprite);
                 gameContainer.addChild(playerSumText, dealerSumText)
-                hudContainer.addChild(playerSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, centerText, keyVSprite, keyCSprite, infoSprite, playerBalanceText, playerBetText);
+                hudContainer.addChild(playerSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, centerText, keyVSprite, keyCSprite, infoSprite, playerBalanceText, playerBetText, clickOverlaySprite);
                 shopSprite.alpha = 1;
 
                 player.deck = [];
@@ -1054,8 +1079,8 @@ import { Table, Player } from "./blackjack";
                     };
                     app.ticker.add(animate);
                 }
-                hudContainer.removeChild(cardEmptySprite1, cardEmptySprite2, keyVSprite, keyCSprite, centerText, keyX2Sprite);
-                gameContainer.addChild(keyXSprite, keyZSprite);
+                hudContainer.removeChild(cardEmptySprite1, cardEmptySprite2, keyVSprite, keyCSprite, centerText, keyX2Sprite, clickOverlaySprite);
+                if (!isMobile.phone) gameContainer.addChild(keyXSprite, keyZSprite);
 
                 dealer.Hit();
                 dealer.Hit();
