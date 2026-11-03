@@ -18,9 +18,12 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
+    background: #00563F;
 }
 
 #pixi-container canvas {
     display: block;
     outline: none;
+    width: 100%;
+    height: 100%;
 }

@@ -6,8 +6,9 @@ import { Table, Player } from "./blackjack";
     const app = new Application();
 
     // Initialize the application
-    const pixiContainer = document.getElementById("pixi-container") 
-    await app.init({ background: "#00563F", resizeTo: pixiContainer });
+    const pixiContainer = document.getElementById("pixi-container")
+    const resolution = Math.min(window.devicePixelRatio || 1, 3);
+    await app.init({ background: "#00563F", resolution: resolution, autoDensity: true, roundPixels: true });
     app.canvas.tabIndex = 0;
     app.canvas.addEventListener("pointerdown", () => {
         app.canvas.focus();
@@ -126,10 +127,10 @@ import { Table, Player } from "./blackjack";
     const endSprite = new Sprite({texture: endTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*5}, scale: scale});
     const endVisSprite = new Sprite({texture: endVisTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*5}, scale: scale, alpha: 0});
     const infoSprite = new Sprite({texture: infoTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: app.screen.height/2 - spacing*0.8}, scale: scale/2, eventMode: "static"});
-    const infoBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale/2});
-    const infoCardNumberSprite = new Sprite({texture: infoCardNumberTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing/3, y: -infoBgSprite.height/2 + spacing*0.5}, scale: scale/2});
-    const infoCardFaceSprite = new Sprite({texture: infoCardFaceTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing/3, y: -infoBgSprite.height/2 + spacing*1.5}, scale: scale/2});
-    const infoCardSpecialSprite = new Sprite({texture: infoCardSpecialTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing/3, y: -infoBgSprite.height/2 + spacing*2.5}, scale: scale/2});
+    const infoBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale});
+    const infoCardNumberSprite = new Sprite({texture: infoCardNumberTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing}, scale: scale, alpha: 0.6});
+    const infoCardFaceSprite = new Sprite({texture: infoCardFaceTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing*3}, scale: scale, alpha: 0.6});
+    const infoCardSpecialSprite = new Sprite({texture: infoCardSpecialTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing*5}, scale: scale, alpha: 0.6});
     const cheatBgSprite = new Sprite({texture: cheatBgTexture, anchor: 0.5, position: {x: 0, y: scale*6}, scale: scale*2.6, zIndex: -2});
     
     const table = new Table();
@@ -288,31 +289,31 @@ import { Table, Player } from "./blackjack";
         text: "Numbers: 1-10",
         style: {
             fill: "#FFFFFF",
-            fontSize: Math.round(scale*3),
+            fontSize: Math.round(scale*6),
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
-        position: {x: infoCardNumberSprite.x + spacing/3, y: infoCardNumberSprite.y}
+        position: {x: infoCardNumberSprite.x + infoCardNumberSprite.width/2, y: infoCardNumberSprite.y}
     })
     const infoFaceText = new Text({
         text: "Faces: 10",
         style: {
             fill: "#FFFFFF",
-            fontSize: Math.round(scale*3),
+            fontSize: Math.round(scale*6),
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
-        position: {x: infoCardFaceSprite.x + spacing/3, y: infoCardFaceSprite.y}
+        position: {x: infoCardFaceSprite.x + infoCardFaceSprite.width/2, y: infoCardFaceSprite.y}
     })
     const infoSpecialText = new Text({
         text: "Specials",
         style: {
             fill: "#FFFFFF",
-            fontSize: Math.round(scale*3),
+            fontSize: Math.round(scale*6),
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
-        position: {x: infoCardSpecialSprite.x + spacing/3, y: infoCardSpecialSprite.y}
+        position: {x: infoCardSpecialSprite.x + infoCardSpecialSprite.width/2, y: infoCardSpecialSprite.y}
     })
     const hitText = new Text({
         text: "Hit",
