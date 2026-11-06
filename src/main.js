@@ -39,7 +39,7 @@ import { Table, Player } from "./blackjack";
     let aspectRatio = app.screen.width / app.screen.height;
     let portraitBoost = Math.min(1.3, 0.75 / aspectRatio);
 
-    const scale = 8;
+    const scale = 10;
     const spacing = scale * 24;
 
     let gameScale = Math.min(app.screen.width / BASE_WIDTH * 0.6 * portraitBoost, app.screen.height / BASE_HEIGHT * 0.4)*2;
