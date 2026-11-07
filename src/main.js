@@ -36,13 +36,13 @@ import { Table, Player } from "./blackjack";
     // Render setup
     const BASE_WIDTH = 2560;
     const BASE_HEIGHT = 1440;
-    let aspectRatio = app.screen.width / app.screen.height;
-    let portraitBoost = Math.min(1.3, 0.75 / aspectRatio);
+    let portraitBoost = isMobile.phone ? 2.25 : 1;
+    let desktopScaleBoost = isMobile.phone ? 1 : 1.25;
 
     const scale = 10;
     const spacing = scale * 24;
 
-    let gameScale = Math.min(app.screen.width / BASE_WIDTH * 0.6 * portraitBoost, app.screen.height / BASE_HEIGHT * 0.4)*2;
+    let gameScale = Math.min(app.screen.width / BASE_WIDTH * 0.6, app.screen.height / BASE_HEIGHT * 0.4) * desktopScaleBoost*portraitBoost;
     let hudScale = gameScale;
 
     let halfWidth = app.screen.width / hudScale / 2;
@@ -690,13 +690,10 @@ import { Table, Player } from "./blackjack";
 
     window.addEventListener("resize", reSize);
     function reSize() {
-        aspectRatio = app.screen.width / app.screen.height;
-        portraitBoost = Math.min(1.6, 0.75 / aspectRatio);
+        portraitBoost = isMobile.phone ? 2.25 : 1;
+        desktopScaleBoost = isMobile.phone ? 1 : 1.25;
 
-        gameScale = Math.min(
-            app.screen.width / BASE_WIDTH * 0.6 * portraitBoost,
-            app.screen.height / BASE_HEIGHT * 0.4
-        )*2;
+        gameScale = Math.min(app.screen.width / BASE_WIDTH * 0.6, app.screen.height / BASE_HEIGHT * 0.4) * desktopScaleBoost*portraitBoost;
         hudScale = gameScale;
 
         halfWidth = app.screen.width / hudScale / 2;
