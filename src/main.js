@@ -98,6 +98,7 @@ import { Table, Player } from "./blackjack";
     const infoCardSpecialTexture = await Assets.load({src: "/assets/cardL1.png", data: {scaleMode: "nearest"}});
     const cheatBgTexture = await Assets.load({src: "/assets/cheatBg.png", data: {scaleMode: "nearest"}});
     const pointerTexture = await Assets.load({src: "/assets/touch_one.png", data: {scaleMode: "nearest"}});
+    const playerinfoBgTexture = await Assets.load({src: "/assets/playerInfoBg.png", data: {scaleMode: "nearest"}});
     const cardL1Textures = [];
     for (let i = 0; i < 8; i++) {
         const texture = await Assets.load({src: `/assets/CardL1/cardL1_${i+1}.png`, data: {scaleMode: "nearest"}});
@@ -132,6 +133,7 @@ import { Table, Player } from "./blackjack";
     const infoCardFaceSprite = new Sprite({texture: infoCardFaceTexture, anchor: 0.5, scale: scale, alpha: 0.6});
     const infoCardSpecialSprite = new Sprite({texture: infoCardSpecialTexture, anchor: 0.5, scale: scale, alpha: 0.6});
     const cheatBgSprite = new Sprite({texture: cheatBgTexture, anchor: 0.5, scale: scale*2.6, zIndex: -2});
+    const playerinfoBgSprite = new Sprite({texture: playerinfoBgTexture, scale: scale*1.4});
     
     const table = new Table();
     table.GenerateSpriteDeck();
@@ -503,6 +505,34 @@ import { Table, Player } from "./blackjack";
         }
         else if (gamestate === "MENU_WAIT") {
             gamestate = "RESET";
+
+            playerSprite.alpha = 0;
+            playerinfoBgSprite.alpha = 0;
+            playerNameText.alpha = 0;
+            playerBalanceText.alpha = 0;
+            playerBetText.alpha = 0;
+            keyVSprite.alpha = 0;
+            keyCSprite.alpha = 0;
+            const animate = () => {
+                playerSprite.alpha += app.ticker.deltaMS/1000;
+                playerinfoBgSprite.alpha += app.ticker.deltaMS/1000;
+                playerNameText.alpha += app.ticker.deltaMS/1000;
+                playerBalanceText.alpha += app.ticker.deltaMS/1000
+                playerBetText.alpha += app.ticker.deltaMS/1000;
+                keyVSprite.alpha += app.ticker.deltaMS/1000;
+                keyCSprite.alpha += app.ticker.deltaMS/1000;
+                if (playerSprite.alpha >= 1) {
+                    playerSprite.alpha = 1;
+                    playerinfoBgSprite.alpha = 1;
+                    playerNameText.alpha = 1;
+                    playerBalanceText.alpha = 1;
+                    playerBetText.alpha = 1;
+                    keyVSprite.alpha = 1;
+                    keyCSprite.alpha = 1;
+                    app.ticker.remove(animate);
+                }
+            };
+            app.ticker.add(animate);
         }
     })
     
@@ -696,6 +726,7 @@ import { Table, Player } from "./blackjack";
         infoSprite.position.set(halfWidth - spacing / 6, halfHeight - spacing * 0.8);
         playerSumText.position.set(0, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing*2);
         dealerSumText.position.set(0, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4 + spacing);
+        playerinfoBgSprite.position.set(playerNameText.x-spacing/4, playerNameText.y - playerNameText.height/3);
 
         shopContainer.y = shopSprite.y + shopSprite.height + shopBgSprite.height/2 + spacing*0.2;
         infoContainer.y = infoSprite.y - infoBgSprite.height/2 - spacing*0.2;
@@ -761,6 +792,28 @@ import { Table, Player } from "./blackjack";
             else if (gamestate === "MENU_WAIT") {
                 keyX2Sprite.alpha = 0.4;
                 gamestate = "RESET";
+
+                playerSprite.alpha = 0;
+                playerinfoBgSprite.alpha = 0;
+                playerNameText.alpha = 0;
+                playerBalanceText.alpha = 0;
+                playerBetText.alpha = 0;
+                const animate = () => {
+                    playerSprite.alpha += app.ticker.deltaMS/1000;
+                    playerinfoBgSprite.alpha += app.ticker.deltaMS/1000;
+                    playerNameText.alpha += app.ticker.deltaMS/1000;
+                    playerBalanceText.alpha += app.ticker.deltaMS/1000
+                    playerBetText.alpha += app.ticker.deltaMS/1000;
+                    if (playerSprite.alpha >= 1) {
+                        playerSprite.alpha = 1;
+                        playerinfoBgSprite.alpha = 1;
+                        playerNameText.alpha = 1;
+                        playerBalanceText.alpha = 1;
+                        playerBetText.alpha = 1;
+                        app.ticker.remove(animate);
+                    }
+                };
+                app.ticker.add(animate);
             }
         }
         if (event.key ==  "z" && gamestate === "LOOP") {
@@ -1122,7 +1175,7 @@ import { Table, Player } from "./blackjack";
                 dealerSumText.eventMode = "none";
                 gameContainer.removeChild(cardBackSprite, cheatBgSprite);
                 gameContainer.addChild(playerSumText, dealerSumText)
-                hudContainer.addChild(playerSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, centerText, keyVSprite, keyCSprite, infoSprite, playerBalanceText, playerBetText);
+                hudContainer.addChild(playerinfoBgSprite, playerSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, centerText, keyVSprite, keyCSprite, infoSprite, playerBalanceText, playerBetText);
                 if (isMobile.phone) hudContainer.addChild(betUpText, betDownText);
                 shopSprite.alpha = 1;
 
