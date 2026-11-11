@@ -76,7 +76,7 @@ import { Table, Player } from "./blackjack";
     const keyXTexture = await Assets.load({src: "/assets/keyboard_x.png", data: {scaleMode: "nearest"}});
     const keyVTexture = await Assets.load({src: "/assets/keyboard_w.png", data: {scaleMode: "nearest"}});
     const keyCTexture = await Assets.load({src: "/assets/keyboard_s.png", data: {scaleMode: "nearest"}});
-    const playerTexture = await Assets.load({src: "/assets/player.png", data: {scaleMode: "nearest"}});
+    const playerTexture = await Assets.load({src: "/assets/playernew.png", data: {scaleMode: "nearest"}});
     const dealerTexture = await Assets.load({src: "/assets/dealer.png", data: {scaleMode: "nearest"}});
     const shopTexture = await Assets.load({src: "/assets/shop.png", data: {scaleMode: "nearest"}});
     const cardBackTexture = await Assets.load({src: "/assets/card53.png", data: {scaleMode: "nearest"}});
@@ -109,29 +109,29 @@ import { Table, Player } from "./blackjack";
         cardL2Textures.push(texture);
     }
 
-    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale})
-    const keyZSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyZTexture, anchor: 0.5, position: {x: 0, y: -app.screen.height / 4}, scale: isMobile.phone ? scale/4 : scale/6});
-    const keyXSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyXTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/4}, scale: isMobile.phone ? scale/4 : scale/6});
-    const keyX2Sprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyXTexture, anchor: 0.5, position: {x: centerText.x-centerText.width/2-spacing*0.2, y: centerText.y}, scale: scale/6});
-    const keyVSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyVTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
-    const keyCSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyCTexture, anchor: 0.5, position: {x: 0, y: app.screen.height/2 - spacing/3}, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
-    const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, position: {x: -app.screen.width/2 + spacing/6, y: app.screen.height/2 - spacing/6}, scale: scale/1.6});
-    const dealerSprite = new Sprite({texture: dealerTexture, position: {x: -app.screen.width/2 + spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6});
-    const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, position: {y: 0}, zIndex: 3});
-    const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, position: {x: -spacing/2, y: app.screen.height/4}, alpha: 0.9, scale: scale});
-    const cardEmptySprite2 = new Sprite({texture: cardEmptyTexture2, anchor: 0.5, position: {x: spacing/2, y: app.screen.height/4}, alpha: 0.7, scale: scale});
-    const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: -app.screen.height/2 + spacing/6}, scale: scale/1.6, eventMode: "static"});
-    const backcard3Sprite = new Sprite({texture: backcard3Texture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*0.5}, scale: scale});
-    const profitSprite = new Sprite({texture: profitTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*2}, scale: scale});
-    const profitGoldSprite = new Sprite({texture: profitGoldTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*3.5}, scale: scale});
-    const endSprite = new Sprite({texture: endTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*5}, scale: scale});
-    const endVisSprite = new Sprite({texture: endVisTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*5}, scale: scale, alpha: 0});
-    const infoSprite = new Sprite({texture: infoTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: app.screen.height/2 - spacing*0.8}, scale: scale/2, eventMode: "static"});
-    const infoBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale});
-    const infoCardNumberSprite = new Sprite({texture: infoCardNumberTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing}, scale: scale, alpha: 0.6});
-    const infoCardFaceSprite = new Sprite({texture: infoCardFaceTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing*3}, scale: scale, alpha: 0.6});
-    const infoCardSpecialSprite = new Sprite({texture: infoCardSpecialTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing*5}, scale: scale, alpha: 0.6});
-    const cheatBgSprite = new Sprite({texture: cheatBgTexture, anchor: 0.5, position: {x: 0, y: scale*6}, scale: scale*2.6, zIndex: -2});
+    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, scale: scale})
+    const keyZSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyZTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/6});
+    const keyXSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyXTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/6});
+    const keyX2Sprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyXTexture, anchor: 0.5, scale: scale/6});
+    const keyVSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyVTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
+    const keyCSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyCTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
+    const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, scale: scale*1.6});
+    const dealerSprite = new Sprite({texture: dealerTexture, scale: scale/1.6});
+    const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, zIndex: 3});
+    const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, alpha: 0.9, scale: scale});
+    const cardEmptySprite2 = new Sprite({texture: cardEmptyTexture2, anchor: 0.5, alpha: 0.7, scale: scale});
+    const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, scale: scale/1.6, eventMode: "static"});
+    const backcard3Sprite = new Sprite({texture: backcard3Texture, anchor: 0.5, scale: scale});
+    const profitSprite = new Sprite({texture: profitTexture, anchor: 0.5, scale: scale});
+    const profitGoldSprite = new Sprite({texture: profitGoldTexture, anchor: 0.5, scale: scale});
+    const endSprite = new Sprite({texture: endTexture, anchor: 0.5, scale: scale});
+    const endVisSprite = new Sprite({texture: endVisTexture, anchor: 0.5, scale: scale, alpha: 0});
+    const infoSprite = new Sprite({texture: infoTexture, anchor: {x: 1, y: 0}, scale: scale/2, eventMode: "static"});
+    const infoBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, scale: scale});
+    const infoCardNumberSprite = new Sprite({texture: infoCardNumberTexture, anchor: 0.5, scale: scale, alpha: 0.6});
+    const infoCardFaceSprite = new Sprite({texture: infoCardFaceTexture, anchor: 0.5, scale: scale, alpha: 0.6});
+    const infoCardSpecialSprite = new Sprite({texture: infoCardSpecialTexture, anchor: 0.5, scale: scale, alpha: 0.6});
+    const cheatBgSprite = new Sprite({texture: cheatBgTexture, anchor: 0.5, scale: scale*2.6, zIndex: -2});
     
     const table = new Table();
     table.GenerateSpriteDeck();
@@ -163,7 +163,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: 0.5,
-        position: {x: 0, y: app.screen.height/4 + spacing*1.2},
         eventMode: "static",
         zIndex: 10
     });
@@ -174,7 +173,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: 0.5,
-        position: {x: 0, y: -app.screen.height/4 + spacing},
         eventMode: "static",
         zIndex: 10
     });
@@ -185,7 +183,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: 0,
-        position: {x: -app.screen.width/2 + spacing*1.1, y: app.screen.height/2 - spacing/1.3}
     });
     const playerBetText = new Text({
         style: {
@@ -194,7 +191,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: 0,
-        position: {x: -app.screen.width/2 + spacing*1.1, y: app.screen.height/2 - spacing/2}
     });
     const playerNameText = new Text({
         text: "Player",
@@ -204,7 +200,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: 0,
-        position: {x: -app.screen.width/2 + spacing*1.12, y: app.screen.height/2 - spacing}
     });
     const dealerNameText = new Text({
         text: "Evil\nDealer",
@@ -214,7 +209,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: 0,
-        position: {x: -app.screen.width/2 + spacing*1.12, y: -app.screen.height/2 + spacing/6}
     });
 
     const shopText = new Text({
@@ -225,7 +219,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: 0.5,
-        position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 - spacing/4}
     })
     const backcard3Text = new Text({
         text: "Backcard\nShow backcard\non the next 3 rounds",
@@ -235,7 +228,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
-        position: {x: backcard3Sprite.x + spacing/2, y: backcard3Sprite.y}
     })
     const profitText = new Text({
         text: "Profit+\nWinnings give\n5% of the bet",
@@ -245,7 +237,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
-        position: {x: profitSprite.x + spacing/2, y: profitSprite.y}
     })
     const profitGoldText = new Text({
         text: "Profit++\nWinnings give\n12% of the bet",
@@ -255,7 +246,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
-        position: {x: profitGoldSprite.x + spacing/2, y: profitGoldSprite.y}
     })
     const endText = new Text({
         text: "The End\nEarn 25k\nto unlock this",
@@ -265,7 +255,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
-        position: {x: endSprite.x + spacing/2, y: endSprite.y}
     })
     const deckCountText = new Text({
         style: {
@@ -274,7 +263,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
-        position: {x: 0, y: spacing}
     })
     const balanceAnimationText = new Text({
         style: {
@@ -293,7 +281,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
-        position: {x: infoCardNumberSprite.x + infoCardNumberSprite.width/2, y: infoCardNumberSprite.y}
     })
     const infoFaceText = new Text({
         text: "Faces: 10",
@@ -303,7 +290,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
-        position: {x: infoCardFaceSprite.x + infoCardFaceSprite.width/2, y: infoCardFaceSprite.y}
     })
     const infoSpecialText = new Text({
         text: "Specials",
@@ -313,7 +299,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
-        position: {x: infoCardSpecialSprite.x + infoCardSpecialSprite.width/2, y: infoCardSpecialSprite.y}
     })
     const hitText = new Text({
         text: "Hit",
@@ -323,7 +308,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: 0.5,
-        position: {x: keyXSprite.x + keyXSprite.width/2 + spacing/2, y: keyXSprite.y}
     });
     const holdText = new Text({
         text: "Hold",
@@ -333,7 +317,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: 0.5,
-        position: {x: keyZSprite.x + keyZSprite.width/2 + spacing/2, y: keyZSprite.y}
     });
     const betUpText = new Text({
         text: "Bet+",
@@ -343,7 +326,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: 0.5,
-        position: {x: keyCSprite.x + keyZSprite.width/2 + spacing/2, y: keyZSprite.y}
     });
     const betDownText = new Text({
         text: "Bet-",
@@ -353,7 +335,6 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: 0.5,
-        position: {x: keyVSprite.x + keyZSprite.width/2 + spacing/2, y: keyZSprite.y}
     });
  
     // Shop items
@@ -705,10 +686,10 @@ import { Table, Player } from "./blackjack";
         hudContainer.scale.set(hudScale);
         hudContainer.position.set(app.screen.width / 2, app.screen.height / 2);
 
-        playerSprite.position.set(-halfWidth + spacing / 6, halfHeight - spacing / 6);
-        playerNameText.position.set(-halfWidth + spacing * 1.12, halfHeight - spacing);
-        playerBalanceText.position.set(-halfWidth + spacing * 1.1, halfHeight - spacing / 1.3);
-        playerBetText.position.set(-halfWidth + spacing * 1.1, halfHeight - spacing / 2);
+        playerSprite.position.set(-halfWidth, halfHeight);
+        playerNameText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing);
+        playerBalanceText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing / 1.3);
+        playerBetText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing / 2);
         dealerSprite.position.set(-halfWidth + spacing / 6, -halfHeight + spacing / 6);
         dealerNameText.position.set(-halfWidth + spacing * 1.12, -halfHeight + spacing / 6);
         shopSprite.position.set(halfWidth - spacing / 6, -halfHeight + spacing / 6);
