@@ -77,7 +77,7 @@ import { Table, Player } from "./blackjack";
     const keyVTexture = await Assets.load({src: "/assets/keyboard_w.png", data: {scaleMode: "nearest"}});
     const keyCTexture = await Assets.load({src: "/assets/keyboard_s.png", data: {scaleMode: "nearest"}});
     const playerTexture = await Assets.load({src: "/assets/playernew.png", data: {scaleMode: "nearest"}});
-    const dealerTexture = await Assets.load({src: "/assets/dealer.png", data: {scaleMode: "nearest"}});
+    const dealerTexture = await Assets.load({src: "/assets/dealernew.png", data: {scaleMode: "nearest"}});
     const shopTexture = await Assets.load({src: "/assets/shop.png", data: {scaleMode: "nearest"}});
     const cardBackTexture = await Assets.load({src: "/assets/card53.png", data: {scaleMode: "nearest"}});
     const cardEmptyTexture1 = await Assets.load({src: "/assets/card59.png", data: {scaleMode: "nearest"}});
@@ -116,24 +116,25 @@ import { Table, Player } from "./blackjack";
     const keyX2Sprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyXTexture, anchor: 0.5, scale: scale/6});
     const keyVSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyVTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
     const keyCSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyCTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
-    const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, scale: scale*1.6});
-    const dealerSprite = new Sprite({texture: dealerTexture, scale: scale/1.6});
+    const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, scale: scale});
+    const dealerSprite = new Sprite({texture: dealerTexture, scale: scale*0.9});
     const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, zIndex: 3});
     const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, alpha: 0.9, scale: scale});
     const cardEmptySprite2 = new Sprite({texture: cardEmptyTexture2, anchor: 0.5, alpha: 0.7, scale: scale});
     const shopSprite = new Sprite({texture: shopTexture, anchor: {x: 1, y: 0}, scale: scale/1.6, eventMode: "static"});
-    const backcard3Sprite = new Sprite({texture: backcard3Texture, anchor: 0.5, scale: scale});
-    const profitSprite = new Sprite({texture: profitTexture, anchor: 0.5, scale: scale});
-    const profitGoldSprite = new Sprite({texture: profitGoldTexture, anchor: 0.5, scale: scale});
-    const endSprite = new Sprite({texture: endTexture, anchor: 0.5, scale: scale});
-    const endVisSprite = new Sprite({texture: endVisTexture, anchor: 0.5, scale: scale, alpha: 0});
-    const infoSprite = new Sprite({texture: infoTexture, anchor: {x: 1, y: 0}, scale: scale/2, eventMode: "static"});
-    const infoBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, scale: scale});
-    const infoCardNumberSprite = new Sprite({texture: infoCardNumberTexture, anchor: 0.5, scale: scale, alpha: 0.6});
-    const infoCardFaceSprite = new Sprite({texture: infoCardFaceTexture, anchor: 0.5, scale: scale, alpha: 0.6});
-    const infoCardSpecialSprite = new Sprite({texture: infoCardSpecialTexture, anchor: 0.5, scale: scale, alpha: 0.6});
+    const backcard3Sprite = new Sprite({texture: backcard3Texture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*0.5}, scale: scale});
+    const profitSprite = new Sprite({texture: profitTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*2}, scale: scale});
+    const profitGoldSprite = new Sprite({texture: profitGoldTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*3.5}, scale: scale});
+    const endSprite = new Sprite({texture: endTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*5}, scale: scale});
+    const endVisSprite = new Sprite({texture: endVisTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*5}, scale: scale, alpha: 0});
+    const infoSprite = new Sprite({texture: infoTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: app.screen.height/2 - spacing*0.8}, scale: scale/2, eventMode: "static"});
+    const infoBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale});
+    const infoCardNumberSprite = new Sprite({texture: infoCardNumberTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing}, scale: scale, alpha: 0.6});
+    const infoCardFaceSprite = new Sprite({texture: infoCardFaceTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing*3}, scale: scale, alpha: 0.6});
+    const infoCardSpecialSprite = new Sprite({texture: infoCardSpecialTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing*5}, scale: scale, alpha: 0.6});
     const cheatBgSprite = new Sprite({texture: cheatBgTexture, anchor: 0.5, scale: scale*2.6, zIndex: -2});
     const playerinfoBgSprite = new Sprite({texture: playerinfoBgTexture, scale: scale*1.4});
+    const dealerinfoBgSprite = new Sprite({texture: playerinfoBgTexture, scale: scale*1.4});
     
     const table = new Table();
     table.GenerateSpriteDeck();
@@ -230,6 +231,7 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
+        position: {x: backcard3Sprite.x + spacing/2, y: backcard3Sprite.y}
     })
     const profitText = new Text({
         text: "Profit+\nWinnings give\n5% of the bet",
@@ -239,6 +241,7 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
+        position: {x: profitSprite.x + spacing/2, y: profitSprite.y}
     })
     const profitGoldText = new Text({
         text: "Profit++\nWinnings give\n12% of the bet",
@@ -248,6 +251,7 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
+        position: {x: profitGoldSprite.x + spacing/2, y: profitGoldSprite.y}
     })
     const endText = new Text({
         text: "The End\nEarn 25k\nto unlock this",
@@ -257,6 +261,7 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
+        position: {x: endSprite.x + spacing/2, y: endSprite.y}
     })
     const deckCountText = new Text({
         style: {
@@ -265,6 +270,7 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
+        position: {x: 0, y: spacing}
     })
     const balanceAnimationText = new Text({
         style: {
@@ -283,6 +289,8 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
+        alpha: 0.6,
+        position: {x: infoCardNumberSprite.x + infoCardNumberSprite.width/2, y: infoCardNumberSprite.y}
     })
     const infoFaceText = new Text({
         text: "Faces: 10",
@@ -292,6 +300,8 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
+        alpha: 0.6,
+        position: {x: infoCardFaceSprite.x + infoCardFaceSprite.width/2, y: infoCardFaceSprite.y}
     })
     const infoSpecialText = new Text({
         text: "Specials",
@@ -301,6 +311,8 @@ import { Table, Player } from "./blackjack";
             fontFamily: "PrimaryFont"
         },
         anchor: {x: 0, y: 0.5},
+        alpha: 0.6,
+        position: {x: infoCardSpecialSprite.x + infoCardSpecialSprite.width/2, y: infoCardSpecialSprite.y}
     })
     const hitText = new Text({
         text: "Hit",
@@ -432,9 +444,9 @@ import { Table, Player } from "./blackjack";
     infoSprite.on("pointertap", () => {
         if (hudContainer.getChildByLabel("infoBg")) {
             const animate = () => {
-                infoContainer.x += app.ticker.deltaMS*scale;
-                if (infoContainer.x >= halfWidth + infoBgSprite.width / 2 + spacing*0.2) {
-                    infoContainer.x = halfWidth + infoBgSprite.width / 2 + spacing*0.2;
+                infoContainer.x -= app.ticker.deltaMS*scale;
+                if (infoContainer.x <= -halfWidth - infoBgSprite.width / 2 - spacing*0.2) {
+                    infoContainer.x = -halfWidth - infoBgSprite.width / 2 - spacing*0.2;
                     app.ticker.remove(animate);
                     hudContainer.removeChild(infoContainer);
                 }
@@ -442,12 +454,12 @@ import { Table, Player } from "./blackjack";
             app.ticker.add(animate);
         }
         else {
-            infoContainer.x = halfWidth + infoBgSprite.width / 2 + spacing*0.2;
+            infoContainer.x = -halfWidth - infoBgSprite.width / 2 - spacing*0.2;
             hudContainer.addChild(infoContainer);
             const animate = () => {
-                infoContainer.x -= app.ticker.deltaMS*scale;
-                if (infoContainer.x <= halfWidth - infoBgSprite.width / 2 - spacing*0.2) {
-                    infoContainer.x = halfWidth - infoBgSprite.width / 2 - spacing*0.2;
+                infoContainer.x += app.ticker.deltaMS*scale;
+                if (infoContainer.x >= -halfWidth + infoBgSprite.width / 2 + spacing*0.2) {
+                    infoContainer.x = -halfWidth + infoBgSprite.width / 2 + spacing*0.2;
                     app.ticker.remove(animate);
                 }
             };
@@ -511,6 +523,9 @@ import { Table, Player } from "./blackjack";
             playerNameText.alpha = 0;
             playerBalanceText.alpha = 0;
             playerBetText.alpha = 0;
+            dealerSprite.alpha = 0;
+            dealerinfoBgSprite.alpha = 0;
+            dealerNameText.alpha = 0;
             keyVSprite.alpha = 0;
             keyCSprite.alpha = 0;
             const animate = () => {
@@ -519,6 +534,9 @@ import { Table, Player } from "./blackjack";
                 playerNameText.alpha += app.ticker.deltaMS/1000;
                 playerBalanceText.alpha += app.ticker.deltaMS/1000
                 playerBetText.alpha += app.ticker.deltaMS/1000;
+                dealerSprite.alpha += app.ticker.deltaMS/1000;
+                dealerinfoBgSprite.alpha += app.ticker.deltaMS/1000;
+                dealerNameText.alpha += app.ticker.deltaMS/1000;
                 keyVSprite.alpha += app.ticker.deltaMS/1000;
                 keyCSprite.alpha += app.ticker.deltaMS/1000;
                 if (playerSprite.alpha >= 1) {
@@ -527,6 +545,9 @@ import { Table, Player } from "./blackjack";
                     playerNameText.alpha = 1;
                     playerBalanceText.alpha = 1;
                     playerBetText.alpha = 1;
+                    dealerSprite.alpha = 1;
+                    dealerinfoBgSprite.alpha = 1;
+                    dealerNameText.alpha = 1;
                     keyVSprite.alpha = 1;
                     keyCSprite.alpha = 1;
                     app.ticker.remove(animate);
@@ -720,16 +741,17 @@ import { Table, Player } from "./blackjack";
         playerNameText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing);
         playerBalanceText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing / 1.3);
         playerBetText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing / 2);
-        dealerSprite.position.set(-halfWidth + spacing / 6, -halfHeight + spacing / 6);
-        dealerNameText.position.set(-halfWidth + spacing * 1.12, -halfHeight + spacing / 6);
-        shopSprite.position.set(halfWidth - spacing / 6, -halfHeight + spacing / 6);
-        infoSprite.position.set(halfWidth - spacing / 6, halfHeight - spacing * 0.8);
-        playerSumText.position.set(0, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing*2);
-        dealerSumText.position.set(0, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4 + spacing);
+        dealerSprite.position.set(halfWidth-dealerSprite.width, -halfHeight);
+        dealerNameText.position.set(dealerSprite.x+dealerSprite.width/2, dealerSprite.y+dealerSprite.height+spacing/2);
+        dealerinfoBgSprite.position.set(dealerNameText.x-spacing/4, dealerNameText.y - dealerNameText.height/3);
+        shopSprite.position.set(halfWidth - spacing / 6, halfHeight - spacing);
+        infoSprite.position.set(-halfWidth + spacing*0.8, -halfHeight+spacing/4);
+        playerSumText.position.set(halfWidth/4, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing*2);
+        dealerSumText.position.set(-halfWidth/4, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4 + spacing);
         playerinfoBgSprite.position.set(playerNameText.x-spacing/4, playerNameText.y - playerNameText.height/3);
 
-        shopContainer.y = shopSprite.y + shopSprite.height + shopBgSprite.height/2 + spacing*0.2;
-        infoContainer.y = infoSprite.y - infoBgSprite.height/2 - spacing*0.2;
+        shopContainer.y = shopSprite.y - shopBgSprite.height/2 - spacing*0.2;
+        infoContainer.y = infoSprite.y + infoBgSprite.height/2 + spacing*0.6;
 
         hudContainer.removeChild(shopContainer, infoContainer);
 
@@ -773,9 +795,9 @@ import { Table, Player } from "./blackjack";
             hitText.position.set(player.deck.length * spacing / 1.4 + spacing*0.5, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing - scale); 
             holdText.position.set(dealer.deck.length * spacing / 1.4 + spacing*0.7, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4 - scale);
         }
-
-        keyXSprite.position.set(player.deck.length * spacing / 1.4, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing); 
-        keyZSprite.position.set(dealer.deck.length * spacing / 1.4, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4);
+        //-(target.deck.length - 1) * spacing / 2 + i * spacing + (target === player ? halfWidth/3 : -halfWidth/4);
+        keyXSprite.position.set((halfWidth / 4 -  spacing * (player.deck.length - 1) / 2)+(spacing * (player.deck.length - 1)) + spacing*1.6, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing); 
+        keyZSprite.position.set((-halfWidth / 4 -  spacing * (dealer.deck.length - 1) / 2)+(spacing * (dealer.deck.length - 1)) + spacing, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4);
     }
 
     document.addEventListener("keydown", (event) => {
@@ -798,18 +820,33 @@ import { Table, Player } from "./blackjack";
                 playerNameText.alpha = 0;
                 playerBalanceText.alpha = 0;
                 playerBetText.alpha = 0;
+                dealerSprite.alpha = 0;
+                dealerinfoBgSprite.alpha = 0;
+                dealerNameText.alpha = 0;
+                keyVSprite.alpha = 0;
+                keyCSprite.alpha = 0;
                 const animate = () => {
                     playerSprite.alpha += app.ticker.deltaMS/1000;
                     playerinfoBgSprite.alpha += app.ticker.deltaMS/1000;
                     playerNameText.alpha += app.ticker.deltaMS/1000;
                     playerBalanceText.alpha += app.ticker.deltaMS/1000
                     playerBetText.alpha += app.ticker.deltaMS/1000;
+                    dealerSprite.alpha += app.ticker.deltaMS/1000;
+                    dealerinfoBgSprite.alpha += app.ticker.deltaMS/1000;
+                    dealerNameText.alpha += app.ticker.deltaMS/1000;
+                    keyVSprite.alpha += app.ticker.deltaMS/1000;
+                    keyCSprite.alpha += app.ticker.deltaMS/1000;
                     if (playerSprite.alpha >= 1) {
                         playerSprite.alpha = 1;
                         playerinfoBgSprite.alpha = 1;
                         playerNameText.alpha = 1;
                         playerBalanceText.alpha = 1;
                         playerBetText.alpha = 1;
+                        dealerSprite.alpha = 1;
+                        dealerinfoBgSprite.alpha = 1;
+                        dealerNameText.alpha = 1;
+                        keyVSprite.alpha = 1;
+                        keyCSprite.alpha = 1;
                         app.ticker.remove(animate);
                     }
                 };
@@ -956,9 +993,7 @@ import { Table, Player } from "./blackjack";
                 continue;
             }
 
-            const targetX =
-                -(target.deck.length - 1) * spacing / 2 + i * spacing;
-
+            const targetX = -(target.deck.length - 1) * spacing / 2 + i * spacing + (target === player ? halfWidth/4 : -halfWidth/4);
             const targetY = target === player ? cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing : cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4;
 
             if (card.sprite.parent !== gameContainer) gameContainer.addChild(card.sprite);
@@ -986,7 +1021,7 @@ import { Table, Player } from "./blackjack";
         cardBackSprite.scale.set(scale);
         cardBackSprite.alpha = 1;
 
-        const targetX = -(dealer.deck.length - 1) * spacing / 2;
+        const targetX = -(dealer.deck.length - 1) * spacing / 2 - halfWidth/4;
         const targetY = cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4;
 
         if (!cardBackSprite.parent) {
@@ -1175,7 +1210,7 @@ import { Table, Player } from "./blackjack";
                 dealerSumText.eventMode = "none";
                 gameContainer.removeChild(cardBackSprite, cheatBgSprite);
                 gameContainer.addChild(playerSumText, dealerSumText)
-                hudContainer.addChild(playerinfoBgSprite, playerSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, centerText, keyVSprite, keyCSprite, infoSprite, playerBalanceText, playerBetText);
+                hudContainer.addChild(playerinfoBgSprite, playerSprite, dealerinfoBgSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, centerText, keyVSprite, keyCSprite, infoSprite, playerBalanceText, playerBetText);
                 if (isMobile.phone) hudContainer.addChild(betUpText, betDownText);
                 shopSprite.alpha = 1;
 
