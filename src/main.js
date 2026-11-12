@@ -726,7 +726,7 @@ import { Table, Player } from "./blackjack";
         desktopScaleBoost = isMobile.phone ? 1 : 1.25;
 
         gameScale = Math.min(app.screen.width / BASE_WIDTH * 0.6, app.screen.height / BASE_HEIGHT * 0.4) * desktopScaleBoost*portraitBoost;
-        hudScale = gameScale;
+        hudScale = isMobile.phone ? gameScale*0.8 : gameScale;
 
         halfWidth = app.screen.width / hudScale / 2;
         halfHeight = app.screen.height / hudScale / 2;
@@ -737,12 +737,14 @@ import { Table, Player } from "./blackjack";
         hudContainer.scale.set(hudScale);
         hudContainer.position.set(app.screen.width / 2, app.screen.height / 2);
 
+        
+
         playerSprite.position.set(-halfWidth, halfHeight);
         playerNameText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing);
         playerBalanceText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing / 1.3);
         playerBetText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing / 2);
         dealerSprite.position.set(halfWidth-dealerSprite.width, -halfHeight);
-        dealerNameText.position.set(dealerSprite.x+dealerSprite.width/2, dealerSprite.y+dealerSprite.height+spacing/2);
+        dealerNameText.position.set(dealerSprite.x+dealerinfoBgSprite.width/2, dealerSprite.y+dealerSprite.height+spacing/2);
         dealerinfoBgSprite.position.set(dealerNameText.x-spacing/4, dealerNameText.y - dealerNameText.height/3);
         shopSprite.position.set(halfWidth - spacing / 6, halfHeight - spacing);
         infoSprite.position.set(-halfWidth + spacing*0.8, -halfHeight+spacing/4);
@@ -788,15 +790,15 @@ import { Table, Player } from "./blackjack";
             keyCSprite.position.set(keyStartX + keyVSprite.width/2 + spacing/8, keyY);
         }
         if (isMobile.phone) {
-            keyVSprite.position.set(-spacing, shopSprite.y + shopSprite.height/2);
-            keyCSprite.position.set(spacing, shopSprite.y + shopSprite.height/2);
-            betUpText.position.set(keyVSprite.x+spacing/2, keyVSprite.y); 
-            betDownText.position.set(keyCSprite.x+spacing/2, keyCSprite.y);
-            hitText.position.set(player.deck.length * spacing / 1.4 + spacing*0.5, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing - scale); 
-            holdText.position.set(dealer.deck.length * spacing / 1.4 + spacing*0.7, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4 - scale);
+            keyVSprite.position.set(infoSprite.x+spacing, infoSprite.y + infoSprite.height/2);
+            keyCSprite.position.set(infoSprite.x+spacing*3, infoSprite.y + infoSprite.height/2);
+            betUpText.position.set(keyVSprite.x+spacing/2, infoSprite.y + infoSprite.height/2); 
+            betDownText.position.set(keyCSprite.x+spacing/2, infoSprite.y + infoSprite.height/2);
+            hitText.position.set((halfWidth / 4 -  spacing * (player.deck.length - 1) / 2)+(spacing * (player.deck.length - 1)) + spacing*1.6, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing - scale); 
+            holdText.position.set((-halfWidth / 4 -  spacing * (dealer.deck.length - 1) / 2)+(spacing * (dealer.deck.length - 1)) + spacing*1.8, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4 - scale);
         }
         //-(target.deck.length - 1) * spacing / 2 + i * spacing + (target === player ? halfWidth/3 : -halfWidth/4);
-        keyXSprite.position.set((halfWidth / 4 -  spacing * (player.deck.length - 1) / 2)+(spacing * (player.deck.length - 1)) + spacing*1.6, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing); 
+        keyXSprite.position.set((halfWidth / 4 -  spacing * (player.deck.length - 1) / 2)+(spacing * (player.deck.length - 1)) + spacing, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing); 
         keyZSprite.position.set((-halfWidth / 4 -  spacing * (dealer.deck.length - 1) / 2)+(spacing * (dealer.deck.length - 1)) + spacing, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4);
     }
 
