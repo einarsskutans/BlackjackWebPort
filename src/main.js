@@ -71,6 +71,7 @@ import { Table, Player } from "./blackjack";
         zIndex: 10
     });
 
+    const backgroundTexture = await Assets.load({src: "/assets/background.png", data: {scaleMode: "nearest"}}); 
     const shopBgTexture = await Assets.load({src: "/assets/shopbg.png", data: {scaleMode: "nearest"}});
     const keyZTexture = await Assets.load({src: "/assets/keyboard_z.png", data: {scaleMode: "nearest"}});
     const keyXTexture = await Assets.load({src: "/assets/keyboard_x.png", data: {scaleMode: "nearest"}});
@@ -99,6 +100,7 @@ import { Table, Player } from "./blackjack";
     const cheatBgTexture = await Assets.load({src: "/assets/cheatBg.png", data: {scaleMode: "nearest"}});
     const pointerTexture = await Assets.load({src: "/assets/touch_one.png", data: {scaleMode: "nearest"}});
     const playerinfoBgTexture = await Assets.load({src: "/assets/playerInfoBg.png", data: {scaleMode: "nearest"}});
+    const playernewextendTexture = await Assets.load({src: "/assets/playernewextend.png", data: {scaleMode: "nearest"}});
     const cardL1Textures = [];
     for (let i = 0; i < 8; i++) {
         const texture = await Assets.load({src: `/assets/CardL1/cardL1_${i+1}.png`, data: {scaleMode: "nearest"}});
@@ -110,13 +112,14 @@ import { Table, Player } from "./blackjack";
         cardL2Textures.push(texture);
     }
 
-    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, scale: scale})
+    const backgroundSprite = new Sprite({texture: backgroundTexture, anchor: 0.5});
+    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, scale: scale});
     const keyZSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyZTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/6});
     const keyXSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyXTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/6});
     const keyX2Sprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyXTexture, anchor: 0.5, scale: scale/6});
     const keyVSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyVTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
     const keyCSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyCTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
-    const playerSprite = new Sprite({texture: playerTexture, anchor: {x: 0, y: 1}, scale: scale});
+    const playerSprite = new Sprite({texture: isMobile.phone ? playernewextendTexture : playerTexture, anchor: {x: 0, y: 1}, scale: scale});
     const dealerSprite = new Sprite({texture: dealerTexture, scale: scale*0.9});
     const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, zIndex: 3});
     const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, alpha: 0.9, scale: scale});
@@ -737,7 +740,8 @@ import { Table, Player } from "./blackjack";
         hudContainer.scale.set(hudScale);
         hudContainer.position.set(app.screen.width / 2, app.screen.height / 2);
 
-        
+        backgroundSprite.width = app.screen.width/gameScale;
+        backgroundSprite.height = app.screen.height/gameScale;
 
         playerSprite.position.set(-halfWidth, halfHeight);
         playerNameText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing);
@@ -1157,6 +1161,7 @@ import { Table, Player } from "./blackjack";
                 }
                 gameContainer.removeChildren();
                 hudContainer.removeChildren();
+                if (!isMobile.phone) gameContainer.addChild(backgroundSprite);
 
                 if (player.balance <= 0) {
                     localStorage.setItem(`${player.name}.save`, 0);
