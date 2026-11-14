@@ -132,9 +132,9 @@ import { Table, Player } from "./blackjack";
     const endVisSprite = new Sprite({texture: endVisTexture, anchor: 0.5, position: {x: -shopBgSprite.width/2 + spacing/2, y: -shopBgSprite.height/2 + spacing*5}, scale: scale, alpha: 0});
     const infoSprite = new Sprite({texture: infoTexture, anchor: {x: 1, y: 0}, position: {x: app.screen.width/2 - spacing/6, y: app.screen.height/2 - spacing*0.8}, scale: scale/2, eventMode: "static"});
     const infoBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, position: {x: 0, y: 0}, scale: scale});
-    const infoCardNumberSprite = new Sprite({texture: infoCardNumberTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing}, scale: scale, alpha: 0.6});
-    const infoCardFaceSprite = new Sprite({texture: infoCardFaceTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing*3}, scale: scale, alpha: 0.6});
-    const infoCardSpecialSprite = new Sprite({texture: infoCardSpecialTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing*5}, scale: scale, alpha: 0.6});
+    const infoCardNumberSprite = new Sprite({texture: infoCardNumberTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing*2.2}, scale: scale*0.8, alpha: 0.8});
+    const infoCardFaceSprite = new Sprite({texture: infoCardFaceTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing*3.6}, scale: scale*0.8, alpha: 0.8});
+    const infoCardSpecialSprite = new Sprite({texture: infoCardSpecialTexture, anchor: 0.5, position: {x: -infoBgSprite.width/2 + spacing*.8, y: -infoBgSprite.height/2 + spacing*5}, scale: scale*0.8, alpha: 0.8});
     const cheatBgSprite = new Sprite({texture: cheatBgTexture, anchor: 0.5, scale: scale*2.6, zIndex: -2});
     const playerinfoBgSprite = new Sprite({texture: playerinfoBgTexture, scale: scale*1.4});
     const dealerinfoBgSprite = new Sprite({texture: playerinfoBgTexture, scale: scale});
@@ -353,6 +353,17 @@ import { Table, Player } from "./blackjack";
         },
         anchor: 0.5,
     });
+    const infoText = new Text({
+        text: "A Game of blackjack -\nin which you mustn't\ngo over 21",
+        style: {
+            fill: "#FFFFFF",
+            fontSize: Math.round(scale * 5),
+            fontFamily: "PrimaryFont"
+        },
+        anchor: 0.5,
+        alpha: 0.8,
+        position: {x: 0, y: -infoBgSprite.height/2+spacing*0.8}
+    });
  
     // Shop items
     const ITEMS = {
@@ -441,7 +452,7 @@ import { Table, Player } from "./blackjack";
         },
     };
 
-    infoContainer.addChild(infoBgSprite, infoCardFaceSprite, infoCardNumberSprite, infoCardSpecialSprite, infoNumberText, infoFaceText, infoSpecialText);
+    infoContainer.addChild(infoBgSprite, infoCardFaceSprite, infoCardNumberSprite, infoCardSpecialSprite, infoNumberText, infoFaceText, infoSpecialText, infoText);
     infoSprite.on("pointerover", () => {infoSprite.alpha = 0.4;});
     infoSprite.on("pointerout", () => {if (gamestate === "BET")infoSprite.alpha = 1;});
     infoSprite.on("pointertap", () => {
