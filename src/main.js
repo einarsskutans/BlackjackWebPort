@@ -111,7 +111,7 @@ import { Table, Player } from "./blackjack";
         cardL2Textures.push(texture);
     }
     const playerTextures = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 6; i++) {
         const texture = await Assets.load({src: `/assets/player/P000${i+1}.png`, data: {scaleMode: "nearest"}});
         playerTextures.push(texture);
     }
