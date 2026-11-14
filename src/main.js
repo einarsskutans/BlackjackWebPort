@@ -110,6 +110,11 @@ import { Table, Player } from "./blackjack";
         const texture = await Assets.load({src: `/assets/CardL2/cardL2_${i+1}.png`, data: {scaleMode: "nearest"}});
         cardL2Textures.push(texture);
     }
+    const playerTextures = [];
+    for (let i = 0; i < 4; i++) {
+        const texture = await Assets.load({src: `/assets/player/P000${i+1}.png`, data: {scaleMode: "nearest"}});
+        playerTextures.push(texture);
+    }
 
     const backgroundSprite = new Sprite({texture: backgroundTexture, anchor: 0.5, zIndex: -100});
     const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, scale: scale});
@@ -118,7 +123,7 @@ import { Table, Player } from "./blackjack";
     const keyX2Sprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyXTexture, anchor: 0.5, scale: scale/6});
     const keyVSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyVTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
     const keyCSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyCTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
-    const playerSprite = new Sprite({texture: isMobile.phone ? playernewextendTexture : playerTexture, anchor: {x: 0, y: 1}, scale: scale});
+    const playerSprite = new AnimatedSprite({textures: playerTextures, anchor: {x: 0, y: 1}, scale: scale, animationSpeed: 0.08});
     const dealerSprite = new Sprite({texture: dealerTexture, scale: scale*0.9});
     let dealerSpriteDefaultY = dealerSprite.y;
     const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, zIndex: 3});
@@ -1224,6 +1229,7 @@ import { Table, Player } from "./blackjack";
                 gameContainer.removeChild(cardBackSprite, cheatBgSprite);
                 gameContainer.addChild(playerSumText, dealerSumText)
                 hudContainer.addChild(playerinfoBgSprite, playerSprite, dealerinfoBgSprite, dealerSprite, shopSprite, playerNameText, dealerNameText, keyX2Sprite, centerText, keyVSprite, keyCSprite, infoSprite, playerBalanceText, playerBetText);
+                playerSprite.play();
                 if (isMobile.phone) hudContainer.addChild(betUpText, betDownText);
                 shopSprite.alpha = 1;
 
