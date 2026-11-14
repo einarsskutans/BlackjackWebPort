@@ -112,7 +112,7 @@ import { Table, Player } from "./blackjack";
     }
     const playerTextures = [];
     for (let i = 0; i < 6; i++) {
-        const texture = await Assets.load({src: `/assets/player/P000${i+1}.png`, data: {scaleMode: "nearest"}});
+        const texture = await Assets.load({src: isMobile.phone ? `/assets/player/M000${i+1}.png` : `/assets/player/P000${i+1}.png`, data: {scaleMode: "nearest"}});
         playerTextures.push(texture);
     }
 
