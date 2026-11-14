@@ -92,7 +92,6 @@ import { Table, Player } from "./blackjack";
     const profitGoldTexture = await Assets.load({src: "/assets/upProfitGold.png", data: {scaleMode: "nearest"}});
     const endTexture = await Assets.load({src: "/assets/upEnd.png", data: {scaleMode: "nearest"}});
     const endVisTexture = await Assets.load({src: "/assets/upEndVis.png", data: {scaleMode: "nearest"}});
-    const heartTexture = await Assets.load({src: "/assets/heart.png", data: {scaleMode: "nearest"}});
     const infoTexture = await Assets.load({src: "/assets/flair_small_info.png", data: {scaleMode: "nearest"}});
     const infoCardNumberTexture = await Assets.load({src: "/assets/card3.png", data: {scaleMode: "nearest"}});
     const infoCardFaceTexture = await Assets.load({src: "/assets/card52.png", data: {scaleMode: "nearest"}});
@@ -112,7 +111,7 @@ import { Table, Player } from "./blackjack";
         cardL2Textures.push(texture);
     }
 
-    const backgroundSprite = new Sprite({texture: backgroundTexture, anchor: 0.5});
+    const backgroundSprite = new Sprite({texture: backgroundTexture, anchor: 0.5, zIndex: -100});
     const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, scale: scale});
     const keyZSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyZTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/6});
     const keyXSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyXTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/6});
@@ -121,6 +120,7 @@ import { Table, Player } from "./blackjack";
     const keyCSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyCTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
     const playerSprite = new Sprite({texture: isMobile.phone ? playernewextendTexture : playerTexture, anchor: {x: 0, y: 1}, scale: scale});
     const dealerSprite = new Sprite({texture: dealerTexture, scale: scale*0.9});
+    let dealerSpriteDefaultY = dealerSprite.y;
     const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, zIndex: 3});
     const cardEmptySprite1 = new Sprite({texture: cardEmptyTexture1, anchor: 0.5, alpha: 0.9, scale: scale});
     const cardEmptySprite2 = new Sprite({texture: cardEmptyTexture2, anchor: 0.5, alpha: 0.7, scale: scale});
@@ -700,29 +700,6 @@ import { Table, Player } from "./blackjack";
         updateButtonColor(itemID);
     }
 
-    const hearts = [];
-    function drawHearts(x, y, amount, maxAmount) {
-        for (const sprite of hearts) {
-            hudContainer.removeChild(sprite);
-            sprite.destroy();
-        }
-
-        for (let i = 1; i <= maxAmount; i++) {
-            const heartSprite = new Sprite({
-                texture: heartTexture,
-                anchor: 0.5,
-                position: {x: x + spacing*0.25 * i, y: y}, scale: scale*0.8});
-
-            if (i > amount) {
-                heartSprite.alpha = 0.2;
-            }
-            else heartSprite.alpha = 1;
-
-            hearts.push(heartSprite);
-            hudContainer.addChild(heartSprite);
-        }
-    }
-
     window.addEventListener("resize", reSize);
     function reSize() {
         portraitBoost = isMobile.phone ? 2.25 : 1;
@@ -748,6 +725,7 @@ import { Table, Player } from "./blackjack";
         playerBalanceText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing / 1.3);
         playerBetText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing / 2);
         dealerSprite.position.set(halfWidth-dealerSprite.width, -halfHeight);
+        dealerSpriteDefaultY = -halfHeight;
         dealerNameText.position.set(dealerSprite.x-dealerSprite.width/4, -halfHeight + spacing);
         dealerinfoBgSprite.position.set(dealerNameText.x-spacing/4, dealerNameText.y - dealerNameText.height/6);
         shopSprite.position.set(halfWidth - spacing / 6, halfHeight - spacing);
@@ -755,6 +733,7 @@ import { Table, Player } from "./blackjack";
         playerSumText.position.set(halfWidth/4, cheatBgSprite.position.y + cheatBgSprite.height/2 + spacing*2);
         dealerSumText.position.set(-halfWidth/4, cheatBgSprite.position.y - cheatBgSprite.height/2 - spacing*1.4 + spacing);
         playerinfoBgSprite.position.set(playerNameText.x-spacing/4, playerNameText.y - playerNameText.height/3);
+        shopText.position.set(shopBgSprite.x-shopBgSprite.width/2 + spacing/2, shopBgSprite.y-shopBgSprite.height/2 - spacing/4);
 
         shopContainer.y = shopSprite.y - shopBgSprite.height/2 - spacing*0.2;
         infoContainer.y = infoSprite.y + infoBgSprite.height/2 + spacing*0.6;
@@ -906,6 +885,22 @@ import { Table, Player } from "./blackjack";
     window.addEventListener("focus", () => {
         app.canvas.focus();
     });
+    let bobDirection = -1;
+
+    const animateDealerBob = () => {
+        dealerSprite.y += bobDirection * app.ticker.deltaMS/100;
+        dealerNameText.y += bobDirection * app.ticker.deltaMS/100;
+        dealerinfoBgSprite.y += bobDirection * app.ticker.deltaMS/100;
+        if (dealerSprite.y <= dealerSpriteDefaultY - 24) {
+            dealerSprite.y = dealerSpriteDefaultY - 24;
+            bobDirection = 1;
+        } else if (dealerSprite.y >= dealerSpriteDefaultY) {
+            dealerSprite.y = dealerSpriteDefaultY;
+            bobDirection = -1;
+        }
+    };
+
+    app.ticker.add(animateDealerBob);
 
     let elapsed = 0;
     let sleep = 0;
@@ -1239,7 +1234,6 @@ import { Table, Player } from "./blackjack";
                     endSprite.alpha = 0;
                     endText.text = "Kill\nEnd dealer's life";
                 }
-                if (player.inventory.kill > 0 && player.endgame != 2) drawHearts(dealerSprite.x+dealerSprite.width, dealerSprite.y+dealerSprite.height-scale*4, dealer.hp, 3);
 
                 gamestate = "BET";
 
@@ -1285,13 +1279,10 @@ import { Table, Player } from "./blackjack";
 
                 drawDealerBackCard();
 
-                if (cheat) drawDeckCards(0, spacing/2);
+                if (cheat) drawDeckCards(0, spacing/4);
 
                 if (player.endgame == 2) {
-                    drawDeckCards(0, spacing/2);
-                    if (hearts.length != 0) {
-                        for (let heart of hearts) hudContainer.removeChild(heart);
-                    }
+                    drawDeckCards(0, spacing/4);
                 }
                 playerSumText.text = player.GetDeckSum();
                 dealerSumText.text = dealer.deck[1].gameValue + "+";
@@ -1479,7 +1470,16 @@ import { Table, Player } from "./blackjack";
                 
                 if (player.inventory.kill > 0 && player.endgame != 2) {
                     dealer.hp -= 1;
-                    drawHearts(dealerSprite.x+dealerSprite.width, dealerSprite.y+dealerSprite.height-scale*4, dealer.hp, 3);
+                    let dmgTick = 0;
+                    dealerSprite.tint = "red";
+                    const animateDealerDmg = () => {
+                        dmgTick += app.ticker.deltaMS;
+                        if (dmgTick > 200) {
+                            dealerSprite.tint = "white";
+                            app.ticker.remove(animateDealerDmg);
+                        }
+                    };
+                    app.ticker.add(animateDealerDmg);
                     if (dealer.hp <= 0) {
                         gamestate = "MERCY";
                         break;
@@ -1516,7 +1516,6 @@ import { Table, Player } from "./blackjack";
             case "SPECIAL_CARD":
                 break;
             case "LOOP":
-                if (player.inventory.kill > 0 && player.endgame != 2) drawHearts(dealerSprite.x+dealerSprite.width, dealerSprite.y+dealerSprite.height-scale*4, dealer.hp, 3);
                 break;
   
             default:
