@@ -123,7 +123,7 @@ import { Table, Player } from "./blackjack";
     const keyX2Sprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyXTexture, anchor: 0.5, scale: scale/6});
     const keyVSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyVTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
     const keyCSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyCTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
-    const playerSprite = new AnimatedSprite({textures: playerTextures, anchor: {x: 0, y: 1}, scale: scale, animationSpeed: 0.08});
+    const playerSprite = new AnimatedSprite({textures: playerTextures, anchor: {x: 0, y: 1}, scale: scale, animationSpeed: 0.1});
     const dealerSprite = new Sprite({texture: dealerTexture, scale: scale*0.9});
     let dealerSpriteDefaultY = dealerSprite.y;
     const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, zIndex: 3});
