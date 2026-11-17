@@ -111,7 +111,7 @@ import { Table, Player } from "./blackjack";
         cardL2Textures.push(texture);
     }
     const playerTextures = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 4; i++) {
         const texture = await Assets.load({src: isMobile.phone ? `/assets/player/M000${i+1}.png` : `/assets/player/P000${i+1}.png`, data: {scaleMode: "nearest"}});
         playerTextures.push(texture);
     }
@@ -123,7 +123,7 @@ import { Table, Player } from "./blackjack";
     const keyX2Sprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyXTexture, anchor: 0.5, scale: scale/6});
     const keyVSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyVTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
     const keyCSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyCTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/8, eventMode: "static"});
-    const playerSprite = new AnimatedSprite({textures: playerTextures, anchor: {x: 0, y: 1}, scale: scale, animationSpeed: 0.1});
+    const playerSprite = new AnimatedSprite({textures: playerTextures, anchor: {x: 0, y: 1}, scale: scale*1.4, animationSpeed: 0.12});
     const dealerSprite = new Sprite({texture: dealerTexture, scale: scale*0.9});
     let dealerSpriteDefaultY = dealerSprite.y;
     const cardBackSprite = new Sprite({texture: cardBackTexture, anchor: 0.5, zIndex: 3});
@@ -737,9 +737,9 @@ import { Table, Player } from "./blackjack";
         backgroundSprite.height = app.screen.height/gameScale;
 
         playerSprite.position.set(-halfWidth, halfHeight);
-        playerNameText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing);
-        playerBalanceText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing / 1.3);
-        playerBetText.position.set(playerSprite.x+playerSprite.width-spacing, halfHeight - spacing / 2);
+        playerNameText.position.set(playerSprite.x+playerSprite.width-spacing*1.4, halfHeight - spacing);
+        playerBalanceText.position.set(playerSprite.x+playerSprite.width-spacing*1.4, halfHeight - spacing / 1.3);
+        playerBetText.position.set(playerSprite.x+playerSprite.width-spacing*1.4, halfHeight - spacing / 2);
         dealerSprite.position.set(halfWidth-dealerSprite.width, -halfHeight);
         dealerSpriteDefaultY = -halfHeight;
         dealerNameText.position.set(dealerSprite.x-dealerSprite.width/4, -halfHeight + spacing);
