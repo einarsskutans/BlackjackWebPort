@@ -112,12 +112,12 @@ import { Table, Player } from "./blackjack";
     }
     const playerTextures = [];
     for (let i = 0; i < 4; i++) {
-        const texture = await Assets.load({src: isMobile.phone ? `/assets/player/M000${i+1}.png` : `/assets/player/P000${i+1}.png`, data: {scaleMode: "nearest"}});
+        const texture = await Assets.load({src: isMobile.phone ? `/assets/player/P000${i+1}.png` : `/assets/player/P000${i+1}.png`, data: {scaleMode: "nearest"}});
         playerTextures.push(texture);
     }
 
     const backgroundSprite = new Sprite({texture: backgroundTexture, anchor: 0.5, zIndex: -100});
-    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, scale: scale});
+    const shopBgSprite = new Sprite({texture: shopBgTexture, anchor: 0.5, scale: scale, eventMode: "static"});
     const keyZSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyZTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/6});
     const keyXSprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyXTexture, anchor: 0.5, scale: isMobile.phone ? scale/4 : scale/6});
     const keyX2Sprite = new Sprite({texture: isMobile.phone ? pointerTexture : keyXTexture, anchor: 0.5, scale: scale/6});
